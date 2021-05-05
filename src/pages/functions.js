@@ -764,7 +764,7 @@ const getChat = (num, id, func) =>{
   
   const sendChat = ( id, mes) =>{
     return new Promise((resolve, reject)=>{
-        data.ref("chat").child(id).push({message: mes, who: 'user', date: new Date().toString(), readbya: false}).then((d)=>{
+        data.ref("chat").child(id).push({message: mes, who: 'user', date: new Date().toString(), readbya: false, readbyu:true}).then((d)=>{
             resolve(true);
         })
     });
@@ -1056,4 +1056,9 @@ const getAllUnread = (id) =>{
     })
 }
 
-export {getAllUnread, readAll, checkIfItemisBought, checkk, checkifincart, getData2, cancelorderR, updateAdvStatus, getUpdatedHistory2, checkLastKey, viewHistory2,updateCartData, addAdvanceOrderList, checkCart, getType, getCartLength, setPrimaryAddress, removeAddress, addAddress, getProductComments, addComment, getProductData, deleteDownAdvReceipt, addDownAdvReceipt, addAdvReceipt,deleteAdvReceipt, getCurrOrder, newMessage, getChat, sendChat, deleteReceipt, addReceipt, checkDate, getAdvanceOrder, NumberFormat,getData, waitloop, updatePass, checkCode, checkIfEmailExist, cancelorder, updateStatus,getUpdatedHistory, viewHistory, updateACCOUNT, addImage, checkPasswordIfCorrect, deletePROFPIC, getAccountDetails, sendContact,checkIfAcctExist, getHistory, updateCart, removeAllCart,addLogs, todaydate, addCart, Reservation, generateCode, endDateofVerification, getCartData, deleteITM, buyItems};
+
+const recLogin  = (id) =>{
+    data.ref("accounts").child(id).update({recent: new Date().toString()});
+}
+
+export {recLogin, getAllUnread, readAll, checkIfItemisBought, checkk, checkifincart, getData2, cancelorderR, updateAdvStatus, getUpdatedHistory2, checkLastKey, viewHistory2,updateCartData, addAdvanceOrderList, checkCart, getType, getCartLength, setPrimaryAddress, removeAddress, addAddress, getProductComments, addComment, getProductData, deleteDownAdvReceipt, addDownAdvReceipt, addAdvReceipt,deleteAdvReceipt, getCurrOrder, newMessage, getChat, sendChat, deleteReceipt, addReceipt, checkDate, getAdvanceOrder, NumberFormat,getData, waitloop, updatePass, checkCode, checkIfEmailExist, cancelorder, updateStatus,getUpdatedHistory, viewHistory, updateACCOUNT, addImage, checkPasswordIfCorrect, deletePROFPIC, getAccountDetails, sendContact,checkIfAcctExist, getHistory, updateCart, removeAllCart,addLogs, todaydate, addCart, Reservation, generateCode, endDateofVerification, getCartData, deleteITM, buyItems};

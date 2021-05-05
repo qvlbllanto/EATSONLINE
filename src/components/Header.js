@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { useHistory, Link } from "react-router-dom";
-import {getAccountDetails, getUpdatedHistory, getCartLength, getUpdatedHistory2} from '../pages/functions.js';
+import {recLogin, getAccountDetails, getUpdatedHistory, getCartLength, getUpdatedHistory2} from '../pages/functions.js';
 import Chat from "../pages/Chat.js";
 
 const Header = (props) =>{
@@ -13,9 +13,9 @@ const Header = (props) =>{
     const down = false;
     const [ch, setCh] = useState(false);
 
-
     React.useEffect(()=>{
         if(!ch){
+            recLogin(props.idnum);
             const script = document.createElement("script");
             script.src = process.env.PUBLIC_URL + "/assets/js/main.js";
             script.async = true;
@@ -25,6 +25,7 @@ const Header = (props) =>{
 
         if(props.logedin && props.legitkey===true){
         const timer = setTimeout(() => {
+            
             getAccountDetails(props.idnum).then((d)=>{
                 setAccountD(d);
             });
@@ -37,9 +38,14 @@ const Header = (props) =>{
             getCartLength(props.idnum).then((d)=>{
                 setCart(d);
             })
+            const timer = setTimeout(() => {
+                recLogin(props.idnum);
+            }, 10000);
+            return () => clearTimeout(timer);
           }, 200);
           return () => clearTimeout(timer);
         }
+        
     });
   
     const goLogin = () =>{

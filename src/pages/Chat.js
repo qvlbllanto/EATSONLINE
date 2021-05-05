@@ -27,7 +27,10 @@ const Chat = (props) =>{
         
     const handleNewUserMessage = (e, newMessage) => {
       e.preventDefault();
-        sendChat(props.idnum, val);
+        sendChat(props.idnum, val).then(()=>{
+            document.getElementById('chatsss').value="";
+            document.getElementById("messages23").scrollTop = document.getElementById("messages23").scrollHeight;
+        })
     }
 
 
@@ -47,7 +50,8 @@ const Chat = (props) =>{
   });
   const r = () =>{
     readAll(props.idnum, num); 
-    document.getElementById("pop").style.display="flex"
+    document.getElementById("pop").style.display="flex";
+    
   }
     return(
       
@@ -81,7 +85,7 @@ const Chat = (props) =>{
                 <form onSubmit={handleNewUserMessage}>
                 <div className="input-area">
                     <button className="button" style={{color: '&#128206', width: '50px', borderRadius: '5px', fontSize: '20px'}}>&#x1F4CE;</button>  &nbsp;
-                    <input type="text" className="form-control" onClick={()=>readAll(props.idnum, num)} onChange={(e)=>{readAll(props.idnum, num); setVal(e.target.value)}} placeholder="Type here ..."/>
+                    <input type="text" className="form-control" id='chatsss' onClick={()=>readAll(props.idnum, num)} onChange={(e)=>{readAll(props.idnum, num); setVal(e.target.value)}} placeholder="Type here ..."/>
                     <button className="submit" style={{color: 'black', backgroundColor: 'red'}}> <i className="material-icons"> send</i></button>
                     
                 </div>
