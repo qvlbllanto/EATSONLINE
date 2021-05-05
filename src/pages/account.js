@@ -422,6 +422,7 @@ const Account = (props)=>{
                        {address.map((d, i)=>{
                            return(<div key={i}>
                                <input key={i} readOnly={true} className="form-control" value={d[1].address} style={{borderWidth: '0', height:'auto', marginBottom: '12px'}} />
+                               <h5 style={{color: 'black', marginLeft: '18px' , textDecoration: 'underline'}}>Edit</h5>
                                {d[1].primary?<h5 style={{color: 'black', textAlign: 'end'}}>Primary Address</h5>
                                :<h5 style={{color: 'black', textAlign: 'end'}}>
                                    <span onClick = {()=>setPrimaryAddress(props.idnum, address[primaryindex][0], d[0])}style={{cursor: 'pointer', color: 'black',  textDecoration: 'underline'}} onMouseOver={(e)=>{e.target.style.color="blue"}} onMouseOut={(e)=>{e.target.style.color="black"}} >Set as Primary address</span> 

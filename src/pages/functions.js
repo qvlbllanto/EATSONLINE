@@ -1004,7 +1004,7 @@ const checkk = async(v,id)=>{
                 }
             })
         }catch(e){
-            resolve(e);
+            resolve(false);
         }
         
     })
