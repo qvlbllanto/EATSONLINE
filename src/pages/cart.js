@@ -168,7 +168,7 @@ const Cart = (props)=>{
                                 reso([true]);
                             });
                             }else{
-                                buyItems(ca, amount, props.idnum, props.vals,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
+                                buyItems(ca, amount, props.idnum, accountD.name,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
                                     if(x[0]){
                                         props.setAID(false);
                                         props.cart(x[1]);
@@ -399,7 +399,7 @@ const Cart = (props)=>{
                                <div className="row">
                                 <div className="col-md-12 col-lg-8 col-11 mx-auto main_cart">
                                     <div style={{boxShadow:'0 3px 20px #aa2b1d', margin:'10px', padding:'10px'}}>
-                                    <h2 className="py-4 font-weight-bold">My Orders: {props.vals}</h2>  
+                                    <h2 className="py-4 font-weight-bold">My Orders: {accountD.name}</h2>  
                                     
                                     <hr/>
                                     <label style= {{display: 'inline'}}><input type="checkbox" className="checkbox"  id="allcheck" style={{display: 'inline'}} onClick={selectAll}/> &nbsp;&nbsp;All Items</label>
