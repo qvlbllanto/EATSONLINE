@@ -1,321 +1,627 @@
 import React, {useState} from 'react';
 import { useHistory, Link } from "react-router-dom";
-import {addLogs, deleteITM, getCartData, buyItems, updateAmount} from "./functions.js"
+import {updateCartData, checkCart, checkPasswordIfCorrect, removeAllCart, addLogs,  getCartData, buyItems,  updateCart,  NumberFormat, getAccountDetails, checkDate, Reservation} from "./functions.js";
+import {cyrb53} from "./encdec.js";
+import TopSide from "../components/TopSide.js";
+import { set } from 'animejs';
 const Cart = (props)=>{
-    const [title, setTitle] = useState(null);
-    const [description, setDesc] = useState(null);
-    const [price, setPrice] = useState(null);
     const [cart, setCart] = useState([]);
-    const [seller, setSeller] = useState(null);
-    const [type, setType] = useState(null);
     const [amount, setAmount] = useState(0);
-    const [cartid, setCartId] = useState(null);
-    const history = useHistory();
-    let total_cart_amt = document.getElementById('total_cart_amt');
-    let discountCode = document.getElementById('discount_code1');
+    const [buyorsave, setbuyorsave]=useState(null);
+    const [accountD, setAccountD] = useState({});
+    const [addresses, setAddresses] = useState([]);
+    const [ch,setCh] = useState(false);
+    const [primaryadd, setPrimaryAdd] = useState(null);
+    const [outofstock, setOutofStock] = useState([]);
+    const [higherthan, setHigherthan] = useState([]);
+    const [itemQty, setItemQty] = useState([]);
+    const [ind, setInd] = useState(0);
+    const [checkboxes, setCheckBoxes] = useState([]);
+    const [totalamt, setTotalamt] = useState(0);
+    const [date, setDate] = useState(null);
+    const [valuesCh, setvaluesCh] = useState([]);
+    const [valuesCh2, setValuesCh2] = useState([]);
+    const [name, setName] = useState(null);
+    const [email, setEmail] = useState(null);
+    const [phone, setPhone] = useState(null);
+    const [time, setTime] = useState(null);
+    const [message, setMessage] = useState(null);
+    const [check, setCheck] = useState(false);
+    const [orderm, setOrderm] = useState([false, false]);
     React.useEffect(()=>{
-        const script = document.createElement("script");
-        script.src = process.env.PUBLIC_URL + "/assets/js/main.js";
-        script.async = true;
-        document.body.appendChild(script)
-        addLogs("Cart");
-        countMoney().then(d=>{
-            setAmount(d);
-        });
-    }, [0]);
-
-    const countMoney = () =>{
-        return new Promise((resolve, reject)=>{
-            getCartData(props.idnum).then((x) =>{
-                setCart(x);
-                let num = 0;
-                for (let i in x) {
-                    num+=parseInt(x[i][1].price);
-                }
-                
-                resolve(num);
-            })
-        });
-    }
-  
-    const togglePopup = () => {
-        document.getElementById("menu").scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'center' });
-        document.getElementById("popup-1").classList.toggle("active");
-    }
-    const  discount_code = () => {
-        let totalamtcurr = parseInt(total_cart_amt.innerHTML);
-        let error_trw = document.getElementById('error_trw');
-        if(discountCode.value === '1234'){
-            let newtotalamt = totalamtcurr - 15;
-            total_cart_amt.innerHTML = newtotalamt;
-            error_trw.innerHTML = "Hurray! code is valid";
-        }else{
-            error_trw.innerHTML = "Try Again! Valid code";
+        if(!ch){
+            props.setP("Cart");
+            addLogs("Cart");
+            props.set(true);
+            setCh(true);   
         }
-    }
-    const deleteItem= (e, d) => {
-        if(props.logedin){
-            deleteITM(props.idnum, d).then(x =>{
-                if(x){
-                    countMoney().then(o=>{
-                        setAmount(o);
-                    });
+    const timer = setTimeout(() => {
+        getCartData(props.idnum).then((x) =>{
+            setCart(x);
+            updateStock(x);
+            let num = 0;
+            let totalcartamt = 0;
+            for (let i of cart) {
+                if(checkboxes.includes(i[0])){
+                    num+=Number(i[1].price)*i[1].amount;
                 }
-            });
+                totalcartamt+=Number(i[1].price)*i[1].amount;
+            }
+            setTotalamt(Number(totalcartamt).toFixed(2));
+            setAmount(Number(num).toFixed(2));
+        });
+            checkifHighRepeat();
+            getAccountDetails(props.idnum).then((d)=>{
+                setAccountD(d);
+                let arr = [];
             
+                for(let x in d.addresses){
+                    arr.push(d.addresses[x]);
+                    if(d.addresses[x].primary){
+                        setPrimaryAdd(d.addresses[x]);
+                    }
+                }
+                setAddresses(arr);
+            });
+      }, 600);
+      return () => clearTimeout(timer);
+    });
+    const updateStock = async(v) =>{
+        let x = v.map(async(d)=>await updateCartData(props.idnum, d[1], d[0]));
+        x = await Promise.all(x);
+        setItemQty(arrayRemove(  x.map((d)=>d[1]), null));
+        setOutofStock(arrayRemove( x.map((d)=>d[0]), null));
+    }
+    const open = (e, ch) =>{
+        e.preventDefault();
+        if(orderm[1]){
+            checkDateIncal().then((x)=>{
+                if(x===null){
+                    togglePopup(ch);
+                }else{
+                    alert(x);
+                }
+            })
         }else{
-            goLogin();
+         togglePopup(ch);
         }
     }
-
-    const del = (e, index) =>{
-        cart.splice(index,1);
+    const togglePopup = (ch) => {
+        setbuyorsave(ch);
+        if(ch===null){
+            document.getElementById("popup-1").classList.toggle("active");
+        }
+        if(ch==="Save"){
+            document.getElementById("popup-1").classList.toggle("active");
+        }
+        if(cart.length!==0 && ch==="Buy"){
+            document.getElementById("popup-1").classList.toggle("active");
+        }else if(ch==="Buy"){
+            alert("Nothing to "+ch);
+        }
+    }
+    const countMoneyNotInDB = (c) =>{
+        return new Promise((resolve, reject)=>{
+                let x=c;
+                let num = 0;
+                let totalcartamt = 0;
+                for (let i in x) {
+                    if(checkboxes.includes(x[i][0])){
+                    num+=Number(x[i][1].price)*x[i][1].amount;
+                    }
+                    totalcartamt+=Number(x[i][1].price)*x[i][1].amount;
+                }
+                setTotalamt(Number(totalcartamt).toFixed(2));
+                resolve(Number(num).toFixed(2));
+        });
     }
 
-    const goLogin = () =>{
-        history.push('/login');
-      }
-    const logout = () =>{
-        history.push("/");
-        props.checkLoggedIn(false, {}, null);
+    const arrayRemove = (arr, value) => { 
+        return arr.filter(function(ele){ 
+            return ele !== value; 
+        });
+    }
+    const arrayRemove2 = (arr, value) => { 
+        return arr.filter(function(ele){ 
+            return ele[0] !== value; 
+        });
+    }
+    const checkifHighRepeat = async() =>{
+        let x = cart.map(async(d)=>!await checkCart(d[1])?d[1].key:null);
+        x = await Promise.all(x);
+        setHigherthan(arrayRemove(x, null));
+    }
+    const checkifHighRepeat2 = async() =>{
+        let x = cart.map(async(d)=>!await checkCart(d[1])?checkboxes.includes(d[0])?d[1].key:null:null);
+        x = await Promise.all(x);
+        return(arrayRemove(x, null));
+    }
+    const checkifHigh = () =>{
+        let x = cart.map((d)=>checkboxes.includes(d[0])?higherthan.includes(d[1].key)?d[1].title:null:null);
+        return(arrayRemove(x, null));
     }
     const buyNow = () =>{
-        if(cart.length!=0){
-            buyItems(cart, amount, props.idnum).then((x)=>{
-                if(x){
-                    countMoney().then(d=>{
-                        setAmount(d);
-                    });
-                }
-            });
-        }
+        return new Promise(async(reso, reje)=>{
+                const v = await checkifHighRepeat2();
+                if(v.length===0){
+                    let x1 = null;
+                    if(orderm[0]){
+                     x1 = document.getElementById('asx').checked?document.getElementById('asx').value:document.getElementById('bsx').checked?document.getElementById('bsx').value:null;
+                    }
+                     if(cart.length!==0){
+                        new Promise((resolve, reject)=>{
+                            let x = [];
+                            let x2 = {};
+                            for(let v of cart){
+                                if(checkboxes.includes(v[0])){
+                                    x.push(v);
+                                }else{
+                                    x2[v[0]]=v[1];
+                                }
+                            }
+                            resolve([x,x2]);
+                        }).then((ca)=>{
+                            if(orderm[1]){
+                            Reservation( accountD.name, email, phone, date, time, message, ca, props.idnum, amount, document.getElementById("selection").value, accountD.id).then((dx)=>{
+                                props.setAID(true);
+                                props.cart(dx);
+                                reso([true]);
+                            });
+                            }else{
+                                buyItems(ca, amount, props.idnum, props.vals,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
+                                    if(x[0]){
+                                        props.setAID(false);
+                                        props.cart(x[1]);
+                                        reso([true]);
+                                    }
+                                });
+                            }
+                        });
+                    }
+            }else{
+                document.getElementById("popup-1").classList.toggle("active");
+            }
+        });
+
+        
     }
-    
+     
     const add = (e, index) =>{
         let i = cart;
         i[index][1].amount += 1;
-        i[index][1].amount += 1;
         setCart(i);
-        document.getElementById("textbox0").value=i[index][1].amount;
+        document.getElementById("textbox"+index).innerHTML=i[index][1].amount;
+        countMoneyNotInDB(cart).then(d=>{
+            setAmount(d);
+            saveToDB();
+        });
     }
     const minus = (e, index) =>{
         let i = cart;
         if(i[index][1].amount > 1){
             i[index][1].amount -= 1;
             setCart(i);
-            document.getElementById("textbox0").value=i[index][1].amount;
+            document.getElementById("textbox"+index).innerHTML=i[index][1].amount;
+            countMoneyNotInDB(cart).then(d=>{
+                setAmount(d);
+                saveToDB();
+            });
         }
     }
+
+    const saveToDB = () =>{
+        new Promise((resolve, reject)=>{
+            let p = {};
+            for(let ca of cart){
+                p[ca[0]]=ca[1];
+            }
+            resolve(p);
+        }).then((ful)=>{
+            updateCart(props.idnum, ful);
+        })
+
+        
+        // removeAllCart(props.idnum).then((x)=>{
+        //     if(x){
+        //         new Promise(()=>{
+        //             countMoneyNotInDB(cart).then(o=>{
+        //                 setAmount(o);
+        //                 alert("Saved!");
+        //                 document.getElementById("popup-1").classList.toggle("active");
+        //             });
+        //         })
+        //     }
+        // })
+        
+    }
+    const confirmation = () =>{
+        if(buyorsave==="Buy"){
+            buyNow().then((d)=>{
+                if(d[0]){
+                    history.push('/receipt')
+                }
+            });
+        }else{
+                new Promise((resolve, reject)=>{
+                    let x = cart;
+                    
+                    x = arrayRemove2(x, ind);
+                    let p = {};
+                    for(let ca of x){
+                        p[ca[0]]=ca[1];
+                    }
+                    
+                    resolve([p,x]);
+                }).then((ful)=>{
+                    updateCart(props.idnum, ful[0]).then(()=>{
+                        setCart(ful[1]);
+                        togglePopup(null);
+                    });
+                })
+            }
+        
+    }
+
+    const selectAll = (e) =>{
+        let x = [];
+        if(e.target.checked){
+            for(let i=0; i<cart.length; i++){
+                document.getElementById("check"+i).checked = true;
+                x.push(cart[i][0]);
+            }
+            setCheckBoxes(x);
+        }else{
+            for(let i=0; i<cart.length; i++){
+                document.getElementById("check"+i).checked = false;
+            }
+            setCheckBoxes(x);
+        }
+        
+    }
+
+    const clickCheck = (e, i) =>{
+        new Promise((resolve, reject)=>{
+            let checkb = checkboxes;
+            if(e.target.checked){
+                checkb.push(i);
+            }else{
+                document.getElementById("allcheck").checked = false;
+                checkb = arrayRemove(checkb, i);
+            }
+            resolve(checkb);    
+        }).then((k)=>{
+            setCheckBoxes(k);
+            countMoneyNotInDB(cart).then((x)=>{
+                setAmount(x);
+            });
+        })
+       
+        
+    }
+    const checkDateIncal = () =>{
+        return new Promise((resolve, reject)=>{
+            if(checkDate(new Date(date))){
+                let o = [];
+                valuesCh.forEach((d)=>{
+                    o.push(d);
+                })
+                setValuesCh2(o);  
+                resolve(null); 
+            }else{
+               resolve("Date should start tomorrow and within the 2 weeks.");
+            }
+        })
+        
+    }
+
+    const valuesForReservation = (e) =>{
+        if(e.target.name === "name"){
+            setName(e.target.value);
+        }else if(e.target.name === "email"){
+            setEmail(e.target.value);
+        }else if(e.target.name === "phone"){
+            setPhone(e.target.value);
+        }else if(e.target.name === "date"){
+            setDate(e.target.value);
+        }else if(e.target.name === "time"){
+            setTime(e.target.value);
+        }else if(e.target.name === "message"){
+            setMessage(e.target.value);
+        }
+      }
+
+    const togglePopup2 = () => {
+        document.getElementById("popup-1").classList.toggle("active");
+    }
+    const history = useHistory();
+
+
+
     return(
         <div>
-        <header id="header" className="fixed-top d-flex align-items-cente">
-            <div className="container-fluid container-xl d-flex align-items-center justify-content-lg-between">
-            <h1 className="logo me-auto me-lg-0"><a href="#hero"><img alt="" src="assets/img/Eats Online logo.png"/></a></h1>
-            <nav id="navbar" className="navbar order-last order-lg-0">
-                <ul>
-                <li><Link className="nav-link scrollto active" to="/">Home</Link></li>
-                <li><Link className="nav-link scrollto" to="/">Menu</Link></li>
-                <li><Link className="nav-link scrollto" to="/#contact">Contact</Link></li>
-                { 
-                    (() => {
-                        if(props.logedin){
-                            return (<div><li className="dropdown"><a href="#hero"><span>{props.vals.name}</span> <i className="bi bi-chevron-down"></i></a>
-                            <ul>
-                            <li><a href="#hero">Cart List</a></li>
-                            <li><a href="#hero">Password Reset</a></li>
-                            <li><a href="" ><span onClick={logout}>Logout</span></a></li>
-                            </ul>
-                        </li></div>);
-                        }else{
-                            return (<div><li><a href="" onClick={goLogin}><span >SignUp/Login</span></a>
-                        </li></div>);
-                        }
-                    })()
-                }
-                <li><Link className="nav-link scrollto" id="reserve" to="/#reservation" >Reservation</Link></li>
-                </ul>
-                <i className="bi bi-list mobile-nav-toggle"></i>
-            </nav>
-            <Link to="/#reservation" className="reservation-btn2 scrollto d-none d-lg-flex" id="reservebutton">Reservation</Link>
-            </div>
-        </header>
-        <section id="hero" className="d-flex align-items-center">
+              <TopSide right={false} first="Your " second="Cart" third={'Total cart price: ₱'+ NumberFormat(totalamt)} desc={"Manage your order here!"} img={["./assets/img/0 NEW SLIDER/Cart.png"]}/>
+           {/* <section id="hero" className="d-flex align-items-center">
+           <div id="myCarouel" className="fullscreen carousel slide " data-ride="carousel">
+                    <div className="carousel-inner">
+                        <div className="item active">
+                            <img src="./assets/img/bigbetterburger.png" style={{width:'100%', backgroundPosition: 'center bottom'}}/>
+                        </div>
+                    </div>
+                        <a className="left carousel-control" href="#myCarousel" data-slide="prev" id="prev" style={{visibility: 'hidden'}}>
+                            <span className="glyphicon glyphicon-chevron-left"></span>
+                            <span className="sr-only">Previous</span>
+                        </a>
+                        <a className="right carousel-control" href="#myCarousel" id="right" style={{visibility: 'hidden'}}>
+                            <span className="glyphicon glyphicon-chevron-right"></span>
+                            <span className="sr-only">Next</span>
+                        </a>
+                       
+                    </div>
             <div className="container position-relative text-center text-lg-start" data-aos="zoom-in" data-aos-delay="100">
                 <div className="row">
                     <div className="col-lg-10">
-                        <h1>Your Cart</h1>
+                        <h1 style={{fontFamily: 'Alex Brush', fontSize: '90px'}}>Your Cart</h1>
                         </div>
                         <div className="row">
-                            <span type="text" className="input">{'Your Total: P '+amount} </span>
-                        </div>
-                        <div className="row">
-                            <input type="button" value="Cash Out" onClick={buyNow} className="close-btn"/>
+                            <span type="text" className="input">{'Total cart price: ₱'+ NumberFormat(amount)} </span>
                         </div>
                     </div>
                 </div>
-        </section>
+        </section> */}
         <main id="main">
             <section id="menu" className="menu section-bg"> 
+            <div className="row1">
+                <div className="cartpopup" id="popup-1">
+                    <div className="overlay"></div>
+                    <div className="cartcontent1">
+                    <div className="close-btn" onClick={(e) => togglePopup(null)}>&times;</div>
+                    <br/>
+                    <form>
+                        <h1 id="popuptitle" style={{color: 'black'}}>Are you sure?</h1>
+                     <br/>
+                        <input type="button" className="btn btn-danger my-cart-btn"  onClick={()=>confirmation()} value="Yes" style={{fontSize: '15px'}}/>&nbsp;&nbsp;&nbsp;
+                                 <input type="button" className="btn btn-danger my-cart-btn" data-id="1"onClick={(e)=>togglePopup(null)}
+                                data-summary="summary 1" data-price="100" data-quantity="1" data-image="assets/img/Eats Online logo.png" value="No"  style={{fontSize: '15px'}}/>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+
                 <div className="container">
                     <div className="section-title">
                         <h2>Food List</h2>
-                        <p>Your Orders</p>
+                        <p>My Orders</p>
                     </div>
-                    <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-10 col-11 mx-auto">
-                            <div class="row mt-5 gx-3">
-                                <div class="col-md-12 col-lg-8 col-11 mx-auto main_cart">
+                
+                    <div className="container-fluid">
+                    <div className="row" >
+                        <div className="col-md-10 col-11 mx-auto"  >
+                               <div className="row">
+                                <div className="col-md-12 col-lg-8 col-11 mx-auto main_cart">
+                                    <div style={{boxShadow:'0 3px 20px #aa2b1d', margin:'10px', padding:'10px'}}>
+                                    <h2 className="py-4 font-weight-bold">My Orders: {props.vals}</h2>  
                                     
-                                    <div class="card p-4">
-                                        <h2 class="py-4 font-weight-bold">Cart List : {props.vals.name}</h2>
-                                        <div class="container">
-                                        <button className="reservation-btn" >Save</button>
-                                        </div>
-                                        <br/>
+                                    <hr/>
+                                    <label style= {{display: 'inline'}}><input type="checkbox" className="checkbox"  id="allcheck" style={{display: 'inline'}} onClick={selectAll}/> &nbsp;&nbsp;All Items</label>
+                                </div>
+                                       
                                         {cart.map((d, index)=>{
                                             return(
-                                             <div class="row" key={index}>
-                                             <div class="col-md-5 col-11 mx-auto bg-light d-flex justify-content-center align-items-center product_img">
-                                                 <img src={d[1].link} class="img-fluid"/>
+                                            
+                                            <div className="card p-4" key={index+20} style={{boxShadow:'0 3px 20px #aa2b1d', margin:'10px'}}> 
+                                             <div className="row"  >
+                                               
+                                             <input type="checkbox" className="checkbox" id={"check"+index} onClick={(e)=>clickCheck(e, d[0])} style={{position: 'relative', marginLeft: '-44%', marginRight: '100%'}}/>
+                                             <div className="col-md-5 col-11 mx-auto d-flex justify-content-center product_img" style={{paddingTop: '20px'}}>
+                                                <img src={d[1].link} className="img-fluid" alt={d[1].link} style={{padding:'10px', background:'transparent'}}/>
                                              </div>
-                                             <div class="col-md-7 col-11 mx-auto px-4 mt-2">
-                                                 <div class="row">
-                                                         <h2 class="mb-4">{d[1].title}</h2>
-                                                         <p class="mb-2">{d[1].desc}</p>
-                                                         <p class="mb-2">Seller: {d[1].seller}</p>
-                                                         <p class="mb-2">Type: {d[1].type}</p>
-                                                         <p class="mb-3">Price: Php{d[1].price}</p>
+                                             <div className="col-md-7 col-11 mx-auto px-4 mt-2">
+                                                   <br/>
+                                                 <div className="row">
+                                                     
+                                                         <h2 className="mb-4">{d[1].title}</h2>
+                                                         <p className="mb-2">{d[1].desc}</p>
+                                                         <p className="mb-2">Supplier: {d[1].seller}</p>
+                                                         <p className="mb-2">Type: {d[1].type}</p>
+                                                         <p className="mb-2">Stock: {itemQty[index]} </p>
+                                                         <p className="mb-3">Price: <span style={{fontSize: '15px'}}>₱</span>{NumberFormat(Number(d[1].price).toFixed(2))}</p>
                                                      <br/>
-                                                     <ul class="pagination">
-                                                             <li class="page-item">
-                                                             <button class="page-link " onClick={(e)=>minus(e, index)}>
-                                                             <i class="fas fa-minus"></i> </button>
+                                                     <p className="mb-3">Quantity: </p>
+                                                     {!outofstock.includes(d[1].key)?
+                                                     
+                                                     <ul className="pagination">
+                                                            <li className="page-item" ><span type="text" style={{height:'100%'}} key={index} className="page-link" id={"textbox"+index}>{d[1].amount}</span>
                                                              </li>
-                                                             <li class="page-item"><input type="text" key={index} class="page-link" value={d[1].amount} id={"textbox"+index}/>
+                                                             <li className="page-item">
+                                                             <button className="page-link" onClick={(e) => add(e, index)}> <i className="fas fa-plus"></i></button>
                                                              </li>
-                                                             <li class="page-item">
-                                                             <button class="page-link" onClick={(e) => add(e, index)}> <i class="fas fa-plus"></i></button>
+                                                             <li className="page-item">
+                                                             <button className="page-link" onClick={(e)=>minus(e, index)} style={{borderRadius: '30px'}}><i className="fas fa-minus"></i> </button>
                                                              </li>
-                                                         </ul>
-                                                  
-                             
-                                                   
+                                                         </ul>:<p className="mb-3" style={{color: 'red'}}>OUT OF STOCK <br/><span style={{color:'blue'}}>Note: Remove item if OUT OF STOCK.</span></p>}  
+                                                         {higherthan.includes(d[1].key) && !outofstock.includes(d[1].key)?<p className="mb-3" style={{color: 'red'}}>Too much item! <br/><span style={{color:'blue'}}>Note: Lower the quantity of item. </span></p>:null}
                                                  </div>
-                                                 <div class="row">
-                                                     <div class="col-8 d-flex remove_wish">
-                                                         <a class="fas fa-trash-alt" href="#" name = {index} onClick={(e)=>del(e, index)}></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                        
+                                                 <div className="row">
+                                                     <div className="col-8 d-flex remove_wish">
+                                                         <a className="fas fa-trash-alt" style={{cursor:'pointer'}} name = {index} onClick={(e)=>{setInd(d[0]); togglePopup("Save");}} >&nbsp; Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                      </div>
                                                      
                                                  </div>
                                                  <br/>
                                              </div>
+                                         </div>
                                          </div>);
                                         })}
-                                           
-                                    </div>
+                                         
                                 </div>
-                                <div class="col-md-12 col-lg-4 col-11 mx-auto">
-                                <div class="right_side p-4 shadow bg-white">
-                                        <h2 class="product_name mb-5">The Total Amount Of</h2>
-                                        <div class="price_indiv d-flex justify-content-between">
-                                            <p>Product amount</p>
-                                            <p>Php<span id="product_total_amt">{amount}</span></p>
-                                        </div>
-                                        <div class="price_indiv d-flex justify-content-between">
-                                            <p>Shipping Fee</p>
-                                            <p>Php50</p>
-                                        </div>
-                                        <hr />
-                                        <div class="total-amt d-flex justify-content-between font-weight-bold">
-                                            <p>The total amount of (including VAT)</p>
-                                            <p>Php<span id="total_cart_amt">1111110.00</span></p>
-                                        </div>
-                                        
-                                        <button className="reservation-btn scrollto d-lg-flex" >Checkout</button>
-                                        
-                                    </div>
-                                    <div class="discount_code mt-3 shadow">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <a class="d-flex justify-content-between" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                                Add a discount code (optional)
-                                                <span><i class="fas fa-chevron-down pt-1"></i></span>
-                                                </a>
-                                                <div class="collapse" id="collapseExample">
-                                                    <div class="mt-3">
-                                                        <input type="text" name="" id="discount_code1" class="form-control font-weight-bold" placeholder="Enter the discount code"/>
-                                                        <small id="error_trw" class="text-dark mt-3">code for coupon</small>
-                                                    </div>
-                                                <button class="btn btn-primary btn-sm mt-3" onClick={discount_code}>Apply</button>
+                                <div className="col-md-12 col-lg-4 col-11 mx-auto">
+                                <div className="right_side p-4 bg-white">
+                                        <div className="my-custom-scrollbar" >
+                                            <div className="row" >
+                                                <div className="overflow-x" >
+                                                    <center>
+                                                <label >Purchase Order</label>
+                                                </center>
+                                                    <table className="table" style={{fontSize:'13px', width: '100%'}}>
+                                                    <thead className="thead-dark" >
+                                                        <tr style={{width:'100%', fontSize:'17px'}}>
+                                                            <th>Name</th>
+                                                            <th>Qty</th>
+                                                            <th>Price</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {cart.map((d, index)=>{
+                                                    return(
+                                                        checkboxes.includes(d[0])?
+                                                    <tr key={index}>
+                                                        <td data-label="Name">{d[1].title} </td>
+                                                        <td data-label="Qty" >{d[1].amount}</td>
+                                                        <td data-label="Price"><span id="total_cart_amt"><span style={{fontSize: '15px'}}>₱</span>{NumberFormat(Number(Number(d[1].price)*d[1].amount).toFixed(2))}</span></td>
+                                                    </tr>:null);
+                                                    })}
+                                                    </tbody>
+                                                    </table>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>     
-                                    <div class="mt-3 shadow p-3 bg-white">
-                                        <div class="pt-4">
-                                            <h5 class="mb-4">Expected delivery date</h5>
-                                                <p>MM-DD-YYYY</p>
-                                                    <p>HH-MM-SS</p>
-                                        </div>
-                                    </div>   
+                                            <hr />
+                                            <div>
+                                            </div>
+                                            <div className="">
+                                                <form onSubmit={(e)=>open(e, "Buy")}>
+                                                    <div className="form-group">
+                                                    
+                                                    <label className="control-label"> <span className="required">*</span>Order Method: </label>
+                                                    <label>
+                                                        <input type="radio" name="colorRadio2" id="opr" value="C.O.D" required={true} onClick={()=>setOrderm([true, false])}/> Order Now
+                                                        <input type="radio" name="colorRadio2" id="oaor" value="Online Payment" style={{marginLeft: '10px'}} required={true} onClick={()=>setOrderm([false, true])} /> Advance Order
+                                                    </label>
+                                                    <hr/>
+                                                    {orderm[0]? <div>
+                                                        <h2 style={{color: '#97191d'}}>ORDER NOW</h2>
+                                                        <br/>
+                                                        <label className="control-label"> <span className="required">*</span>Payment Method: </label>
+                                                        <label>
+                                                            <input type="radio" name="colorRadio" id="asx" value="C.O.D"  required={true} /> Pay C.O.D 
+                                                            <input type="radio" name="colorRadio" id="bsx" value="Online Payment"   style={{marginLeft: '10px'}}required={true}/> Online Payment
+                                                        </label><hr/>
+                                                    </div>
+                                                    :
+                                                    orderm[1]?
+                                                    <div>
+                                                    <h2 style={{color: '#97191d'}}>ADVANCE ORDER</h2>
+                                                    <br/>
+                                                    <div data-aos="fade-up" data-aos-delay="100">
+                                                            <div className="row">
+                                                                <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'50%'}}>
+                                                                <label className="inline"><span className="required">*</span>Date: </label>
+                                                                    <input type="date" name="date" className="form-control" id="date" placeholder="Date"  onChange={valuesForReservation} required={true}/>
+                                                                    <div className="validate"></div>
+                                                                </div>
+                                                                <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'50%'}}>
+                                                                <label className="inline"><span className="required">*</span>Time: </label>
+                                                                    <input type="time" className="form-control" name="time" id="time" placeholder="Time" onChange={valuesForReservation} required={true}/>
+                                                                    <div className="validate"></div>
+                                                                </div>
+                                                            
+                                                                <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'100%'}}>
+                                                                <label className="inline"><span className="required">*</span>Email: </label>
+                                                                    <input type="email" className="form-control" name="email" id="email" placeholder="Type your Email" onChange={valuesForReservation} required={true}/>
+                                                                    <div className="validate"></div>
+                                                                </div>
+                                                                <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'100%'}}>
+                                                                <label className="inline"><span className="required">*</span>Phone Number: </label>
+                                                                    <input type="number" className="form-control" name="phone" id="phone" placeholder="Type your Phone Number" onChange={valuesForReservation} required={true}/>
+                                                                    <div className="validate"></div>
+                                                                </div>
+                                                            </div>
+                                                                <div className="form-group mt-3">
+                                                                <label className="inline">Message: </label>
+                                                                    <textarea className="form-control" name="message" rows="5" placeholder="Message" onChange={valuesForReservation}></textarea>
+                                                                    <div className="validate"></div>
+                                                                </div>
+                                                                <div className="mb-3">
+                                                                    <div className="error-message"></div>
+                                                                    { 
+                                                                        (() => {
+                                                                        if(check){
+                                                                            return (<div className="sent-message">Your booking request was sent. We will call back or send an Email to confirm your reservation. Thank you!</div>);
+                                                                            }
+                                                                        })()
+                                                                    }    
+                                                                </div>
+                                                                <hr/>
+                                                                </div>
+                                                                {/* <div className="text-center"><input type="submit" className="reservation-btn scrollto d-lg-flex" value="Order Now" style={{borderRadius: '50px'}}/></div> */}
+                                                        </div>
+                                                        :null}
+                                                    <div>
+                                                    <label className="control-label">Address:</label>
+                                                        <select style={{width:'100%', fontSize:'16px'}} id="selection">
+                                                                {addresses.length===0?<option>No registered address.</option>:null}
+                                                                {primaryadd!==null?<option value={primaryadd.address}>{primaryadd.address}</option>:null}
+                                                                {addresses.map((d, index)=>{
+                                                                    return(!d.primary?<option key={index} value={d.address} >{d.address}</option>:null);
+                                                                })}
+                                                        </select>
+                                                        
+                                                    {addresses.length===0?<h5>You need to have an address to continue. To add an address, go to account page. <span style={{textDecoration:'underline', color: 'black', cursor: 'pointer'}} onMouseOver={(e)=>{e.target.style.color='blue';}} onMouseOut={(e)=>{e.target.style.color='black';}} onClick={()=>history.push("/account")}>Click here to go to account page</span></h5>:null}
+                                                    <br/><br/>
+                                                    <div className="total-amt d-flex font-weight-bold" style={{textAlign: 'start',}}>
+                                                        <br/> 
+                                                        <p style={{marginRight: '10px',  fontWeight: 'bold',}}>Total Amount: </p>
+                                                        <p style={{fontWeight:'bold', textAlign:'start'}}><span id="total_cart_amt"><span style={{fontSize: '15px'}}>₱</span>{NumberFormat(amount)}</span></p>
+                                                    </div>
+                                                    
+                                                   {addresses.length!==0 && cart.length!==0 && checkboxes.length!==0 && checkifHigh().length === 0 ?<button type="submit" className="reservation-btn scrollto d-lg-flex" >Order Now</button>:null}
+                                                   {checkifHigh().length !== 0?<p style={{marginRight: '100px'}}>Some Items exceeded the stock quantity or out of stock, please lower the value or delete the item. Items ({checkifHigh().map((d,i)=>i===0?<span style={{fontWeight: 'bold', color: 'red'}}>{d}</span>:<span>, <span style={{fontWeight: 'bold', color: 'red'}}>{d}</span></span>)})</p>:null }
+                                                   </div>
+                                                   </div>
+                                                </form>
+                                            </div>
+                            </div>
+                            </div>
+                                            
+                                        </div>  
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    </div>
-                </div>
-            </section>
+                </section>
+            </main>
             <footer id="footer">
-            <div className="footer-top ">
+            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{backgroundColor: '#faff65'}:{backgroundColor: 'white', color: 'black'}}>
                 <div className="container">
                     
                     <div className="row">
                         <div col-lg-3="true" col-md-6="true">
                             <div className="footer-info">
-                                <h3>Eats Online</h3>
-                                <p>
-                                    LOCATION <br></br>
-                                    wala sa wishlist yung address<br></br>
-                                    <strong>Phone:</strong> 09157583842<br></br>
-                                    <strong>Email: </strong> EatsOnline@gmail.com<br></br>
+                                <div className="section-title">
+                                <h2>Eats Online</h2>
+                                </div>
+                                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>
+                                <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157583842<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EatsOnline@gmail.com<br></br>
                                 </p>
                                 <div className="social-links mt-3">
-                                    <a href="#hero" className="twitter"><i className="bx bxl-twitter"></i></a>
                                     <a href="#hero" className="facebook"><i className="bx bxl-facebook"></i></a>
                                     <a href="#hero" className="instagram"><i className="bx bxl-instagram"></i></a>
-                                    <a href="#hero" className="google-plus"><i className="bx bxl-skype"></i></a>
-                                    <a href="#hero" className="linkedin"><i className="bx bxl-linkedin"></i></a>
+                                    <a href="#hero" className="twitter"><i className="fab fa-google-plus-g"></i></a>
                                 </div>
                             </div>
-                        </div>
-                        <div className="col-lg-2 col-md-6 footer-links">
-                            <h4>Useful Links</h4>
-                                <ul>
-                                    <li><i className="bx bx-chevron-right"></i> <a href="#home">Home</a></li>
-                                    <li><i className="bx bx-chevron-right"></i> <a href="#menu">Menu</a></li>
-                                    <li><i className="bx bx-chevron-right"></i> <a href="#contact">Contact</a></li>
-                                </ul>
-                        </div>
-                        <div className="col-lg-4 col-md-6 footer-newletter">
-                            <h4>Feedback!</h4>
-                            <p>adjsafhasjfkkashfhasfjksafsfsahfksfhasjfksj</p>
-                            <form action="" method="post">
-                                <input type="email" name="email"/>
-                                <input type="submit" value="Subscribe"/>
-                            </form>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="container">
+            <div className="container" >
                 <div className="copyright">
                     &copy; Copyright <strong><span>Eats Online</span></strong>. All Rights Reserved
                 </div>
             </div>
         </footer>
-        </main>
         </div>
     );
 }

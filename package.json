@@ -6,25 +6,31 @@
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.8.3",
+    "animejs": "^3.2.1",
     "axios": "^0.21.1",
+    "crypto-js": "^4.0.0",
     "emailjs-com": "^2.6.4",
     "firebase": "^8.3.1",
     "gh-pages": "^3.1.0",
+    "jquery": "^3.6.0",
     "react": "^17.0.1",
+    "react-bootstrap": "^1.5.2",
+    "react-chat-widget": "^3.0.5",
     "react-device-detect": "^1.17.0",
     "react-dom": "^17.0.1",
     "react-native-public-ip": "^1.0.2",
+    "react-native-sha256": "^1.4.7",
     "react-router-dom": "^5.2.0",
     "react-script-tag": "^1.1.2",
     "react-scripts": "4.0.3",
+    "react-transition-group": "^4.4.1",
     "web-vitals": "^1.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "homepage": "https://github.com/soulevil098123/EATSPROJ"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [

@@ -1,215 +1,145 @@
 import React, {useState} from 'react';
-import {addLogs, addCart , Reservation} from "./functions.js"
-import { useHistory, Link } from "react-router-dom";
+import {sendContact, addLogs, addCart , Reservation, getData, waitloop, NumberFormat, checkDate} from "./functions.js"
+import { useHistory, Link} from "react-router-dom";
+import TopSide from "../components/TopSide.js";
+import $ from 'jquery';
 const Home = (props)=>{
-    const [indexOfList, setIndexOfList] = useState(8);
-    const [startOfList, setStartOfList] = useState(0);
-    const [title, setTitle] = useState(null);
-    const [seller, setSeller] = useState(null);
-    const [type, setType] = useState(null);
-    const [description, setDesc] = useState(null);
-    const [price, setPrice] = useState(null);
-    const [link, setLink] = useState(null);
-    const [name, setName] = useState(null);
-    const [email, setEmail] = useState(null);
-    const [phone, setPhone] = useState(null);
-    const [date, setDate] = useState(null);
-    const [time, setTime] = useState(null);
-    const [people, setPeople] = useState(null);
-    const [message, setMessage] = useState(null);
-    const [check, setCheck] = useState(false);
-    const [active, setActive] = useState(["filter-active", "", "",""]);
-    const history = useHistory();
+
+    const [name2, setName2] = useState(null);
+    const [email2, setEmail2] = useState(null);
+    const [message2, setMessage2] = useState(null);
+    const [subject2, setSubject2] = useState(null);
+    const [successful, setSuccessful] = useState(null);
+    const [ch, setCh] = useState(false);
     React.useEffect(() => { 
-        const script = document.createElement("script");
-        script.src = process.env.PUBLIC_URL + "/assets/js/main.js";
-        script.async = true;
-        document.body.appendChild(script);
-        addLogs("Home");
-    }, []);
-    const togglePopup = () => {
-        document.getElementById("menu").scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'center' });
-        document.getElementById("popup-1").classList.toggle("active");
-    }
-
-
-    const addProdtoCart = () => {
-        if(props.logedin){
-            addCart(title, price, description, link, props.idnum, seller, type);
-            document.getElementById("popup-1").classList.toggle("active");
-        }else{
-            goLogin();
+        if(!ch){
+            props.setP("Home");
+            addLogs("Home");
+            props.set(true);
+            setCh(true);
+            // document.getElementById("home_hero").scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });
         }
-    }
+    
+    });
 
-    const sendReservation = (e) =>{
+
+    const onSubmitContactUs = (e) =>{
         e.preventDefault();
-        Reservation(name, email, phone, date, time, people, message).then(e=>{
-            setCheck(true);
+       
+        sendContact(name2, subject2, email2, message2).then((d)=>{
+            if(d){
+                setSuccessful('Your message has been sent. Thank you!');
+            }
+            
         });
     }
-
-    const addtoCartPopup = (t, d, p, l,s, ty) => {
-        setTitle(t);
-        setDesc(d);
-        setPrice(p);
-        setLink(l);
-        setSeller(s);
-        setType(ty);
-        togglePopup();
-    }
-
-    const nextornm = (e) =>{
-        document.getElementById("menu").scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });
-        if(e.target.name === "next"){
-          setIndexOfList(indexOfList+8);
-          setStartOfList(startOfList+8);
-        }else if(e.target.name="num"){
-            const s = 8 * parseInt(e.target.innerHTML);
-            setIndexOfList(s);
-            setStartOfList(s-8);
-        }
-        
-      }
-      const prevContent = (e) =>{
-          document.getElementById("menu").scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });
-          if(e.target.name === "prev"){
-            setIndexOfList(indexOfList-8);
-            setStartOfList(startOfList-8);
-          }
-        
-      }
-      const goLogin = () =>{
-        history.push('/login');
-      }
-      const valuesForReservation = (e) =>{
-        if(e.target.name === "name"){
-            setName(e.target.value);
-        }else if(e.target.name === "email"){
-            setEmail(e.target.value);
-        }else if(e.target.name === "phone"){
-            setPhone(e.target.value);
-        }else if(e.target.name === "date"){
-            setDate(e.target.value);
-        }else if(e.target.name === "time"){
-            setTime(e.target.value);
-        }else if(e.target.name === "people"){
-            setPeople(e.target.value);
-        }else if(e.target.name === "message"){
-            setMessage(e.target.value);
-        }
-      }
-    const logout = () =>{
-        props.checkLoggedIn(false, {}, null);
-    }
-    const goSearch = () =>{
-        history.push('/search');
-    }
+    
     return(
         <div>
-        <header id="header" className="fixed-top d-flex align-items-cente">
-            <div className="container-fluid container-xl d-flex align-items-center justify-content-lg-between">
-            <h1 className="logo me-auto me-lg-0"><a href="#hero"><img alt="" src="assets/img/Eats Online logo.png"/></a></h1>
-            <nav id="navbar" className="navbar order-last order-lg-0">
-                <ul>
-                <li><Link className="nav-link scrollto active" to="#hero">Home</Link></li>
-                <li><Link className="nav-link scrollto" to="#menu">Menu</Link></li>
-                <li><Link className="nav-link scrollto" to="#contact">Contact</Link></li>
-                { 
-                    (() => {
-                        if(props.logedin){
-                            return (<div><li className="dropdown"><Link to="#hero"><span>{props.vals.name}</span> <i className="bi bi-chevron-down"></i></Link>
-                            <ul>
-                            <li><Link to="/cart">Cart List</Link></li>
-                            <li><Link to="/account">Account</Link></li>
-                            <li><Link to="#hero">Password Reset</Link></li>
-                            <li><Link to="#" ><span onClick={logout}>Logout</span></Link></li>
-                            </ul>
-                        </li></div>);
-                        }else{
-                            return (<div><li><Link to="#" onClick={goLogin}><span >SignUp/Login</span></Link>
-                        </li></div>);
-                        }
-                    })()
-                }
-                <li><Link className="nav-link scrollto" id="reserve" to="#reservation" >Reservation</Link></li>
-                </ul>
-                <i className="bi bi-list mobile-nav-toggle"></i>
-            </nav>
-            <Link to="#reservation" className="reservation-btn2 scrollto d-none d-lg-flex" id="reservebutton">Reservation</Link>
-            </div>
-        </header>
-
-        <section id="hero" className="d-flex align-items-center">
-        <div className="container position-relative text-center text-lg-start" data-aos="zoom-in" data-aos-delay="100">
-            <div className="row">
-                <div className="col-lg-10">
-                    <h1>Welcome to <span>Eats Online</span></h1>
-                    <h2>Delivering great food for more than a years!</h2>
+      {/*<---------------T E S T I N G -------------->*/}          
+            <div className="modal fade" id="myModal1" role="dialog">
+                <div className="modal-dialog modal-sm">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h4 className="modal-title">Order Updates</h4>
+                    </div>
+                    <br/>
+                    <div style={{padding:'10px'}}>
+                    </div>
+                        <br/>
+                        <div>
+                            <input type="button" className="btn btn-outline-success" id="close" value="Completed" data-dismiss="modal"/>
+                            &nbsp;&nbsp;&nbsp;
+                            <input type="button" className="btn btn-default" id="close" value="Close" data-dismiss="modal"/>
+                        </div>
+                    <br/>
+                </div>
                 </div>
             </div>
-            <br/>
-             <div className="row">
-                    <input type="text" className="input" placeholder="What are you looking for?" onChange={e=>props.searchItem(e.target.value)}/>
-            </div>
-            <div className="row">
-				    <input type="button" value="search" className="close-btn" onClick={goSearch}/>
-            </div>
-        </div>
-        </section>
-
+         
+        <TopSide right={true} first="Welcome to " second="Eats Online" desc="Delivering great food for more than a year!" img={["./assets/img/0 NEW SLIDER/Slider Image 0.png","./assets/img/0 NEW SLIDER/Slider Image 1.png", "./assets/img/0 NEW SLIDER/Slider Image 2.png", "./assets/img/0 NEW SLIDER/Slider Image 3.png"]}/>
+    
         <main id="main">
-        <section id="menu" className="menu section-bg">
-            <div className="container" data-aos="fade-up">
+        <section id="home_menu" className="menu section-bg">
+            <div className="container" data-aos="fade-up" >
                 <div className="section-title">
-                    <h2>Menu</h2>
-                    <p>Check Our Tasty Menu</p>
+                    <h1>Featured Products</h1>
                 </div>
-                <div className="row" data-aos="fade-up" data-aos-delay="100">
+                <div className="container-all">
+                    <div className="featured-container">
+                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 1.png" alt=""/>
+                        
+                    </div>
+                    <div className="featured-container">
+                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 2.png" alt="" />
+                        
+                    </div>
+                    <div className="featured-container">
+                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 3.png" alt=""/>
+                    </div>
+                    <div className="featured-container">
+                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 4.png" alt=""/>
+                    </div>
+                    <div className="featured-container">
+                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 5.png" alt=""/>
+                    </div>
+                    <div className="featured-container">
+                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 6.png" alt=""/>
+                    </div>
+                </div>
+  
+                {/*<div className="row" data-aos="fade-up" data-aos-delay="100"  >
                     <div className="col-lg-12 d-flex justify-content-center">
-                        <ul id="menu-flters">
-                            <li data-filter="*" className={active[0]}>All</li>
-                            <li data-filter=".filter-vegatable" className={active[1]}>Sale</li>
-                            <li data-filter=".filter-pork" className={active[2]}>Best Seller</li>
-                            <li data-filter=".filter-specialty" className={active[3]}>Others</li>
+                        <ul id="menu-flters" >
+                            <li data-filter="*" className={active[0]} onClick={(e)=>{setActive(["filter-active", ""]); setV(null); setValues(products); setCh2(true);}} >All</li>
+                            <li data-filter=".filter-pork" onClick={(e)=>setActive(["", "filter-active"])} onClick={(e)=>setActive(["", "filter-active"])}>
+                            <div id="navbar" className="navbar2"  style={{position: 'relative', right:'13px'}}> 
+                                <ul >
+                                    <li className={"dropdown2 "+active[2]} >{v===null?"Others":v} <i className="bi bi-chevron-down"></i>
+                                        <ul>
+                                            {categ.map((d, i)=>{
+                                                return(<li key={i} onClick={(e)=>{setV(e.target.innerHTML); search(e.target.innerHTML);}}>{d}</li>)
+                                            })}
+                                            
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                          </li>
                         </ul>
                     </div>
-                    <div className="container">
-                        <div className="row1">
-                        <div className="popup" id="popup-1">
-                            <div className="overlay"></div>
-                            <div className="content">
-                            <div className="close-btn" onClick={togglePopup}>&times;</div>
-                                <h1 id="popuptitle">{title}</h1>
-                                <h5 id="popuptitle">Seller: {seller}</h5>
-                                <span><strong>Php {price}</strong></span>
-                                <p>{description}</p>
-                                <p><strong>Type: {type}</strong></p>
-                                <button className="btn btn-danger my-cart-btn" data-id="1" data-name="Product 1" onClick={addProdtoCart}
-                                            data-summary="summary 1" data-price="100" data-quantity="1" data-image="assets/img/Eats Online logo.png">
-                                    Add to cart
-                                </button>
-
-                            </div>
-                            </div>
-                            <div className="row">
-                            {props.products.slice(startOfList, indexOfList).map((data, index) =>(
-                                <div className="col-md-3 text-center" key={index}>
+                    <div className="container" >
+                        <center>
+                            <div className="row" >
+                            {values.length===0?products.slice(startOfList, indexOfList).map((data, index) =>(
+                                <div className="col-md-3 text-center" key={index}  >
                                     <br/>
-                                    <p>{data.title}</p>
-                                    <button onClick={(e) => addtoCartPopup(data.title, data.description,  data.price, data.link, data.seller, data.type)}><img alt="" src={data.link} className="menu-img"/></button>
+                                    <h6 style={{color:'black'}}>{data[1].title}</h6>
+                                    <a style={{cursor:'pointer'}} onClick={(e) => addtoCartPopup(data[0], data[1].title, data[1].description,  data[1].price, data[1].link, data[1].seller, data[1].type)}>
+                                       {hover===index+1?<div className="menu-img" style={{boxShadow:'0 5px 10px #2EAF7D', margin:'10px', padding:'15px'} } onMouseLeave={(e)=>setHover(0)}><p style={{color: 'black'}}>{data[1].title}</p>
+                                            <p style={{color: 'black'}}>{data[1].description}</p>
+                                            <p style={{color: 'black'}}>{data[1].price}</p>
+                                            <p style={{color: 'black'}}>{data[1].seller}</p>
+                                            <p style={{color: 'black'}}>{data[1].type}</p></div>
+                                    :<img alt="" style={{boxShadow:'0 5px 10px #2EAF7D', margin:'10px', padding:'15px'} } src={data[1].link} className="menu-img" onMouseOver={(e)=>setHover(index+1)} />}</a>
+                                </div>
+                            )):values.slice(startOfList, indexOfList).map((data, index) =>(
+                                <div className="col-md-3 text-center" key={index}  >
+                                    <br/>
+                                    <h6 style={{color:'black'}}>{data[1].title}</h6>
+                                    <a style={{cursor:'pointer'}} onClick={(e) => addtoCartPopup(data[0], data[1].title, data[1].description,  data[1].price, data[1].link, data[1].seller, data[1].type)}><img alt="" style={{boxShadow:'0 5px 10px #2EAF7D', margin:'10px', padding:'15px'} } src={data[1].link} className="menu-img"/></a>
                                 </div>
                             ))}
                             </div>
-                        </div>
-                    </div>
-                 </div>
+                            </center>
+                        </div>                     
+                </div>*/}
             </div>
         </section>
-        <section id="menu" className="menu section-bg">
-            <div className="container" data-aos="fade-up">
-                <div className="row" data-aos="fade-up" data-aos-delay="100">
-                    <div className="col-lg-12 d-flex justify-content-center">
+   <section id="home_menu2" className="menu section-bg">
+        {/*<div className="container" data-aos="fade-up">
+            <div className="row" data-aos="fade-up" data-aos-delay="100"  >
+            <div className="col-lg-12 d-flex justify-content-center">
                         <ul id="menu-flters">
                         { 
                             (() => {
@@ -220,7 +150,8 @@ const Home = (props)=>{
                         }
                         { 
                             (() => {
-                                if( indexOfList < props.products.length) {
+                                let o = values.length===0?products.length:values.length;
+                                if( indexOfList < o) {
                                 return (<li className="filter-active"><a name="next" onClick={nextornm}>Next</a></li>);
                                 }
                             
@@ -228,8 +159,9 @@ const Home = (props)=>{
                         }  
                         { 
                             (() => {
-                                if( indexOfList >= props.products.length && startOfList === 0) {
-                                return (<li className="filter-active">---</li>);
+                                let o = values.length===0?products.length:values.length;
+                                if( indexOfList >= o && startOfList === 0) {
+                                return (<li className="filter-active">-----</li>);
                                 }
                             
                             })()
@@ -239,49 +171,100 @@ const Home = (props)=>{
                     <div className="container">
                         <div className="row">
                             <div className="col-md-2 text-center">
-                                <ul className="pagination justify-content-center fixed-bottom mb-5">                                          
+                                <ul className="pagination justify-content-center fixed-bottom mb-5" id="menu-flters">   
+                                                                   
                                     {
-                                        props.num.map((n, index)=>(
-                                            <li className="page-item active" key={index}><button name="num" className="page-link rounded-circle m-1" onClick={nextornm}>{n}</button></li>
+                                        num.map((n, index)=>(
+                                            <li className="page-item active" key={index}><button name="num" className="page-link rounded-circle" onClick={nextornm} style={{fontSize:'15px', backgroundColor:'#aa2b1d', padding: '12px'}}>{n}</button></li>
                                         ))
                                     }
+                                
                                 </ul>
                             </div>
                         </div>
                     </div>
                  </div>
-            </div>
+            </div>*/}
         </section>
-        <section id="reservation" className="reservation">
+        {/*{ 
+        (() => {
+            if(props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null) {
+            return (<section id="home_reservation" className="reservation">
+                <div className="popup" id="popup-2">
+                    <div className="my-custom-scrollbar content">
+                    <div className="close-btn" onClick={togglePopup2}>&times;</div>
+                   <span style={{color:'black', fontWeight:'bold', fontFamily:'cursive'}}> Total Price: ₱{NumberFormat(Number(totalvalue))}</span>
+                   <br/>
+                        <br/>
+                            {valuesCh2.map((d, i)=>{
+                                 count2();
+                               return(<div key={i} style={{color:'black'}}><span style={{fontFamily:'cursive'}}>{d.split("///key=")[0] +" - ₱"+NumberFormat(Number(d.split("///key=")[2]))}</span><input type="number" className="form-control" id={d.split("///key=")[1]+i} placeholder="1" onChange={(e)=>count2()}/><br/></div> );
+                            })}
+                            <br/>
+                            <button style={{color:'black', borderColor:'black'}} className="btn btn-danger my-cart-btn" data-id="1" data-name="Product 1" onClick={advance}
+                                        data-summary="summary 1" data-price="100" data-quantity="1" data-image="assets/img/Eats Online logo.png">
+                                Advance Order
+                            </button>
+                            </div>
+
+                    <br/>
+                    
+                    </div>
             <div className="container" data-aos="fade-up">
                 <div className="section-title">
-                    <h2>Reservation</h2>
-                    <p>Book Your Order</p>
+                    <h2>Advance Order</h2>
+                    <p>Advance Order </p>
                 </div>
                 <form role="form" data-aos="fade-up" data-aos-delay="100" onSubmit={sendReservation}>
                     <div className="row">
-                        <div className="col-lg-4 col-md-6 form-group mt-3">
-                            <input type="text" name="name" className="form-control" id="name" placeholder="Your Name" data-rule="minlen:4" data-msg="Please enter at least 4 chars" onChange={valuesForReservation} required={true}/>
+                        <div className="clearfix visible-xs"></div>
+                        <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'50%'}}>
+                            <input type="text" name="name" className="form-control" id="name" placeholder="Your Name" onChange={valuesForReservation} required={true}/>
                             <div className="validate"></div>
                         </div>
-                        <div className="col-lg-4 col-md-6 form-group mt-3">
-                            <input type="email" className="form-control" name="email" id="email" placeholder="Your Email" data-rule="email" data-msg="Please enter a valid email" onChange={valuesForReservation} required={true}/>
+                        
+                        <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'50%'}}>
+                        <input type="text" className="form-control" name="phone" id="phone" placeholder="Your Phone" onChange={valuesForReservation} required={true}/>
                             <div className="validate"></div>
                         </div>
-                        <div className="col-lg-4 col-md-6 form-group mt-3">
-                            <input type="text" className="form-control" name="phone" id="phone" placeholder="Your Phone" data-rule="minlen:4" data-msg="Please enter at least 4 chars" onChange={valuesForReservation} required={true}/>
+                        <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'100%', fontSize:'20px'}}>
+                            <select className="selection" id="selection" name="sub_sel" style={{width:'100%', fontSize:'16px'}} value="categories">
+                                    <option value="blank">Categories</option>
+                                    <option value="all">All</option>
+                                    {categ.map((d, index)=>{
+                                        return(<option key={index} value={d}>{d}</option>);
+                                    })}
+                            </select>
+                        </div>
+                            <fieldset className="group"> 
+                            <br/> 
+                            <ul className="checkbox">
+                            {categ.map((d1, i)=>{
+                            return(
+                            <div id={d1} key={i} className="row" style={{width:'100%'}}><br/><h3 style={{color:'#2EAF7D'}}>{d1}</h3>
+                                {products.map((d, index)=>{
+                                    return(d[1].type===d1? <li className="col-xs-6 col-sm-3 col-md-6 " key={index}><label style={{fontFamily:'cursive'}}><input type="checkbox" id={d[0]} name='test' onClick={(e)=>{change(e, d[1].title, d[1].price)}} />{d[1].title}</label>{document.getElementById(d[0])!==null?document.getElementById(d[0]).checked?<div><button style={{width: '50%', backgroundColor: 'white', color: 'black', margin: '2px'}}>+</button><button style={{width: '50%', backgroundColor: 'white', color: 'black', margin: '2px'}}>-</button></div>:null:null}</li>:null );
+                                })}
+                                <br/>  <br/>   
+                            </div>
+                                );
+                            })}
+                               </ul> 
+                            </fieldset> 
+
+                            
+                        
+                        <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'50%'}}>
+                            <input type="date" name="date" className="form-control" id="date" placeholder="Date"  onChange={valuesForReservation} required={true}/>
                             <div className="validate"></div>
                         </div>
-                        <div className="col-lg-4 col-md-6 form-group mt-3">
-                            <input type="date" name="date" className="form-control" id="date" placeholder="Date" data-rule="minlen:4" data-msg="Please enter at least 4 chars" onChange={valuesForReservation} required={true}/>
+                        <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'50%'}}>
+                            <input type="time" className="form-control" name="time" id="time" placeholder="Time" onChange={valuesForReservation} required={true}/>
                             <div className="validate"></div>
                         </div>
-                        <div className="col-lg-4 col-md-6 form-group mt-3">
-                            <input type="time" className="form-control" name="time" id="time" placeholder="Time" data-rule="minlen:4" data-msg="Please enter at least 4 chars" onChange={valuesForReservation} required={true}/>
-                            <div className="validate"></div>
-                        </div>
-                        <div className="col-lg-4 col-md-6 form-group mt-3">
-                            <input type="number" className="form-control" name="people" id="people" placeholder="# of people" data-rule="minlen:1" data-msg="Please enter at least 1 chars" onChange={valuesForReservation} required={true}/>
+                       
+                        <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'50%'}}>
+                            <input type="email" className="form-control" name="email" id="email" placeholder="Email" onChange={valuesForReservation} required={true}/>
                             <div className="validate"></div>
                         </div>
                     </div>
@@ -299,16 +282,20 @@ const Home = (props)=>{
                                 })()
                             }    
                         </div>
-                        <div className="text-center"><button type="submit" className="reservation-btn scrollto d-lg-flex" >Reserve Now!</button></div>
+                        <div className="text-center"><input type="submit" className="reservation-btn scrollto d-lg-flex" value="Order Now" /></div>
                 </form>
-        </div>
-    </section>
-    <section id="contact" className="contact section-bg">
+                        </div>
+                        </section>);
+            }
+        
+        })()
+        }  */}  
+        
+    <section id="contact" className={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?"contact section-bg":""}>
       <div className="container" data-aos="fade-up">
 
         <div className="section-title">
-          <h2>Contact</h2>
-          <p>Contact Us</p>
+          <h1>Contact Us</h1>
         </div>
       </div>
 
@@ -317,60 +304,60 @@ const Home = (props)=>{
         <div className="row mt-5">
 
           <div className="col-lg-4">
-            
-              <div className="address">
-                <i className="bi bi-geo-alt"></i>
-                <h4>Location:</h4>
-                <p>ADDRESS PO?</p>
-            
+            <div className="address" >
+                <i className="bi bi-geo-alt"  style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'black'}}></i>
+                <h4 style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '20px'}:{color: 'black', fontSize: '20px'}}>Location:</h4><br/><br/>
+                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '18px'}:{color: 'black', fontSize: '18px'}}>19, Via Milano St., Villa Firenze, Quezon City, Philippines</p>
+            </div>
 
               <div className="open-hours">
-                <i className="bi bi-clock"></i>
-                <h4>Open Hours:</h4>
-                <p>Monday-Saturday:<br/>
-                  11:00 AM - 2300 PM
+                <i className="bi bi-clock" style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'black'}}></i>
+                <h4 style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '20px'}:{color: 'black', fontSize: '20px'}}>Open Hours:</h4>
+                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '18px'}:{color: 'black', fontSize: '18px'}}>Monday-Saturday:<br/>
+                9:00 AM-5:00 PM
                 </p>
               </div>
 
               <div className="email">
-                <i className="bi bi-envelope"></i>
-                <h4>Email:</h4>
-                <p>EatsOnline@gmail.com</p>
+                <i className="bi bi-envelope" style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'black'}}></i>
+                <h4 style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '20px'}:{color: 'black', fontSize: '20px'}}>Email:</h4>
+                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '18px'}:{color: 'black', fontSize: '18px'}}>EatsOnline@gmail.com</p>
               </div>
 
               <div className="phone">
-                <i className="bi bi-phone"></i>
-                <h4>Call:</h4>
-                <p>09157583872</p>
+                <i className="bi bi-phone" style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'black'}}></i>
+                <h4 style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '20px'}:{color: 'black', fontSize: '20px'}}>Call:</h4>
+                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '18px'}:{color: 'black', fontSize: '18px'}}>09157583872</p>
               </div>
-
-            </div>
-
           </div>
 
           <div className="col-lg-8 mt-5 mt-lg-0">
 
-            <form action="" method="post" role="form" className="php-email-form">
+            <form action="" method="post" role="form" className="php-email-form" onSubmit={onSubmitContactUs}>
               <div className="row">
                 <div className="col-md-6 form-group">
-                  <input type="text" name="name" className="form-control" id="name2" placeholder="Your Name" required/>
+                <label className="controllabel"><span className="required">*</span>Name: </label>
+                  <input type="text" name="name" className="form-control" id="name2" placeholder="Your Name" onChange={(e)=>setName2(e.target.value)} required style={{background: '#97191d', color:'white'}}/>
                 </div>
                 <div className="col-md-6 form-group mt-3 mt-md-0">
-                  <input type="email" className="form-control" name="email" id="email2" placeholder="Your Email" required/>
+                <label className="controllabel"><span className="required">*</span>Email: </label>
+                  <input type="email" className="form-control" name="email" id="email2" placeholder="Your Email" onChange={(e)=>setEmail2(e.target.value)} required style={{background: '#97191d', color:'white'}}/>
                 </div>
               </div>
               <div className="form-group mt-3">
-                <input type="text" className="form-control" name="subject" id="subject2" placeholder="Subject" required/>
+              <label className="controllabel"><span className="required">*</span>Subject: </label>
+                <input type="text" className="form-control" name="subject" id="subject2" placeholder="Subject" onChange={(e)=>setSubject2(e.target.value)} required style={{background: '#97191d', color:'white'}}/>
               </div>
               <div className="form-group mt-3">
-                <textarea className="form-control" name="message" rows="8" placeholder="Message" required></textarea>
+              <label className="controllabel"><span className="required">*</span>Message: </label>
+                <textarea className="form-control" name="message2" rows="8" placeholder="Message" onChange={(e)=>setMessage2(e.target.value)} required style={{background: '#97191d', color:'white'}}></textarea>
               </div>
-              <div className="my-3">
-                <div className="loading">Loading</div>
-                <div className="error-message"></div>
-                <div className="sent-message">Your message has been sent. Thank you!</div>
-              </div>
-              <div className="text-center"><button type="submit">Send Message</button></div>
+                <span style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'white'}}>{successful}</span>
+              
+                <div className="text-center">
+                  <button type="submit" >Send Message</button>
+                  {/* style={{borderRadius: '50px', background: '#97191d' , color: '#ffffff', fontWeight: '400', border: '2px solid #97191d', textAlign: 'center', height: '30px', width: '150px' }} */}
+                </div>
             </form>
           </div>
         </div>
@@ -378,50 +365,15 @@ const Home = (props)=>{
     </section>
         </main>
         <footer id="footer">
-            <div className="footer-top ">
-                <div className="container">
-                    
-                    <div className="row">
-                        <div col-lg-3="true" col-md-6="true">
-                            <div className="footer-info">
-                                <h3>Eats Online</h3>
-                                <p>
-                                    LOCATION <br></br>
-                                    wala sa wishlist yung address<br></br>
-                                    <strong>Phone:</strong> 09157583842<br></br>
-                                    <strong>Email: </strong> EatsOnline@gmail.com<br></br>
-                                </p>
-                                <div className="social-links mt-3">
-                                    <a href="#hero" className="twitter"><i className="bx bxl-twitter"></i></a>
-                                    <a href="#hero" className="facebook"><i className="bx bxl-facebook"></i></a>
-                                    <a href="#hero" className="instagram"><i className="bx bxl-instagram"></i></a>
-                                    <a href="#hero" className="google-plus"><i className="bx bxl-skype"></i></a>
-                                    <a href="#hero" className="linkedin"><i className="bx bxl-linkedin"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-lg-2 col-md-6 footer-links">
-                            <h4>Useful Links</h4>
-                                <ul>
-                                    <li><i className="bx bx-chevron-right"></i> <a href="#home">Home</a></li>
-                                    <li><i className="bx bx-chevron-right"></i> <a href="#menu">Menu</a></li>
-                                    <li><i className="bx bx-chevron-right"></i> <a href="#contact">Contact</a></li>
-                                </ul>
-                        </div>
-                        <div className="col-lg-4 col-md-6 footer-newletter">
-                            <h4>Feedback!</h4>
-                            <p>adjsafhasjfkkashfhasfjksafsfsahfksfhasjfksj</p>
-                            <form action="" method="post">
-                                <input type="email" name="email"/>
-                                <input type="submit" value="Subscribe"/>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="container">
+            <div className="container" >
+
                 <div className="copyright">
-                    &copy; Copyright <strong><span>Eats Online</span></strong>. All Rights Reserved
+                <div className="social-links mt-3">
+                <a href="#hero" className="facebook"><i className="bx bxl-facebook"></i></a>
+                <a href="#hero" className="instagram"><i className="bx bxl-instagram"></i></a>
+                <a href="#hero" className="twitter"><i className="fab fa-google-plus-g"></i></a>
+            </div>
+                    &copy; Copyright <strong><span style={{color: '#97171d'}}>Eats Online</span></strong>. All Rights Reserved
                 </div>
             </div>
         </footer>
@@ -431,3 +383,4 @@ const Home = (props)=>{
 
 }
 export default Home;
+ 
