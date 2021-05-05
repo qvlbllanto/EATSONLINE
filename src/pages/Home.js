@@ -291,7 +291,7 @@ const Home = (props)=>{
         })()
         }  */}  
         
-    <section id="contact" className={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?"contact section-bg":""}>
+    <section id="contact" className={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?"contact section-bg":"contact section-bg"}>
       <div className="container" data-aos="fade-up">
 
         <div className="section-title">
@@ -352,7 +352,7 @@ const Home = (props)=>{
               <label className="controllabel"><span className="required">*</span>Message: </label>
                 <textarea className="form-control" name="message2" rows="8" placeholder="Message" onChange={(e)=>setMessage2(e.target.value)} required style={{background: '#97191d', color:'white'}}></textarea>
               </div>
-                <span style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'white'}}>{successful}</span>
+                <span style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'black'}}>{successful}</span>
               
                 <div className="text-center">
                   <button type="submit" >Send Message</button>

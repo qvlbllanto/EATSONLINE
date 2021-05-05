@@ -421,11 +421,12 @@ const Account = (props)=>{
                         <div className="row" style={{width: 'auto'}}>
                        {address.map((d, i)=>{
                            return(<div key={i}>
+                            <hr style={{color: '#aa2b1d', height: '5px'}}/>
                                <input key={i} readOnly={true} className="form-control" value={d[1].address} style={{borderWidth: '0', height:'auto', marginBottom: '12px'}} />
-                               <h5 style={{color: 'black', marginLeft: '18px' , textDecoration: 'underline'}}>Edit</h5>
                                {d[1].primary?<h5 style={{color: 'black', textAlign: 'end'}}>Primary Address</h5>
                                :<h5 style={{color: 'black', textAlign: 'end'}}>
                                    <span onClick = {()=>setPrimaryAddress(props.idnum, address[primaryindex][0], d[0])}style={{cursor: 'pointer', color: 'black',  textDecoration: 'underline'}} onMouseOver={(e)=>{e.target.style.color="blue"}} onMouseOut={(e)=>{e.target.style.color="black"}} >Set as Primary address</span> 
+                                   <span style={{marginLeft: '18px', cursor:'pointer', color:'black', textDecoration: 'underline'}}>Edit</span>
                                    <span style={{marginLeft: '18px', cursor:'pointer', color:'black', textDecoration: 'underline'}} onMouseOver={(e)=>{e.target.style.color="red"}} onMouseOut={(e)=>{e.target.style.color="black"}} onClick={()=>removeAddress(props.idnum, d[0])}>Remove</span>
                                 </h5>}</div>);
                        })}
@@ -433,16 +434,19 @@ const Account = (props)=>{
                         
                         <input type="button" className="form-1" style={{width: 'auto', borderRadius: '50px'}} value={!addornot?"+ Add Address":"Cancel"} onClick={()=>{addornot?setaorn(false):setaorn(true); setUpdating([null, false])}}/>
                         {addornot?<form onSubmit={(e)=>{e.preventDefault();  waitforAdding(streetno+" "+street+", "+brgy+", "+city+", "+region);}}>
-                            <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>House/Building Number:</h4>
-                            <input className="form-control" placeholder="Street No." onChange={(e)=>setNo(e.target.value)} required={true} />
-                            <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>Street:</h4>
-                            <input className="form-control" placeholder="Street" onChange={(e)=>setS(e.target.value)} required={true}/>
-                            <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>Barangay:</h4>
-                            <input className="form-control" placeholder="Barangay" onChange={(e)=>setBrgy(e.target.value)} required={true}/>
-                            <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>City:</h4>
+                        <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>Address</h4>
+                            <input className="form-control" placeholder="Address" onChange={(e)=>setNo(e.target.value)} required={true} />
+
+                        <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>City</h4>
+                            <input className="form-control" placeholder="City" onChange={(e)=>setS(e.target.value)} required={true}/>
+                            
+                            <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>Region</h4>
+                            <input className="form-control" placeholder="Region" onChange={(e)=>setBrgy(e.target.value)} required={true}/>
+
+                            {/*<h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>City:</h4>
                             <input className="form-control" placeholder="City" onChange={(e)=>setC(e.target.value)} required={true}/>
                             <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>Region:</h4>
-                            <input className="form-control" placeholder="Region" onChange={(e)=>setR(e.target.value)} required={true}/>
+                    <input className="form-control" placeholder="Region" onChange={(e)=>setR(e.target.value)} required={true}/>*/}
                             {updating[1]?
                             <div>
                                <br/>

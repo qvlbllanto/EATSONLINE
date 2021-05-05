@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { useHistory, Link } from "react-router-dom";
-import {getUpdatedHistory, getCartLength, getUpdatedHistory2} from '../pages/functions.js';
+import {getAccountDetails, getUpdatedHistory, getCartLength, getUpdatedHistory2} from '../pages/functions.js';
 import Chat from "../pages/Chat.js";
 
 const Header = (props) =>{
@@ -8,10 +8,10 @@ const Header = (props) =>{
     const box = document.getElementById('box');
     const [notifArr, setNotifArr] = useState([]);
     const [notifArr2, setNotifArr2] = useState([]);
+    const [accountD, setAccountD] = useState({});
     const [cart, setCart] = useState(0);
     const down = false;
     const [ch, setCh] = useState(false);
-    //lagay mo dito variables
 
 
     React.useEffect(()=>{
@@ -22,8 +22,12 @@ const Header = (props) =>{
             document.body.appendChild(script);
             setCh(true);
         }
+
         if(props.logedin && props.legitkey===true){
         const timer = setTimeout(() => {
+            getAccountDetails(props.idnum).then((d)=>{
+                setAccountD(d);
+            });
             getUpdatedHistory(props.idnum).then((d)=>{
                 setNotifArr(d);
             });
@@ -33,7 +37,7 @@ const Header = (props) =>{
             getCartLength(props.idnum).then((d)=>{
                 setCart(d);
             })
-          }, 100);
+          }, 200);
           return () => clearTimeout(timer);
         }
     });
@@ -131,7 +135,7 @@ const Header = (props) =>{
                         if(props.logedin || props.legitkey){
                             return (<div><li className="dropdown"><Link to="#"className={props.p==="Acct"?"nav-link scrollto active":"nav-link scrollto"} style={{textDecoration:'none'}}><span>Account <i className="fa fa-user fa-2x"></i></span> <i className="bi bi-chevron-down"></i></Link>
                             <ul>
-                                <li style={{padding: '10px',}} ><h4 style={{color:'black',  fontWeight: 'bold', color: '#97191d'}}>{props.vals}</h4></li>
+                                <li style={{padding: '10px',}} ><h4 style={{color:'black',  fontWeight: 'bold', color: '#97191d'}}>{accountD.name}</h4></li>
                                 <li><Link className={props.p==="Acct"?"nav-link scrollto active":"nav-link scrollto"} to="/account" style={{textDecoration:'none',fontSize: '15px'}}>Account</Link></li>
                                 <li><Link to="#" style={{textDecoration:'none',fontSize: '15px'}}><span onClick={logout}>Logout</span></Link></li>
                             </ul>

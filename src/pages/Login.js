@@ -31,6 +31,7 @@ const Login = (props)=>{
             name: n,
             code: randomcode,
             email: e,
+            messsage: "Thanks for registering to EATS ONLINE, here is your verification code,",
         };
         let template ="service_gkqzauk";
         let id = "template_3kpnkpt";
@@ -38,7 +39,7 @@ const Login = (props)=>{
             .then(function(response) {
                 console.log('SUCCESS!', response.status, response.text);
               }, function(error) {
-                console.log('FAILED...', error);
+                console.lo.g('FAILED...', error);
               });
     }
 
@@ -290,11 +291,13 @@ const Login = (props)=>{
     const sendVerificationEmail2 = (e,l) => {
 
         var templateParams = {
+            name: e,
+            code: l,
             email: e,
-            link: l
+            message: "Here is the link for resetting your password,"
         };
         let template ="service_gkqzauk";
-        let id = "template_s3wcuod";
+        let id = "template_3kpnkpt";
         emailjs.send(template,id,templateParams, )
             .then(function(response) {
                 setV('Verification link sent!');

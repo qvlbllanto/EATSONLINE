@@ -764,7 +764,7 @@ const getChat = (num, id, func) =>{
   
   const sendChat = ( id, mes) =>{
     return new Promise((resolve, reject)=>{
-        data.ref("chat").child(id).push({message: mes, who: 'user', date: new Date().toString()}).then((d)=>{
+        data.ref("chat").child(id).push({message: mes, who: 'user', date: new Date().toString(), readbya: false}).then((d)=>{
             resolve(true);
         })
     });
@@ -1041,4 +1041,19 @@ const checkIfItemisBought = (idnum, menuid) =>{
    
 }
 
-export {checkIfItemisBought, checkk, checkifincart, getData2, cancelorderR, updateAdvStatus, getUpdatedHistory2, checkLastKey, viewHistory2,updateCartData, addAdvanceOrderList, checkCart, getType, getCartLength, setPrimaryAddress, removeAddress, addAddress, getProductComments, addComment, getProductData, deleteDownAdvReceipt, addDownAdvReceipt, addAdvReceipt,deleteAdvReceipt, getCurrOrder, newMessage, getChat, sendChat, deleteReceipt, addReceipt, checkDate, getAdvanceOrder, NumberFormat,getData, waitloop, updatePass, checkCode, checkIfEmailExist, cancelorder, updateStatus,getUpdatedHistory, viewHistory, updateACCOUNT, addImage, checkPasswordIfCorrect, deletePROFPIC, getAccountDetails, sendContact,checkIfAcctExist, getHistory, updateCart, removeAllCart,addLogs, todaydate, addCart, Reservation, generateCode, endDateofVerification, getCartData, deleteITM, buyItems};
+const readAll = (id, num) =>{
+    data.ref("chat").child(id).limitToLast(num).once('value', (snapshot)=>{
+        snapshot.forEach((snap)=>{
+            data.ref("chat").child(id).child(snap.key).update({readbyu: true});
+        })
+    })
+}
+const getAllUnread = (id) =>{
+    return new Promise((resolve, reject)=>{
+        data.ref("chat").child(id).orderByChild('readbyu').equalTo(false).once('value', (snapshot)=>{
+            resolve(snapshot.numChildren());
+        })
+    })
+}
+
+export {getAllUnread, readAll, checkIfItemisBought, checkk, checkifincart, getData2, cancelorderR, updateAdvStatus, getUpdatedHistory2, checkLastKey, viewHistory2,updateCartData, addAdvanceOrderList, checkCart, getType, getCartLength, setPrimaryAddress, removeAddress, addAddress, getProductComments, addComment, getProductData, deleteDownAdvReceipt, addDownAdvReceipt, addAdvReceipt,deleteAdvReceipt, getCurrOrder, newMessage, getChat, sendChat, deleteReceipt, addReceipt, checkDate, getAdvanceOrder, NumberFormat,getData, waitloop, updatePass, checkCode, checkIfEmailExist, cancelorder, updateStatus,getUpdatedHistory, viewHistory, updateACCOUNT, addImage, checkPasswordIfCorrect, deletePROFPIC, getAccountDetails, sendContact,checkIfAcctExist, getHistory, updateCart, removeAllCart,addLogs, todaydate, addCart, Reservation, generateCode, endDateofVerification, getCartData, deleteITM, buyItems};

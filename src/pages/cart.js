@@ -519,6 +519,7 @@ const Cart = (props)=>{
                                                                     <input type="date" name="date" className="form-control" id="date" placeholder="Date"  onChange={valuesForReservation} required={true}/>
                                                                     <div className="validate"></div>
                                                                 </div>
+                                                                
                                                                 <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'50%'}}>
                                                                 <label className="inline"><span className="required">*</span>Time: </label>
                                                                     <input type="time" className="form-control" name="time" id="time" placeholder="Time" onChange={valuesForReservation} required={true}/>
@@ -530,6 +531,7 @@ const Cart = (props)=>{
                                                                     <input type="email" className="form-control" name="email" id="email" placeholder="Type your Email" onChange={valuesForReservation} required={true}/>
                                                                     <div className="validate"></div>
                                                                 </div>
+
                                                                 <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'100%'}}>
                                                                 <label className="inline"><span className="required">*</span>Phone Number: </label>
                                                                     <input type="number" className="form-control" name="phone" id="phone" placeholder="Type your Phone Number" onChange={valuesForReservation} required={true}/>

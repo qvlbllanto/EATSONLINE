@@ -145,16 +145,16 @@ const Receipt = (props) => {
                        
                             {/* <div className="col-md-12 col-lg-8 col-11 mx-auto main_cart" > */}
                                 <div className="card p-4"style={{marginRight: '50px'}} style={{borderRadius: '20px' }} >
-                                <p style={{fontSize: '40px', fontFamily: 'cursive'}}><img src="assets/img/Eats Online logo.png" style={{height: '50px', width: '40px', marginRight: '50px'}}/>Eats Online </p>
-                                    <h1 className="product_name" style={{fontSize:'20px', textAlign: 'center'}}>BILLING<br/></h1>
+                                <p style={{fontSize: '40px', fontFamily: 'cursive'}}><img src="assets/img/Eats Online logo.png" style={{height: '50px', width: '40px'}}/>Eats Online </p>
+                                    <h1 className="product_name" style={{fontSize:'20px', textAlign: 'center' , fontWeight: 800, fontFamily: 'cursive'}}>BILLING<br/></h1>
                                     <div className="p-4 shadow bg-white"> 
-                                        <h5 style={{color:'black'}}>Name:  <strong style={{fontSize:'12px', color:'#000000'}}>{items.name}</strong></h5>
-                                        <h5 style={{color:'black', left: 50}}>Order Id: <strong style={{fontSize:'15px', color:'#000000'}}>{items.id}</strong></h5>
-                                        <h5 style={{color:'black', left: 50}}>Phone: {items.phone}</h5>
-                                        <h5 style={{color:'black', left: 50}}>Address:  {items.address}</h5>
-                                        <h5 style={{color:'black', left: 50}}>Order Date: {new Date(items.dateBought).toDateString()} {new Date(items.dateBought).toLocaleTimeString()}</h5>
-                                        {props.reserve?<h5 style={{color:'black'}}>Delivery Date and Time: {new Date(items.date).toDateString()} {new Date(new Date(items.date).toDateString()+" "+items.time).toLocaleTimeString()}</h5>:null}
-                                        {props.reserve?<h5 style={{color:'black'}}>Message:  {items.message}</h5>:null}
+                                        <h5 style={{color:'black', textAlign: 'start'}}>Name:  <strong style={{fontSize:'12px', color:'#000000'}}>{items.name}</strong></h5>
+                                        <h5 style={{color:'black', textAlign: 'start'}}>Order Id: <strong style={{fontSize:'15px', color:'#000000'}}>{items.id}</strong></h5>
+                                        <h5 style={{color:'black', textAlign: 'start'}}>Phone: {items.phone}</h5>
+                                        <h5 style={{color:'black', textAlign: 'start'}}>Address:  {items.address}</h5>
+                                        <h5 style={{color:'black', textAlign: 'start'}}>Order Date: {new Date(items.dateBought).toDateString()} {new Date(items.dateBought).toLocaleTimeString()}</h5>
+                                        {props.reserve?<h5 style={{color:'black' , textAlign: 'start', bottom: '100%'}}>Delivery Date and Time: {new Date(items.date).toDateString()} {new Date(new Date(items.date).toDateString()+" "+items.time).toLocaleTimeString()}</h5>:null}
+                                        {props.reserve?<h5 style={{color:'black', textAlign: 'start'}}>Message:  {items.message}</h5>:null}
                                         <div className="my-custom-scrollbar" >
                                             <div className="row" >
                                                 <div>

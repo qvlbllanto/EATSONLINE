@@ -394,7 +394,8 @@ a#scrollUp i {
   }
   
   .ml15 .word {
-    text-align: center;
+    text-align: center
+										;
     display: inline-block;
     line-height: 1em;
     color: #aa2b1d;

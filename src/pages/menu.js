@@ -106,7 +106,7 @@ const Menu = (props) =>{
 		
 		props.setMenu(v);
 		setT(typ);
-		setS(sel);
+		setS(sel);	
 	}
 	const toggle = (className, displayState) => {
 		let elements =document.getElementsByName(className);
@@ -523,7 +523,7 @@ const Menu = (props) =>{
 
 	</section></main>
 	<footer id="footer">
-            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{backgroundColor: '#faff65'}:{backgroundColor: 'white', color: 'black'}}>
+            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{backgroundColor: '#faff65'}:{backgroundColor: '#faff65', color: 'black'}}>
                 <div className="container">
                     
                     <div className="row">
