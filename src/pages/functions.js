@@ -995,13 +995,18 @@ const checkLastKey = (what) =>{
 }
 const checkk = async(v,id)=>{
     return new Promise((resolve, reject)=>{
-        data.ref("cart").child(id).orderByChild("key").equalTo(v).once('value', (snapshot)=>{
-            if(!snapshot.val()){
-                resolve(false);
-            }else{
-                resolve(true);
-            }
-        })
+        try{
+            data.ref("cart").child(id).orderByChild("key").equalTo(v).once('value', (snapshot)=>{
+                if(!snapshot.val()){
+                    resolve(false);
+                }else{
+                    resolve(true);
+                }
+            })
+        }catch(e){
+            resolve(e);
+        }
+        
     })
 }
 const checkifincart= async(arr, id) =>{
