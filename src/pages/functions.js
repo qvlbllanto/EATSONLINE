@@ -1,7 +1,6 @@
 import {browserName, fullBrowserVersion,  osName, osVersion, deviceType} from "react-device-detect";
 import {data, storage} from "../firebase";
 import publicIP from 'react-native-public-ip';
- 
 const saveLogs = (ip, page) =>{
     data.ref('logs').push().set({
         "IP" : ip,
@@ -140,16 +139,7 @@ const Reservation= (name, email, phone, date, time, message, set, uid, totalpric
         x.then(()=>{
             data.ref('cart').child(uid).set(set[1]).then(()=>{
                 data.ref('reservation').child(x.key).update({id: (generateCode().substring(3)+x.key.substring(6, 9)).replace("-","").replace("_","")}).then((d)=>{
-                    data.ref('reservation').child(x.key).child('items').once('value',(snapshot)=>{
-                        snapshot.forEach((snap)=>{
-                            data.ref('products').orderByKey().equalTo(snap.val()[1].key).once('value',(s)=>{
-                                s.forEach((x1)=>{
-                                    data.ref('products').child(x1.key).update({numberofitems: x1.val().numberofitems - snap.val()[1].amount}); 
-                                }); 
-                            });
-                        });
                         resolve(x.key);
-                     });
                 });
             });
         })
@@ -223,7 +213,7 @@ const addLogs = (page) =>{
 }
 const endDateofVerification = () =>{
     let d = new Date();
-    var n = parseInt(d.getTime())+300000;
+    var n = parseInt(d.getTime())+86400000;
     var x = new Date(n);
     return x.toString();
 }
@@ -464,17 +454,7 @@ const cancelorder = (hid, reason)=>{
 const cancelorderR = (hid, reason)=>{
     return new Promise((resolve, reject)=>{
         data.ref('reservation').child(hid).update({status: 'Cancelled' , reason: reason}).then((d)=>{
-            data.ref('reservation').child(hid).once('value', (snapshot)=>{
-                snapshot.val().items.forEach((d)=>{
-                    data.ref('products').child(d[1].key).once('value', (snaps)=>{
-                        if(snapshot.val()!==null){
-                            console.log("DAWD");
-                            data.ref('products').child(d[1].key).update({numberofitems: snaps.val().numberofitems+d[1].amount});
-                        }
-                    });
-                })
-                resolve(true);
-            })
+            resolve(true);
         });
     })
 }
@@ -1060,5 +1040,6 @@ const getAllUnread = (id) =>{
 const recLogin  = (id) =>{
     data.ref("accounts").child(id).update({recent: new Date().toString()});
 }
+
 
 export {recLogin, getAllUnread, readAll, checkIfItemisBought, checkk, checkifincart, getData2, cancelorderR, updateAdvStatus, getUpdatedHistory2, checkLastKey, viewHistory2,updateCartData, addAdvanceOrderList, checkCart, getType, getCartLength, setPrimaryAddress, removeAddress, addAddress, getProductComments, addComment, getProductData, deleteDownAdvReceipt, addDownAdvReceipt, addAdvReceipt,deleteAdvReceipt, getCurrOrder, newMessage, getChat, sendChat, deleteReceipt, addReceipt, checkDate, getAdvanceOrder, NumberFormat,getData, waitloop, updatePass, checkCode, checkIfEmailExist, cancelorder, updateStatus,getUpdatedHistory, viewHistory, updateACCOUNT, addImage, checkPasswordIfCorrect, deletePROFPIC, getAccountDetails, sendContact,checkIfAcctExist, getHistory, updateCart, removeAllCart,addLogs, todaydate, addCart, Reservation, generateCode, endDateofVerification, getCartData, deleteITM, buyItems};

@@ -20,6 +20,7 @@ const Login = (props)=>{
     const [password1, setPassword1] = useState(null);
     const [code, setCode] = useState(null);
     const [forget, setForget] = useState(false);
+    const [address, setAddress] = useState(null);
     const history = useHistory();
     React.useEffect(() => { 
         addLogs("Login/Register");
@@ -64,7 +65,7 @@ const Login = (props)=>{
             if(ch){
                 const id = await checkLastKey('accounts');
                 let coderandom = generateCode2();
-                data.ref('accounts').push().set({
+                let x9 = data.ref('accounts').push({
                     "id": id,
                     "name": name,
                     "email": email,
@@ -75,10 +76,12 @@ const Login = (props)=>{
                     "verificationCode": coderandom,
                     "verifyend": x,
                     "dateCreated": todaydate()
-                }).then(id=>{
+                });
+                data.ref("accounts").child(x9.key).child('addresses').push({address: address, primary: true}).then(()=>{
                     sendVerificationEmail(name, email, coderandom);
                     document.getElementById("errororsuccess2").innerHTML = "<span style='color: green'>Successfully Registered <br/> Verification Code is sent to your inbox</span>"
-                });
+                })
+
             }else{
                 document.getElementById("errororsuccess2").innerHTML = "Account already Exist!";
             }
@@ -374,7 +377,7 @@ const Login = (props)=>{
                                 <label className="controllabel"><span className="required">*</span>Email: </label>
                                 <input type="email" name="" placeholder="Email Address" onChange={e => setEmail(e.target.value)} required={true}/>
                                 <label className="controllabel"><span className="required">*</span>Address: </label>
-                                <input type="text" name="" placeholder="Address"/>
+                                <input type="text" name="" placeholder="Address" onChange={(e)=>setAddress(e.target.value)}/>
                                 <label className="controllabel"><span className="required">*</span>Phone Number: </label>
                                 <input type="number" name="" placeholder="Phone Number" onChange={e => setPhoneNumber(e.target.value.toString())} required={true}/>
                                 <label className="controllabel"><span className="required">*</span>Password: </label>

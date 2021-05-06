@@ -1,6 +1,6 @@
     import React, {useState} from 'react';
 import { useHistory} from "react-router-dom";
-import {getAdvanceOrder, cancelorderR, cancelorder,addAddress,  removeAddress, updateACCOUNT, addImage, NumberFormat, checkPasswordIfCorrect, deletePROFPIC, addLogs, getHistory, getAccountDetails, setPrimaryAddress} from "./functions.js";
+import { getAdvanceOrder, cancelorderR, cancelorder,addAddress,  removeAddress, updateACCOUNT, addImage, NumberFormat, checkPasswordIfCorrect, deletePROFPIC, addLogs, getHistory, getAccountDetails, setPrimaryAddress} from "./functions.js";
 import {cyrb53, encrypt} from "./encdec.js";
 import TopSide from "../components/TopSide.js";
 import { set } from 'animejs';
@@ -91,7 +91,6 @@ const Account = (props)=>{
       const checkImage = (x) =>{
           return new Promise((resolve, reject)=>{
             if(image!==null){
-                
                 deletePROFPIC(props.idnum).then((d)=>{
                     console.log(x);
                     if(d){
@@ -408,7 +407,7 @@ const Account = (props)=>{
                                                <p style={{color: 'green', textAlign: 'start'}}>{updating2[0]}</p></div>:null}
                                                 
                                                <br/>
-                                               <input className="form-control" type="button" value="Save" style={{width: '50%', marginTop: '20px'}} onClick={togglePopup}/>
+                                               <input input type="button" className="form-1" value="Save" style={{width: '50%', marginTop: '20px'}} onClick={togglePopup}/>
                                             </div>);
                                     }
                                 })()
@@ -422,27 +421,22 @@ const Account = (props)=>{
                        {address.map((d, i)=>{
                            return(<div key={i}>
                             <hr style={{color: '#aa2b1d', height: '5px'}}/>
-                               <input key={i} readOnly={true} className="form-control" value={d[1].address} style={{borderWidth: '0', height:'auto', marginBottom: '12px'}} />
-                               {d[1].primary?<h5 style={{color: 'black', textAlign: 'end'}}>Primary Address</h5>
+                               <input key={i} readOnly={true} className="form-control" value={d[1].address} id={"chAdd"+i} style={{borderWidth: '0', height:'auto', marginBottom: '12px'}} />
+                               {d[1].primary?<h5 style={{color: 'black', textAlign: 'end'}}><span>Primary Address</span></h5>
                                :<h5 style={{color: 'black', textAlign: 'end'}}>
                                    <span onClick = {()=>setPrimaryAddress(props.idnum, address[primaryindex][0], d[0])}style={{cursor: 'pointer', color: 'black',  textDecoration: 'underline'}} onMouseOver={(e)=>{e.target.style.color="blue"}} onMouseOut={(e)=>{e.target.style.color="black"}} >Set as Primary address</span> 
-                                   <span style={{marginLeft: '18px', cursor:'pointer', color:'black', textDecoration: 'underline'}}>Edit</span>
+
                                    <span style={{marginLeft: '18px', cursor:'pointer', color:'black', textDecoration: 'underline'}} onMouseOver={(e)=>{e.target.style.color="red"}} onMouseOut={(e)=>{e.target.style.color="black"}} onClick={()=>removeAddress(props.idnum, d[0])}>Remove</span>
                                 </h5>}</div>);
                        })}
                        {address.length===0?<div><h5 style={{color: 'black', textAlign: 'start'}}>No registered address!</h5><br/></div>:null}
                         
                         <input type="button" className="form-1" style={{width: 'auto', borderRadius: '50px'}} value={!addornot?"+ Add Address":"Cancel"} onClick={()=>{addornot?setaorn(false):setaorn(true); setUpdating([null, false])}}/>
-                        {addornot?<form onSubmit={(e)=>{e.preventDefault();  waitforAdding(streetno+" "+street+", "+brgy+", "+city+", "+region);}}>
-                        <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>Address</h4>
-                            <input className="form-control" placeholder="Address" onChange={(e)=>setNo(e.target.value)} required={true} />
-
-                        <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>City</h4>
-                            <input className="form-control" placeholder="City" onChange={(e)=>setS(e.target.value)} required={true}/>
+                        {addornot?<form onSubmit={(e)=>{e.preventDefault();  waitforAdding(street);}}>
+                        <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>Full Address</h4>
+                            <input className="form-control" placeholder="Full Address" onChange={(e)=>setS(e.target.value)} required={true}/>
                             
-                            <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>Region</h4>
-                            <input className="form-control" placeholder="Region" onChange={(e)=>setBrgy(e.target.value)} required={true}/>
-
+                        
                             {/*<h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>City:</h4>
                             <input className="form-control" placeholder="City" onChange={(e)=>setC(e.target.value)} required={true}/>
                             <h4 style={{color: 'black', textAlign: 'start'}}><span className="required">*</span>Region:</h4>
@@ -495,7 +489,7 @@ const Account = (props)=>{
                                         <th>Order Item</th>
                                         <th>Total Price</th>
                                         <th>Order Status</th>
-                                        <th style={{textAlign: 'center'}}>Billing</th>
+                                        <th style={{textAlign: 'center'}}>View Order</th>
                                         <th>Cancel Order</th>
                                     </tr>
                                 </thead>
@@ -510,7 +504,7 @@ const Account = (props)=>{
                                         <td data-label="TotalPrice" style={{cursor:'pointer', fontSize:'15px'}} onClick={(e)=>{toReceipt(e, d[0])}}>₱{NumberFormat(d[1].totalprice)}</td>
                                         <td data-label="Status" style={{cursor:'pointer'}} onClick={(e)=>{toReceipt(e, d[0])}} ><div className="flex-btn"></div>    
                                             <p style={{fontSize:'15px'}} className={d[1].status==="Pending" || d[1].status==="Delivering" || d[1].status==="Cancelled"?d[1].status==="Cancelled"?"label label-error":d[1].status==="Pending" ?"label label-warning":"label label-info":"label label-success"}>{d[1].status}</p></td>
-                                            <td style={{textAlign: 'center'}} onClick={(e)=>{setIdtoP(d[0]); setReserveq(false); document.getElementById("popup-3").classList.toggle("active"); }}><i class="fas fa-receipt" style={{cursor:'pointer'}}></i></td>
+                                            <td style={{textAlign: 'center'}} onClick={(e)=>{setIdtoP(d[0]); setReserveq(false); document.getElementById("popup-3").classList.toggle("active"); }}><i class="fas fa-receipt" style={{cursor:'pointer'}}>View</i></td>
                                         {d[1].status==="Pending"?<td data-label="Cancel Order" style={{textAlign: 'center'}}><i className="fas fa-trash-alt btndelete" style={{cursor:'pointer'}} onClick={(e)=>{setidToDel(d[0]); setWhat("T"); document.getElementById("popup-2").classList.toggle("active"); }}></i></td>:<td data-label="Cancel Order" >---</td>}
                                     </tr> 
                                     );
@@ -550,7 +544,7 @@ const Account = (props)=>{
                                         <th>Total Item</th>
                                         <th>Message</th>
                                         <th>Order Status</th>
-                                        <th style={{textAlign: 'center'}}>Billing</th>
+                                        <th style={{textAlign: 'center'}}>View Order</th>
                                         <th style={{textAlign: 'center'}}>Cancel  Order</th>
                                     </tr>
                                 </thead>
@@ -570,7 +564,7 @@ const Account = (props)=>{
                                         <td data-label="Message" style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}}>{d[1].message}</td>
                                         <td data-label="Order Status" style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}}><div className="flex-btn"></div>    
                                             <p style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}} className={d[1].status==="Pending" || d[1].status==="Delivering" || d[1].status==="Cancelled"?d[1].status==="Cancelled"?"label label-error":d[1].status==="Pending" ?"label label-warning":"label label-info":"label label-success"}>{d[1].status}</p></td>
-                                            <td style={{textAlign: 'center'}}  onClick={()=>{setIdtoP(d[0]); setReserveq(true);  document.getElementById("popup-3").classList.toggle("active");}}><i class="fas fa-receipt" style={{ cursor:'pointer'}}></i></td>
+                                            <td style={{textAlign: 'center'}}  onClick={()=>{setIdtoP(d[0]); setReserveq(true);  document.getElementById("popup-3").classList.toggle("active");}}><i class="fas fa-receipt" style={{ cursor:'pointer'}}>View</i></td>
                                         {d[1].status==="Pending"?<td data-label="Cancel Order" style={{textAlign: 'center'}} ><i className="fas fa-trash-alt btndelete" style={{cursor:'pointer'}} onClick={(e)=>{setidToDel(d[0]); setWhat("R"); document.getElementById("popup-2").classList.toggle("active"); }}></i></td>:<td data-label="Cancel Order">---</td>}
                                         
                                     </tr>
@@ -600,7 +594,7 @@ const Account = (props)=>{
                                 <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
                                     <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
                                     <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157583842<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EatsOnline@gmail.com<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
                                 </p>
                                 <div className="social-links mt-3">
                                     <a href="#hero" className="facebook"><i className="bx bxl-facebook"></i></a>

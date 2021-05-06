@@ -138,7 +138,7 @@ const MenuDetails = (props) =>{
 					
 						{props.logedin && props.legitkey && ifcommented?<form onSubmit={(e)=>{e.preventDefault();addComment(props.menu, message, props.name, rating, accountD.email, accountD.id).then((d)=>{
 										});}}>
-								<textarea name="" id="textar" onChange={(e)=>setMessage(e.target.value)} placeholder="Comment here and rate below..." style={{color:'black'}} required/>
+								<textarea name="" id="textar" onChange={(e)=>setMessage(e.target.value)} placeholder="Comment here and rate below..." style={{color:'black'}}/>
 								<b>Your Rating: 
 								<div className="rating">
 									<input type="radio" name="rating" value="5" id="5" onClick={(e)=>setRating(e.target.value)} required={true}/><label htmlFor="5">☆</label>

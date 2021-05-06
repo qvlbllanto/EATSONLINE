@@ -11,6 +11,7 @@ const Home = (props)=>{
     const [subject2, setSubject2] = useState(null);
     const [successful, setSuccessful] = useState(null);
     const [ch, setCh] = useState(false);
+    const history = useHistory();
     React.useEffect(() => { 
         if(!ch){
             props.setP("Home");
@@ -67,24 +68,48 @@ const Home = (props)=>{
                 </div>
                 <div className="container-all">
                     <div className="featured-container">
-                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 1.png" alt=""/>
+                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 1.png" onClick={()=>history.push("/menu")} alt=""/>
                         
                     </div>
                     <div className="featured-container">
-                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 2.png" alt="" />
+                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 2.png" onClick={()=>history.push({
+                                                                                                        pathname: '/menu',
+                                                                                                        ch: true,
+                                                                                                        val:{
+                                                                                                            type: "Bangus",
+                                                                                                            seller: "ANGELES FRIED CHICKEN",
+                                                                                                            id: "-MZgrmuuPvrgzL5KOSnk"
+                                                                                                        }
+                                                                                                        })} alt="" />
                         
                     </div>
                     <div className="featured-container">
-                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 3.png" alt=""/>
+                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 3.png"  onClick={()=>history.push("/menu")} alt=""/>
                     </div>
                     <div className="featured-container">
-                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 4.png" alt=""/>
+                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 4.png" onClick={()=>history.push({
+                                                                                                        pathname: '/menu',
+                                                                                                        ch: true,
+                                                                                                        val:{
+                                                                                                            type: "Bangus",
+                                                                                                            seller: "ANGELES FRIED CHICKEN",
+                                                                                                            id: "-MZgrmuuPvrgzL5KOSnk"
+                                                                                                        }
+                                                                                                        })} alt=""/>
                     </div>
                     <div className="featured-container">
-                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 5.png" alt=""/>
+                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 5.png" onClick={()=>history.push("/menu")} alt=""/>
                     </div>
                     <div className="featured-container">
-                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 6.png" alt=""/>
+                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 6.png" onClick={()=>history.push({
+                                                                                                        pathname: '/menu',
+                                                                                                        ch: true,
+                                                                                                        val:{
+                                                                                                            type: "Chicharon",
+                                                                                                            seller: "ALING LUCING",
+                                                                                                            id: "-MZgx6o1kGo6Zut9am2c"
+                                                                                                        }
+                                                                                                        })} alt=""/>
                     </div>
                 </div>
   
@@ -321,13 +346,13 @@ const Home = (props)=>{
               <div className="email">
                 <i className="bi bi-envelope" style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'black'}}></i>
                 <h4 style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '20px'}:{color: 'black', fontSize: '20px'}}>Email:</h4>
-                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '18px'}:{color: 'black', fontSize: '18px'}}>EatsOnline@gmail.com</p>
+                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '18px'}:{color: 'black', fontSize: '18px'}}>EATSONLINE.2021@gmail.com</p>
               </div>
 
               <div className="phone">
                 <i className="bi bi-phone" style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'black'}}></i>
                 <h4 style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '20px'}:{color: 'black', fontSize: '20px'}}>Call:</h4>
-                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '18px'}:{color: 'black', fontSize: '18px'}}>09157583872</p>
+                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '18px'}:{color: 'black', fontSize: '18px'}}>0915 748 3872</p>
               </div>
           </div>
 

@@ -26,6 +26,7 @@ class App extends React.Component{
       page: null,
       menuid: null,
       reserve: false,
+      click: false
     };
   }
   setMenuId = (id) =>{
@@ -104,8 +105,8 @@ class App extends React.Component{
       
         {/*<Sidebar/>*/}
         <Switch>
-        <Route path="/" exact render={(props)=>(<Home {...props} setP = {this.setPage.bind(this)} setAID = {this.setA.bind(this)} set = {this.setHead.bind(this)} legitkey = {this.state.legitKEYS} logedin={this.state.loggedIn} vals={this.state.idnValues} idnum={this.state.idn} checkLoggedIn={this.logInFunction.bind(this)}/>)}/>
-          <Route path="/menu" exact render={(props)=>(<Menu {...props} name={this.state.idnValues} logedin={this.state.loggedIn} legitkey = {this.state.legitKEYS} menu = {this.state.menuid}  idnum={this.state.idn} setMenu = {this.setMenuId.bind(this)} setP = {this.setPage.bind(this)} set = {this.setHead.bind(this)} logedin={this.state.loggedIn}/>)}/>
+        <Route path="/" exact render={(props)=>(<Home {...props} menu = {this.state.menuid}  setP = {this.setPage.bind(this)} setAID = {this.setA.bind(this)} set = {this.setHead.bind(this)} legitkey = {this.state.legitKEYS} logedin={this.state.loggedIn} vals={this.state.idnValues} idnum={this.state.idn} checkLoggedIn={this.logInFunction.bind(this)}/>)}/>
+          <Route path="/menu" exact render={(props)=>(<Menu {...props} c = {this.state.click} name={this.state.idnValues} logedin={this.state.loggedIn} legitkey = {this.state.legitKEYS} menu = {this.state.menuid}  idnum={this.state.idn} setMenu = {this.setMenuId.bind(this)} setP = {this.setPage.bind(this)} set = {this.setHead.bind(this)} logedin={this.state.loggedIn}/>)}/>
         {this.state.historyid!==null?<Route path="/receipt" exact render={(props)=>(<Receipt {...props} reserve={this.state.reserve} set = {this.setHead.bind(this)}  idnum = {this.state.idn} hid={this.state.historyid}/>)} />:null}
         <Route path="/reset" exact render={(props)=>(<Reset {...props} set = {this.setHead.bind(this)} />)} />
           {this.state.legitKEYS === true && this.state.loggedIn === true && this.state.idn !== null && this.state.idnValues!==null ? <Route path="/cart" exact render={(props)=>(<Cart {...props} setAID = {this.setA.bind(this)} setP = {this.setPage.bind(this)} set = {this.setHead.bind(this)}  legitkey = {this.state.legitKEYS} vals={this.state.idnValues} cart={this.setCart.bind(this)}  idnum={this.state.idn} checkLoggedIn={this.logInFunction.bind(this)} logedin={this.state.loggedIn}/>) }/>

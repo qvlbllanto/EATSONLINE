@@ -1186,6 +1186,81 @@ section {
 }
 /* end cart popup */
 
+/* cart question about advance order popup */
+
+
+.advancepopup .overlay{
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  display: none;
+}
+.advancepopup .content{
+  position: fixed;
+  top: 50%;
+  bottom: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%) scale(0);
+  background: #f0c929;
+  width: 450px;
+  max-width: 100%;
+  height: 350px;
+  max-height: 100%;
+  z-index: 2;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+
+  opacity: 0.6;
+}
+.advancecontent1{
+  position: fixed;
+  top: 50%;
+  bottom: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%) scale(0);
+  background: #f0c929;
+  width: 400px;
+  max-width: 100%;
+  height: 350px;
+  max-height: 100%;
+  z-index: 2;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+  border-width: 3px;
+  border-style: solid;
+  border-radius: 30px;
+  border-color: #611b14;
+}
+.advancepopup .close-btn{
+  cursor: pointer;
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  width: 30px;
+  height: 30px;
+  background: #303030;
+  opacity: 0.8;
+  color: #fff;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 30px;
+  text-align: center;
+  border-radius: 50%;
+}
+.advancepopup.active .overlay{
+  display: block;
+}
+.advancepopup.active .advancecontent1{
+  transition: all .5s ease;
+  transform: translate(-50%,-50%) scale(1);
+}
+/* end of cart question about advance order popup */
+
 /* account popup */
 
 .accountpopup .overlay{

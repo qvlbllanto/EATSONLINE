@@ -12,20 +12,18 @@ const Header = (props) =>{
     const [cart, setCart] = useState(0);
     const down = false;
     const [ch, setCh] = useState(false);
-
+    const [count, setCount] = useState(0);
     React.useEffect(()=>{
-        if(!ch){
-            recLogin(props.idnum);
-            const script = document.createElement("script");
-            script.src = process.env.PUBLIC_URL + "/assets/js/main.js";
-            script.async = true;
-            document.body.appendChild(script);
-            setCh(true);
-        }
-
         if(props.logedin && props.legitkey===true){
         const timer = setTimeout(() => {
-            
+            if(!ch){
+                recLogin(props.idnum);
+                const script = document.createElement("script");
+                script.src = process.env.PUBLIC_URL + "/assets/js/main.js";
+                script.async = true;
+                document.body.appendChild(script);
+                setCh(true);
+            }
             getAccountDetails(props.idnum).then((d)=>{
                 setAccountD(d);
             });
@@ -38,9 +36,13 @@ const Header = (props) =>{
             getCartLength(props.idnum).then((d)=>{
                 setCart(d);
             })
-            const timer = setTimeout(() => {
+   
+            if(count===120){
                 recLogin(props.idnum);
-            }, 10000);
+                setCount(0);
+            }else{
+                setCount(count+1);
+            }
             return () => clearTimeout(timer);
           }, 200);
           return () => clearTimeout(timer);

@@ -155,7 +155,17 @@ const Receipt = (props) => {
                                         <h5 style={{color:'black', textAlign: 'start'}}>Order Date: {new Date(items.dateBought).toDateString()} {new Date(items.dateBought).toLocaleTimeString()}</h5>
                                         {props.reserve?<h5 style={{color:'black' , textAlign: 'start', bottom: '100%'}}>Delivery Date and Time: {new Date(items.date).toDateString()} {new Date(new Date(items.date).toDateString()+" "+items.time).toLocaleTimeString()}</h5>:null}
                                         {props.reserve?<h5 style={{color:'black', textAlign: 'start'}}>Message:  {items.message}</h5>:null}
-                                        <div className="my-custom-scrollbar" >
+                                        <h5 style={{color:'black' , textAlign: 'end' , display: 'block', marginTop: '-125px'}}>Order Status: {items.status.toUpperCase()}</h5>
+                                            {items.status==="Cancelled"?<h5 style={{color:'black', textAlign: 'end'}}>Reason for Cancellation:</h5>:null}
+                                            {items.status==="Cancelled"?<p style={{fontWeight:'normal', color:'#97191d',textAlign: 'end'}}>{items.reason}</p>:null}
+                                            <h5 style={{color:'black', textAlign: 'end' , display: 'block'}}>Payment Status: {items.pstatus}</h5>
+                                            {!props.reserve?<h5 style={{color:'black', textAlign: 'end' , display: 'block'}}>Payment Mode: {items.payment}</h5>:null}
+                                            {items.status.toUpperCase()==="DELIVERING"?
+                                            <div className="total-amt d-flex justify-content-between font-weight-bold">
+                                                    <p style={{fontWeight: 'bold'}}>Delivery fee</p>
+                                                    <p style={{fontWeight: 'bold', fontSize: '20px'}}>₱<span id="total_cart_amt"  style={{fontWeight: 'bold', fontSize: '20px'}}>{items.deliveryfee}</span></p>
+                                            </div>:null}
+                                        <div className="my-custom-scrollbar" style={{marginTop: '50px'}}>
                                             <div className="row" >
                                                 <div>
                                                     <table className="table" style={{width:'100%'}}>

@@ -28,6 +28,8 @@ const Cart = (props)=>{
     const [message, setMessage] = useState(null);
     const [check, setCheck] = useState(false);
     const [orderm, setOrderm] = useState([false, false]);
+    const [processing, setProcessing] = useState(false);
+    const [res, setRes] = useState(false);
     React.useEffect(()=>{
         if(!ch){
             props.setP("Cart");
@@ -49,12 +51,12 @@ const Cart = (props)=>{
             }
             setTotalamt(Number(totalcartamt).toFixed(2));
             setAmount(Number(num).toFixed(2));
+            console.log(checkboxes);
         });
             checkifHighRepeat();
             getAccountDetails(props.idnum).then((d)=>{
                 setAccountD(d);
                 let arr = [];
-            
                 for(let x in d.addresses){
                     arr.push(d.addresses[x]);
                     if(d.addresses[x].primary){
@@ -63,7 +65,8 @@ const Cart = (props)=>{
                 }
                 setAddresses(arr);
             });
-      }, 600);
+
+      }, 300);
       return () => clearTimeout(timer);
     });
     const updateStock = async(v) =>{
@@ -102,17 +105,17 @@ const Cart = (props)=>{
     }
     const countMoneyNotInDB = (c) =>{
         return new Promise((resolve, reject)=>{
-                let x=c;
-                let num = 0;
-                let totalcartamt = 0;
-                for (let i in x) {
-                    if(checkboxes.includes(x[i][0])){
-                    num+=Number(x[i][1].price)*x[i][1].amount;
-                    }
-                    totalcartamt+=Number(x[i][1].price)*x[i][1].amount;
+            let x=c;
+            let num = 0;
+            let totalcartamt = 0;
+            for (let i in x) {
+                if(checkboxes.includes(x[i][0])){
+                num+=Number(x[i][1].price)*x[i][1].amount;
                 }
-                setTotalamt(Number(totalcartamt).toFixed(2));
-                resolve(Number(num).toFixed(2));
+                totalcartamt+=Number(x[i][1].price)*x[i][1].amount;
+            }
+            setTotalamt(Number(totalcartamt).toFixed(2));
+            resolve(Number(num).toFixed(2));
         });
     }
 
@@ -132,7 +135,7 @@ const Cart = (props)=>{
         setHigherthan(arrayRemove(x, null));
     }
     const checkifHighRepeat2 = async() =>{
-        let x = cart.map(async(d)=>!await checkCart(d[1])?checkboxes.includes(d[0])?d[1].key:null:null);
+        let x = cart.map(async(d)=>!await checkCart(d[1])?checkboxes.includes(d[0])?[d[0],d[1].key]:null:null);
         x = await Promise.all(x);
         return(arrayRemove(x, null));
     }
@@ -143,7 +146,8 @@ const Cart = (props)=>{
     const buyNow = () =>{
         return new Promise(async(reso, reje)=>{
                 const v = await checkifHighRepeat2();
-                if(v.length===0){
+                if(v.length===0 || res){
+                    setProcessing(true);
                     let x1 = null;
                     if(orderm[0]){
                      x1 = document.getElementById('asx').checked?document.getElementById('asx').value:document.getElementById('bsx').checked?document.getElementById('bsx').value:null;
@@ -162,7 +166,7 @@ const Cart = (props)=>{
                             resolve([x,x2]);
                         }).then((ca)=>{
                             if(orderm[1]){
-                            Reservation( accountD.name, email, phone, date, time, message, ca, props.idnum, amount, document.getElementById("selection").value, accountD.id).then((dx)=>{
+                            Reservation( accountD.name, accountD.email, accountD.phoneNumber, date, time, message, ca, props.idnum, amount, document.getElementById("selection").value, accountD.id).then((dx)=>{
                                 props.setAID(true);
                                 props.cart(dx);
                                 reso([true]);
@@ -178,14 +182,105 @@ const Cart = (props)=>{
                             }
                         });
                     }
-            }else{
-                document.getElementById("popup-1").classList.toggle("active");
-            }
+                }else{
+                    document.getElementById("popup-1").classList.toggle("active");
+                    document.getElementById("popup-2").classList.toggle("active");
+                
+                }
         });
 
         
     }
      
+    const confirmIfAdv = (conf) =>{
+        buy2(conf).then((d)=>{
+            if(d[0]){
+                setProcessing(false);
+                history.push('/receipt');
+            }
+        })
+    }
+
+    const buy2 = (clickY) =>{
+        return new Promise((reso, reje)=>{
+            setProcessing(true);
+            let x1 = null;
+            if(orderm[0]){
+                x1 = document.getElementById('asx').checked?document.getElementById('asx').value:document.getElementById('bsx').checked?document.getElementById('bsx').value:null;
+            }
+                if(cart.length!==0){
+                new Promise((resolve, reject)=>{
+                    let x = [];
+                    let x2 = {};
+                    let count = 0;
+                    let toBeAdvanceval = new Array();
+                    let advamount = 0;
+                    for(let v of cart){
+                        if(checkboxes.includes(v[0])){
+                            if(v[1].amount > itemQty[count]){
+                                let newval = {};
+                                let remaining = v[1].amount - itemQty[count];
+                                newval.amount = remaining;
+                                for(let i in v[1]){
+                                    if(i!=="amount"){
+                                        newval[i] = v[1][i];
+                                    }
+                                }
+                                toBeAdvanceval.push([v[0], newval]);
+                                advamount += Number(remaining*v[1].price);
+                                v[1].amount = itemQty[count];
+                                if(itemQty[count]>0){
+                                    x.push(v);
+                                }
+                            }else{
+                                x.push(v);
+                            }
+                        }else{
+                            x2[v[0]]=v[1];
+                        }
+                        count++;
+                    }
+                    let newtotalprice = amount;
+                    newtotalprice-=advamount;
+                    resolve([x,x2, toBeAdvanceval, advamount, newtotalprice]);
+                }).then((ca)=>{
+                    const nv = [ca[2], ca[1]];
+                    let nextDay = new Date();
+                    nextDay.setDate(nextDay.getDate() + 3); 
+                    if(!clickY){
+                        buyItems(ca, Number(ca[4]).toFixed(2), props.idnum, accountD.name,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
+                            if(x[0]){
+                                props.setAID(false);
+                                props.cart(x[1]);
+                                reso([true]);
+                            }
+                        });
+                    }else{
+                        if(ca[0].length>0){
+                            buyItems(ca, Number(ca[4]).toFixed(2), props.idnum, accountD.name,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
+                                if(x[0]){
+                                    Reservation( accountD.name, accountD.email, accountD.phoneNumber, nextDay, nextDay.toLocaleTimeString(), message, nv, props.idnum, Number(ca[3]).toFixed(2), document.getElementById("selection").value, accountD.id).then((dx)=>{
+                                        props.setAID(false);
+                                        props.cart(x[1]);
+                                        reso([true]);
+                                    });
+                                }
+                            });
+                        }else{
+                            Reservation( accountD.name, accountD.email, accountD.phoneNumber, nextDay, nextDay.toLocaleTimeString(), message, nv, props.idnum, Number(ca[3]).toFixed(2), document.getElementById("selection").value, accountD.id).then((dx)=>{
+                                props.setAID(true);
+                                props.cart(dx);
+                                reso([true]);
+                            });
+                        }
+                        
+                    }
+                });
+            }
+        })
+       
+    }
+
     const add = (e, index) =>{
         let i = cart;
         i[index][1].amount += 1;
@@ -238,6 +333,7 @@ const Cart = (props)=>{
         if(buyorsave==="Buy"){
             buyNow().then((d)=>{
                 if(d[0]){
+                    setProcessing(false);
                     history.push('/receipt')
                 }
             });
@@ -376,17 +472,39 @@ const Cart = (props)=>{
                     <div className="cartcontent1">
                     <div className="close-btn" onClick={(e) => togglePopup(null)}>&times;</div>
                     <br/>
-                    <form>
-                        <h1 id="popuptitle" style={{color: 'black'}}>Are you sure?</h1>
-                     <br/>
-                        <input type="button" className="btn btn-danger my-cart-btn"  onClick={()=>confirmation()} value="Yes" style={{fontSize: '15px'}}/>&nbsp;&nbsp;&nbsp;
-                                 <input type="button" className="btn btn-danger my-cart-btn" data-id="1"onClick={(e)=>togglePopup(null)}
+                        <form>
+                            <h1 id="popuptitle" style={{color: 'black'}}>Are you sure?</h1>
+                            <br/>
+                            {processing?
+                                <span>Please Wait...</span>:
+                                <div>
+                                <input type="button" className="btn btn-danger my-cart-btn"  onClick={()=>confirmation()} value="Yes" style={{fontSize: '15px'}}/>&nbsp;&nbsp;&nbsp;
+                                <input type="button" className="btn btn-danger my-cart-btn" data-id="1"onClick={(e)=>togglePopup(null)}
                                 data-summary="summary 1" data-price="100" data-quantity="1" data-image="assets/img/Eats Online logo.png" value="No"  style={{fontSize: '15px'}}/>
-                        </form>
+                        </div>}</form>
                     </div>
                     </div>
                 </div>
-
+                <div className="row1">
+                <div className="advancepopup" id="popup-2">
+                    <div className="overlay"></div>
+                    <div className="advancecontent1">
+                    <div className="close-btn" onClick={(e) => document.getElementById("popup-2").classList.toggle("active")}>&times;</div>
+                    <br/>
+                    <form>
+                        <h1 id="popuptitle" style={{color: 'black'}}>Some products exceeded the stock, do you want to advance order?</h1>
+                     <br/>
+                     {processing?
+                     <span>Please Wait...</span>:
+                     <div>
+                     <input type="button" className="btn btn-danger my-cart-btn"  onClick={()=>confirmIfAdv(true)} value="Yes" style={{fontSize: '15px'}}/>&nbsp;&nbsp;&nbsp;
+                     <input type="button" className="btn btn-danger my-cart-btn" data-id="1" onClick={()=>confirmIfAdv(false)}
+                    data-summary="summary 1" data-price="100" data-quantity="1" data-image="assets/img/Eats Online logo.png" value="No"  style={{fontSize: '15px'}}/>
+                       </div> }
+                    </form>
+                    </div>
+                    </div>
+                </div>
                 <div className="container">
                     <div className="section-title">
                         <h2>Food List</h2>
@@ -427,8 +545,6 @@ const Cart = (props)=>{
                                                          <p className="mb-3">Price: <span style={{fontSize: '15px'}}>₱</span>{NumberFormat(Number(d[1].price).toFixed(2))}</p>
                                                      <br/>
                                                      <p className="mb-3">Quantity: </p>
-                                                     {!outofstock.includes(d[1].key)?
-                                                     
                                                      <ul className="pagination">
                                                             <li className="page-item" ><span type="text" style={{height:'100%'}} key={index} className="page-link" id={"textbox"+index}>{d[1].amount}</span>
                                                              </li>
@@ -438,8 +554,7 @@ const Cart = (props)=>{
                                                              <li className="page-item">
                                                              <button className="page-link" onClick={(e)=>minus(e, index)} style={{borderRadius: '30px'}}><i className="fas fa-minus"></i> </button>
                                                              </li>
-                                                         </ul>:<p className="mb-3" style={{color: 'red'}}>OUT OF STOCK <br/><span style={{color:'blue'}}>Note: Remove item if OUT OF STOCK.</span></p>}  
-                                                         {higherthan.includes(d[1].key) && !outofstock.includes(d[1].key)?<p className="mb-3" style={{color: 'red'}}>Too much item! <br/><span style={{color:'blue'}}>Note: Lower the quantity of item. </span></p>:null}
+                                                         </ul>
                                                  </div>
                                                  <div className="row">
                                                      <div className="col-8 d-flex remove_wish">
@@ -494,8 +609,8 @@ const Cart = (props)=>{
                                                     
                                                     <label className="control-label"> <span className="required">*</span>Order Method: </label>
                                                     <label>
-                                                        <input type="radio" name="colorRadio2" id="opr" value="C.O.D" required={true} onClick={()=>setOrderm([true, false])}/> Order Now
-                                                        <input type="radio" name="colorRadio2" id="oaor" value="Online Payment" style={{marginLeft: '10px'}} required={true} onClick={()=>setOrderm([false, true])} /> Advance Order
+                                                        <input type="radio" name="colorRadio2" id="opr" value="C.O.D" required={true} onClick={()=>{setRes(false);setOrderm([true, false])}}/> Order Now
+                                                        <input type="radio" name="colorRadio2" id="oaor" value="Online Payment" style={{marginLeft: '10px'}} required={true} onClick={()=>{setRes(true);setOrderm([false, true])}} /> Advance Order
                                                     </label>
                                                     <hr/>
                                                     {orderm[0]? <div>
@@ -504,8 +619,9 @@ const Cart = (props)=>{
                                                         <label className="control-label"> <span className="required">*</span>Payment Method: </label>
                                                         <label>
                                                             <input type="radio" name="colorRadio" id="asx" value="C.O.D"  required={true} /> Pay C.O.D 
-                                                            <input type="radio" name="colorRadio" id="bsx" value="Online Payment"   style={{marginLeft: '10px'}}required={true}/> Online Payment
-                                                        </label><hr/>
+                                                            <input type="radio" name="colorRadio" id="bsx" value="Online Payment"   style={{marginLeft: '10px'}} required={true}/> Online Payment
+                                                        </label>
+                                                        <hr/>
                                                     </div>
                                                     :
                                                     orderm[1]?
@@ -526,33 +642,14 @@ const Cart = (props)=>{
                                                                     <div className="validate"></div>
                                                                 </div>
                                                             
-                                                                <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'100%'}}>
-                                                                <label className="inline"><span className="required">*</span>Email: </label>
-                                                                    <input type="email" className="form-control" name="email" id="email" placeholder="Type your Email" onChange={valuesForReservation} required={true}/>
-                                                                    <div className="validate"></div>
-                                                                </div>
-
-                                                                <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'100%'}}>
-                                                                <label className="inline"><span className="required">*</span>Phone Number: </label>
-                                                                    <input type="number" className="form-control" name="phone" id="phone" placeholder="Type your Phone Number" onChange={valuesForReservation} required={true}/>
-                                                                    <div className="validate"></div>
-                                                                </div>
+                                                    
                                                             </div>
                                                                 <div className="form-group mt-3">
                                                                 <label className="inline">Message: </label>
                                                                     <textarea className="form-control" name="message" rows="5" placeholder="Message" onChange={valuesForReservation}></textarea>
                                                                     <div className="validate"></div>
                                                                 </div>
-                                                                <div className="mb-3">
-                                                                    <div className="error-message"></div>
-                                                                    { 
-                                                                        (() => {
-                                                                        if(check){
-                                                                            return (<div className="sent-message">Your booking request was sent. We will call back or send an Email to confirm your reservation. Thank you!</div>);
-                                                                            }
-                                                                        })()
-                                                                    }    
-                                                                </div>
+
                                                                 <hr/>
                                                                 </div>
                                                                 {/* <div className="text-center"><input type="submit" className="reservation-btn scrollto d-lg-flex" value="Order Now" style={{borderRadius: '50px'}}/></div> */}
@@ -576,15 +673,15 @@ const Cart = (props)=>{
                                                         <p style={{fontWeight:'bold', textAlign:'start'}}><span id="total_cart_amt"><span style={{fontSize: '15px'}}>₱</span>{NumberFormat(amount)}</span></p>
                                                     </div>
                                                     
-                                                   {addresses.length!==0 && cart.length!==0 && checkboxes.length!==0 && checkifHigh().length === 0 ?<button type="submit" className="reservation-btn scrollto d-lg-flex" >Order Now</button>:null}
-                                                   {checkifHigh().length !== 0?<p style={{marginRight: '100px'}}>Some Items exceeded the stock quantity or out of stock, please lower the value or delete the item. Items ({checkifHigh().map((d,i)=>i===0?<span style={{fontWeight: 'bold', color: 'red'}}>{d}</span>:<span>, <span style={{fontWeight: 'bold', color: 'red'}}>{d}</span></span>)})</p>:null }
+                                                   {addresses.length!==0 && cart.length!==0 && checkboxes.length!==0 ?<button type="submit" className="reservation-btn scrollto d-lg-flex" >Order Now</button>:null}
+                                                   {/* {checkifHigh().length !== 0?<p style={{marginRight: '100px'}}>Some Items exceeded the stock quantity or out of stock, please lower the value or delete the item. Items ({checkifHigh().map((d,i)=>i===0?<span style={{fontWeight: 'bold', color: 'red'}}>{d}</span>:<span>, <span style={{fontWeight: 'bold', color: 'red'}}>{d}</span></span>)})</p>:null } */}
                                                    </div>
                                                    </div>
                                                 </form>
                                             </div>
-                            </div>
-                            </div>
-                                            
+                                        </div>
+                                        </div>
+                                                        
                                         </div>  
                                     </div>
                                 </div>
@@ -605,8 +702,8 @@ const Cart = (props)=>{
                                 <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>
                                 <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
                                     <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157583842<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EatsOnline@gmail.com<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157483872<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
                                 </p>
                                 <div className="social-links mt-3">
                                     <a href="#hero" className="facebook"><i className="bx bxl-facebook"></i></a>
