@@ -12,17 +12,22 @@ const Header = (props) =>{
     const [cart, setCart] = useState(0);
     const down = false;
     const [ch, setCh] = useState(false);
+    const [ch2, setCh2] = useState(false);
     const [count, setCount] = useState(0);
     React.useEffect(()=>{
+        if(!ch){
+            
+            const script = document.createElement("script");
+            script.src = process.env.PUBLIC_URL + "/assets/js/main.js";
+            script.async = true;
+            document.body.appendChild(script);
+            setCh(true);
+        }
         if(props.logedin && props.legitkey===true){
         const timer = setTimeout(() => {
-            if(!ch){
+            if(!ch2){
                 recLogin(props.idnum);
-                const script = document.createElement("script");
-                script.src = process.env.PUBLIC_URL + "/assets/js/main.js";
-                script.async = true;
-                document.body.appendChild(script);
-                setCh(true);
+                setCh2(true);
             }
             getAccountDetails(props.idnum).then((d)=>{
                 setAccountD(d);
