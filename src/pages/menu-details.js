@@ -3,7 +3,7 @@
 
 import React, {useState} from 'react';
 import { useHistory, Link } from "react-router-dom";
-import {checkIfItemisBought, checkk, getProductData, getAccountDetails, NumberFormat, addCart, addComment, getProductComments, getType, addAdvanceOrderList} from "./functions";
+import { checkIfItemisBought, checkk, getProductData, getAccountDetails, NumberFormat, addCart, addComment, getProductComments, getType, addAdvanceOrderList} from "./functions";
 
 const MenuDetails = (props) =>{
 	const [message, setMessage] = useState(null);
@@ -100,10 +100,16 @@ const MenuDetails = (props) =>{
 												</li>
 											</ul>
 											</div>:<p>This product is already in your cart</p>}
-											
-						<p><b>Stock: </b>{parseInt(val.numberofitems)!==0?val.numberofitems: <span style={{fontWeight: 'bold'}}>Out of Stock!</span>}</p>
-						<p><b>Category:</b>{val.type}</p>
-						<p><b>Supplier:</b> {val.seller}</p>
+														
+												<p><b>Stock: </b>{parseInt(val.numberofitems)!==0?val.numberofitems: <span style={{fontWeight: 'bold'}}>Out of Stock!</span>}</p>
+												<p><b>Category:</b>{val.type}</p>
+												<p><b>Supplier:</b> {val.seller}</p>
+												<p>Available Dates</p>
+						<select className="form-control alterationTypeSelect" style={{width: '100%', height: '35px'}}>
+							{props.dates.map((d2, ib)=>
+							d2[0]===props.menu?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib}>No available date for advance order</option>
+							:null)}
+						</select>
 						<a href=""><img src="images/product-details/share.png" className="share img-responsive"  alt="" /></a>
 					</div>
 
@@ -136,7 +142,7 @@ const MenuDetails = (props) =>{
 						</div>);
 						})}
 					
-						{props.logedin && props.legitkey && ifcommented?<form onSubmit={(e)=>{e.preventDefault();addComment(props.menu, message, props.name, rating, accountD.email, accountD.id).then((d)=>{
+						{props.logedin && props.legitkey && ifcommented?<form onSubmit={(e)=>{e.preventDefault();addComment(props.menu, message, accountD.name, rating, accountD.email, accountD.id).then((d)=>{
 										});}}>
 								<textarea name="" id="textar" onChange={(e)=>setMessage(e.target.value)} placeholder="Comment here and rate below..." style={{color:'black'}}/>
 								<b>Your Rating: 

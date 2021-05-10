@@ -394,11 +394,18 @@ a#scrollUp i {
   }
   
   .ml15 .word {
-    text-align: center
-										;
+    text-align: center;
     display: inline-block;
     line-height: 1em;
-    color: #aa2b1d;
+    color: #f0c929;
+    -webkit-text-stroke: 1px black;
+   text-shadow:
+       2px  2px 0 #000,
+      -1px -1px 0 #000,  
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000;
+     /* #aa2b1d; */
   }
   .search_box input {
     background: #F0F0E9;

@@ -14,6 +14,7 @@ const Home = (props)=>{
     const history = useHistory();
     React.useEffect(() => { 
         if(!ch){
+            // console.log(process.env.REACT_APP_OBJECT_VAL);
             props.setP("Home");
             addLogs("Home");
             props.set(true);
@@ -213,7 +214,7 @@ const Home = (props)=>{
         </section>
         {/*{ 
         (() => {
-            if(props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null) {
+            if(props.legitkey===true && props.logedin===true && props.idnum!==null) {
             return (<section id="home_reservation" className="reservation">
                 <div className="popup" id="popup-2">
                     <div className="my-custom-scrollbar content">
@@ -316,7 +317,7 @@ const Home = (props)=>{
         })()
         }  */}  
         
-    <section id="contact" className={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?"contact section-bg":"contact section-bg"}>
+    <section id="contact" className={props.legitkey===true && props.logedin===true && props.idnum!==null?"contact section-bg":"contact section-bg"}>
       <div className="container" data-aos="fade-up">
 
         <div className="section-title">
@@ -330,29 +331,29 @@ const Home = (props)=>{
 
           <div className="col-lg-4">
             <div className="address" >
-                <i className="bi bi-geo-alt"  style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'black'}}></i>
-                <h4 style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '20px'}:{color: 'black', fontSize: '20px'}}>Location:</h4><br/><br/>
-                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '18px'}:{color: 'black', fontSize: '18px'}}>19, Via Milano St., Villa Firenze, Quezon City, Philippines</p>
+                <i className="bi bi-geo-alt"  style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white'}:{color: 'white'}}></i>
+                <h4 style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white', fontSize: '20px'}:{color: 'white', fontSize: '20px'}}>Location:</h4><br/><br/>
+                <p style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white', fontSize: '18px'}:{color: 'white', fontSize: '18px'}}>19, Via Milano St., Villa Firenze, Quezon City, Philippines</p>
             </div>
 
               <div className="open-hours">
-                <i className="bi bi-clock" style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'black'}}></i>
-                <h4 style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '20px'}:{color: 'black', fontSize: '20px'}}>Open Hours:</h4>
-                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '18px'}:{color: 'black', fontSize: '18px'}}>Monday-Saturday:<br/>
+                <i className="bi bi-clock" style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white'}:{color: 'white'}}></i>
+                <h4 style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white', fontSize: '20px'}:{color: 'white', fontSize: '20px'}}>Open Hours:</h4>
+                <p style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white', fontSize: '18px'}:{color: 'white', fontSize: '18px'}}>Monday-Saturday:<br/>
                 9:00 AM-5:00 PM
                 </p>
               </div>
 
               <div className="email">
-                <i className="bi bi-envelope" style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'black'}}></i>
-                <h4 style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '20px'}:{color: 'black', fontSize: '20px'}}>Email:</h4>
-                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '18px'}:{color: 'black', fontSize: '18px'}}>EATSONLINE.2021@gmail.com</p>
+                <i className="bi bi-envelope" style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white'}:{color: 'white'}}></i>
+                <h4 style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white', fontSize: '20px'}:{color: 'white', fontSize: '20px'}}>Email:</h4>
+                <p style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white', fontSize: '18px'}:{color: 'white', fontSize: '18px'}}>EATSONLINE.2021@gmail.com</p>
               </div>
 
               <div className="phone">
-                <i className="bi bi-phone" style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'black'}}></i>
-                <h4 style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '20px'}:{color: 'black', fontSize: '20px'}}>Call:</h4>
-                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black', fontSize: '18px'}:{color: 'black', fontSize: '18px'}}>0915 748 3872</p>
+                <i className="bi bi-phone" style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white'}:{color: 'white'}}></i>
+                <h4 style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white', fontSize: '20px'}:{color: 'white', fontSize: '20px'}}>Call:</h4>
+                <p style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white', fontSize: '18px'}:{color: 'white', fontSize: '18px'}}>0915 748 3872</p>
               </div>
           </div>
 
@@ -362,22 +363,22 @@ const Home = (props)=>{
               <div className="row">
                 <div className="col-md-6 form-group">
                 <label className="controllabel"><span className="required">*</span>Name: </label>
-                  <input type="text" name="name" className="form-control" id="name2" placeholder="Your Name" onChange={(e)=>setName2(e.target.value)} required style={{background: '#97191d', color:'white'}}/>
+                  <input type="text" name="name" className="form-control" id="name2" placeholder="Your Name" onChange={(e)=>setName2(e.target.value)} required style={{background: '#2aece3', color:'black'}}/>
                 </div>
                 <div className="col-md-6 form-group mt-3 mt-md-0">
                 <label className="controllabel"><span className="required">*</span>Email: </label>
-                  <input type="email" className="form-control" name="email" id="email2" placeholder="Your Email" onChange={(e)=>setEmail2(e.target.value)} required style={{background: '#97191d', color:'white'}}/>
+                  <input type="email" className="form-control" name="email" id="email2" placeholder="Your Email" onChange={(e)=>setEmail2(e.target.value)} required style={{background: '#2aece3', color:'black'}}/>
                 </div>
               </div>
               <div className="form-group mt-3">
               <label className="controllabel"><span className="required">*</span>Subject: </label>
-                <input type="text" className="form-control" name="subject" id="subject2" placeholder="Subject" onChange={(e)=>setSubject2(e.target.value)} required style={{background: '#97191d', color:'white'}}/>
+                <input type="text" className="form-control" name="subject" id="subject2" placeholder="Subject" onChange={(e)=>setSubject2(e.target.value)} required style={{background: '#2aece3', color:'black'}}/>
               </div>
               <div className="form-group mt-3">
               <label className="controllabel"><span className="required">*</span>Message: </label>
-                <textarea className="form-control" name="message2" rows="8" placeholder="Message" onChange={(e)=>setMessage2(e.target.value)} required style={{background: '#97191d', color:'white'}}></textarea>
+                <textarea className="form-control" name="message2" rows="8" placeholder="Message" onChange={(e)=>setMessage2(e.target.value)} required style={{background: '#2aece3', color:'black'}}></textarea>
               </div>
-                <span style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{color: 'black'}:{color: 'black'}}>{successful}</span>
+                <span style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'black'}:{color: 'black'}}>{successful}</span>
               
                 <div className="text-center">
                   <button type="submit" >Send Message</button>
@@ -389,6 +390,7 @@ const Home = (props)=>{
       </div>
     </section>
         </main>
+
         <footer id="footer">
             <div className="container" >
 
@@ -398,7 +400,7 @@ const Home = (props)=>{
                 <a href="#hero" className="instagram"><i className="bx bxl-instagram"></i></a>
                 <a href="#hero" className="twitter"><i className="fab fa-google-plus-g"></i></a>
             </div>
-                    &copy; Copyright <strong><span style={{color: '#97171d'}}>Eats Online</span></strong>. All Rights Reserved
+                    &copy; Copyright <strong><span style={{color: '#eaec31', textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000', letterSpacing: '1px'}}>Eats Online</span></strong>. All Rights Reserved
                 </div>
             </div>
         </footer>

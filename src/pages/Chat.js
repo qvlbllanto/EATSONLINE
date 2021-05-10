@@ -66,7 +66,7 @@ const Chat = (props) =>{
             <button className="chat-btn" onClick={(e)=>{document.getElementById("pop").style.display==="none"?r():document.getElementById("pop").style.display="none"}}> 
                <i className="material-icons"> comment </i>{unr>0? <span className="icon-button__badge1">{unr}</span>:null}
             </button>
-            <div className="chat-popup" id="pop" style={{backgroundColor: '#7c1e23', padding: '10px', display:'none'}}>
+            <div className="chat-popup" id="pop" style={{backgroundColor: '#115d59', padding: '10px', display:'none'}}>
             <label><img src="./assets/img/eatsonlinelogo.png" className="avatar" alt="" style={{width: '30px', height: '30px'}}/>&nbsp;&nbsp;EATS ONLINE</label>
                 <div className="chat-area" id="messages23" style={{backgroundColor: 'white'}}>
                   {messages.map((d, index)=>{
@@ -86,7 +86,7 @@ const Chat = (props) =>{
                 <div className="input-area">
                     <button className="button" style={{color: '&#128206', width: '50px', borderRadius: '5px', fontSize: '20px'}}>&#x1F4CE;</button>  &nbsp;
                     <input type="text" className="form-control" id='chatsss' onClick={()=>readAll(props.idnum, num)} onChange={(e)=>{readAll(props.idnum, num); setVal(e.target.value)}} placeholder="Type here ..."/>
-                    <button className="submit" style={{color: 'black', backgroundColor: 'red'}}> <i className="material-icons"> send</i></button>
+                    <button className="submit" style={{color: 'black', backgroundColor: '#eef04d'}}> <i className="material-icons"> send</i></button>
                     
                 </div>
                 </form>

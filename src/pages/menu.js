@@ -1,7 +1,7 @@
-import React from 'react';
+ import React from 'react';
 import { useState } from 'react';
 import { useHistory, Link } from "react-router-dom";
-import {checkifincart, addLogs, getData,getData2, waitloop, NumberFormat, addCart} from "./functions.js"
+import {getDatesz, checkifincart, addLogs, getData,getData2, waitloop, NumberFormat, addCart} from "./functions.js"
 import anime, { set } from "animejs";
 import MenuDetails from "./menu-details";
 import TopSide from "../components/TopSide.js"
@@ -25,6 +25,7 @@ const Menu = (props) =>{
 	const [v, setv] = useState(null);
 	const [ty, setTy] = useState(null);
 	const [incart, setInCart] = useState(null);
+	const [dates, setDates] = useState([]);
     React.useEffect(()=>{
         if(!ch){
 			props.setP("Menu");
@@ -54,6 +55,9 @@ const Menu = (props) =>{
 			}
         }
         const timer = setTimeout(() => {
+			getDatesz().then((x)=>{
+				setDates(x);
+			})
 			if(ch2){
 
             getData(qty).then(async(data) =>{
@@ -314,7 +318,7 @@ const Menu = (props) =>{
 				<div className="breadcrumbs">
 					<ol className="breadcrumb">
 					<li><a onClick={()=>setClicked(false)} style={{cursor: 'pointer'}}>Menu</a></li>
-					<li className={clicked?"active":''}><i className="fa fa-chevron-left" aria-hidden="true"></i></li>
+					<li className={clicked?"active":''}><i className="fa fa-chevron-left" aria-hidden="true" style={{color: 'black'}}></i></li>
 					<li className={clicked?"active":''} style={!clicked?{visibility: 'hidden'}:null}>Menu Details</li>
 					</ol>
 				</div>
@@ -390,7 +394,12 @@ const Menu = (props) =>{
 												<p>By: {d[1].seller}</p>
 												<p>Category: {d[1].type}</p>
 												<p style={{fontSize: '14px'}}>Stock: <span style={parseInt(d[1].numberofitems)<=0?{fontWeight: 'bold'}:null}>{parseInt(d[1].numberofitems)!==0?d[1].numberofitems:'Out of Stock!'}</span></p>
-												
+												<p>Available Dates</p>
+												<select className="form-control alterationTypeSelect" style={{width: '90%', height: '35px', marginLeft:'5%', marginRight:'5%'}}>
+													{dates.map((d2, ib)=>
+													d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib}>No available date for advance order</option>
+													:null)}
+												</select>
 											</div>
 											<div className="product-overlay">
 												<div className="overlay-content">
@@ -457,6 +466,12 @@ const Menu = (props) =>{
 												<p>By: {d[1].seller}</p>
 												<p>Category: {d[1].type}</p>
 												<p style={{fontSize: '14px', fontWeight:'bold'}}>Stock: {parseInt(d[1].numberofitems)!==0?d[1].numberofitems:'Out of Stock!'}</p>
+												<p>Available Dates</p>
+												<select className="form-control alterationTypeSelect" style={{width: '90%', height: '35px', marginLeft:'5%', marginRight:'5%'}}>
+													{dates.map((d2, ib)=>
+													d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib}>No available date for advance order</option>
+													:null)}
+												</select>
 												</div>
 											
 											<div className="product-overlay">
@@ -519,13 +534,13 @@ const Menu = (props) =>{
 							})}
 							{val.length===0?indexOfList<products.length?<li><a style={{cursor:'pointer' , color:'black'}} name="next"  onClick={nextornm}>{'>>'}</a></li>:null:indexOfList<val.length?<li><a style={{cursor:'pointer' , color:'black'}} name="next"  onClick={nextornm}>{'>>'}</a></li>:null}
 							</ul>
-					</div>:<MenuDetails toCart = {true} name={props.name} idnum={props.idnum}  logedin={props.logedin} legitkey = {props.legitkey} menu = {props.menu} set = {props.set} type = {t} seller = {s} changeM ={changeMenuD}/>}
+					</div>:<MenuDetails dates = {dates} toCart = {true} idnum={props.idnum}  logedin={props.logedin} legitkey = {props.legitkey} menu = {props.menu} set = {props.set} type = {t} seller = {s} changeM ={changeMenuD}/>}
 				</div>
 			</div>
 
 	</section></main>
 	<footer id="footer">
-            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{backgroundColor: '#faff65'}:{backgroundColor: '#faff65', color: 'black'}}>
+            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.idnum!==null?{backgroundColor: '#faff65'}:{backgroundColor: '#faff65', color: 'black'}}>
                 <div className="container">
                     
                     <div className="row">
@@ -534,11 +549,11 @@ const Menu = (props) =>{
                                 <div className="section-title">
                                 <h2>Eats Online</h2>
                                 </div>
-                                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>
-                                <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157483872<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
+                                <p style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>
+                                <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157483872<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
                                 </p>
                                 <div className="social-links mt-3">
 									<a href="#hero" className="facebook"><i className="bx bxl-facebook"></i></a>

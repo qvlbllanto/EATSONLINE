@@ -155,7 +155,6 @@ const Receipt = (props) => {
                                         <h5 style={{color:'black'}}>Phone Number: {items.phone}</h5>
                                         <h5 style={{color:'black'}}>Address:  {items.address}</h5>
                                         <h5 style={{color:'black'}}>Order Date: {new Date(items.dateBought).toDateString()} {new Date(items.dateBought).toLocaleTimeString()}</h5>
-                                        {props.reserve?<h5 style={{color:'black'}}>Delivery Date and Time: {new Date(items.date).toDateString()} {new Date(new Date(items.date).toDateString()+" "+items.time).toLocaleTimeString()}</h5>:null}
                                         {props.reserve?<h5 style={{color:'black'}}>Message:  {items.message}</h5>:null}
                                         <div className="my-custom-scrollbar" >
                                             <div className="row" >
@@ -167,6 +166,8 @@ const Receipt = (props) => {
                                                             {/*<th><h5><strong>Type</strong></h5></th>*/}
                                                             <th><h5 style={{color:'black'}}><strong>Quantity</strong></h5></th>
                                                             <th><h5 style={{color:'black'}}><strong>Price</strong></h5></th>
+                                                            {props.reserve? <th><h5 style={{color:'black'}}><strong>Order Date</strong></h5></th>:null}
+                                                            {props.reserve? <th><h5 style={{color:'black'}}><strong>Item Status</strong></h5></th>:null}
                                                         </tr>
                                                     </thead>
                                                     <tbody className="thead-dark">
@@ -177,6 +178,8 @@ const Receipt = (props) => {
                                                                 {/*<td data-label="Type">{val[1].type}</td>*/}
                                                                 <td data-label="Qty" style={{paddingLeft:'40px'}}>{val[1].amount}</td>
                                                                 <td data-label="Price">₱{NumberFormat(Number(val[1].price*val[1].amount).toFixed(2))}</td>
+                                                                {props.reserve? <td  data-label="Order Date">{val[1].date}</td>:null}
+                                                                {props.reserve? <td  data-label="Item Status">{val[1].status}</td>:null}
                                                             </tr>
                                                             /*<p style={{fontSize: '15px'}}>{val[1].title} x{val[1].amount}</p>
                                                             &nbsp;&nbsp;

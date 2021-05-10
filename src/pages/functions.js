@@ -16,7 +16,7 @@ const saveLogs = (ip, page) =>{
 }
 const todaydate = () =>{
     let d = new Date();
-    return d.toString();
+    return d.toUTCString();
   }
 const addCart = (key, title, price, description, link, idnum,seller, type, id, qty) =>{
     return new Promise((resolve, reject)=>{
@@ -115,15 +115,12 @@ const deleteITM = (idnum, cart) =>{
         resolve(true);
     });
 }
-const Reservation= (name, email, phone, date, time, message, set, uid, totalprice, add, id) =>{
+const Reservation= (name, email, phone, message, set, uid, totalprice, add, id) =>{
     return new Promise(function (resolve, reject) {
-        let v = new Date(date);
         let x = data.ref('reservation').push({
             "name" : name,
             "email": email,
             "phone": phone,
-            "date": v.toString(),
-            "time": time,
             "message": message,
             "items": set[0],
             "userid": uid,
@@ -289,24 +286,31 @@ const getUpdatedHistory2 = (idn) =>{
         });
     })
 }
-
-const checkIfAcctExist = (idn, s) =>{
+const getUpdatedR3 = (idn) =>{
+    return new Promise((resolve, reject)=>{
+        data.ref('reservation').orderByChild('status').equalTo('Pending').once('value', (snapshot)=>{
+            let s = []
+            snapshot.forEach((snap)=>{
+                if(snap.val().userid===idn){
+                    for(let x of snap.val().items){
+                        if(x[1].status === "Processing" || x[1].status === "Delivering"){
+                            s.push([snap.key, x[1], snap.val().id]);
+                        }
+                    }
+                }
+            });
+            resolve(s);
+        });
+    })
+}
+const checkIfAcctExist = (idn) =>{
     return new Promise((resolve, reject)=>{
         data.ref('accounts').orderByKey().equalTo(idn).once('value', (snapshot)=>{
             try{
                if(snapshot.val()===null){
                    resolve(false);
                }else{
-                   new Promise(()=>{
-                    snapshot.forEach((d)=>{
-                        if(d.val().name===s){
-                            
-                            resolve(true);
-                        }
-                    })
-                    resolve(false);
-                   })
-                  
+                    resolve(true);
                }
             }catch(e){
                 resolve(false);
@@ -1010,7 +1014,7 @@ const checkIfItemisBought = (idnum, menuid) =>{
         data.ref("reservation").orderByChild('userid').equalTo(idnum).once('value', (snapshot)=>{
             snapshot.forEach((snap)=>{
                 snap.val().items.forEach((d)=>{
-                    if(d[1].key===menuid && snap.val().status === "Completed"){
+                    if(d[1].key===menuid && d[1].status === "Completed"){
                         resolve(true);
                     }
                 })
@@ -1040,6 +1044,49 @@ const getAllUnread = (id) =>{
 const recLogin  = (id) =>{
     data.ref("accounts").child(id).update({recent: new Date().toString()});
 }
+const getDatesz = () => {
+    return new Promise(function (resolve, reject) {
+      data.ref("products").once("value", (snapshot) =>{
+        let u = [];
+        snapshot.forEach(snap=>{
+          let m = []
+          for(let v in snap.val().adv){
+           m.push([v, snap.val().adv[v]]);
+          }
+          u.push([snap.key,m])
+        });
+        resolve(u);
+      });
+    });
+  }
+
+  const getDat = async(id) =>{
+    let values = await new Promise((resolve, reject)=>{
+        data.ref("products").child(id).once('value', (snapshot)=>{
+            
+            if(snapshot.val()!==null){
+                let o = [];
+                for(let x in snapshot.val().adv){
+                    o.push([x, snapshot.val().adv[x]]);
+                }
+                resolve(o);
+            }
+            resolve(null);
+        })
+    })
+    values = await Promise.all(values);
+    return(values);
+  }
 
 
-export {recLogin, getAllUnread, readAll, checkIfItemisBought, checkk, checkifincart, getData2, cancelorderR, updateAdvStatus, getUpdatedHistory2, checkLastKey, viewHistory2,updateCartData, addAdvanceOrderList, checkCart, getType, getCartLength, setPrimaryAddress, removeAddress, addAddress, getProductComments, addComment, getProductData, deleteDownAdvReceipt, addDownAdvReceipt, addAdvReceipt,deleteAdvReceipt, getCurrOrder, newMessage, getChat, sendChat, deleteReceipt, addReceipt, checkDate, getAdvanceOrder, NumberFormat,getData, waitloop, updatePass, checkCode, checkIfEmailExist, cancelorder, updateStatus,getUpdatedHistory, viewHistory, updateACCOUNT, addImage, checkPasswordIfCorrect, deletePROFPIC, getAccountDetails, sendContact,checkIfAcctExist, getHistory, updateCart, removeAllCart,addLogs, todaydate, addCart, Reservation, generateCode, endDateofVerification, getCartData, deleteITM, buyItems};
+const getDateforCart = (cartd) =>{
+    return new Promise(async(resolve, reject)=>{
+        let x = [];
+        for(let o of cartd){
+            x.push([o[0], await getDat(o[1].key)]);
+        }
+        resolve(x);
+    })
+}
+
+export {getUpdatedR3, getDateforCart, getDatesz,recLogin, getAllUnread, readAll, checkIfItemisBought, checkk, checkifincart, getData2, cancelorderR, updateAdvStatus, getUpdatedHistory2, checkLastKey, viewHistory2,updateCartData, addAdvanceOrderList, checkCart, getType, getCartLength, setPrimaryAddress, removeAddress, addAddress, getProductComments, addComment, getProductData, deleteDownAdvReceipt, addDownAdvReceipt, addAdvReceipt,deleteAdvReceipt, getCurrOrder, newMessage, getChat, sendChat, deleteReceipt, addReceipt, checkDate, getAdvanceOrder, NumberFormat,getData, waitloop, updatePass, checkCode, checkIfEmailExist, cancelorder, updateStatus,getUpdatedHistory, viewHistory, updateACCOUNT, addImage, checkPasswordIfCorrect, deletePROFPIC, getAccountDetails, sendContact,checkIfAcctExist, getHistory, updateCart, removeAllCart,addLogs, todaydate, addCart, Reservation, generateCode, endDateofVerification, getCartData, deleteITM, buyItems};

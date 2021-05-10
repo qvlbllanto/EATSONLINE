@@ -22,6 +22,10 @@ const Login = (props)=>{
     const [forget, setForget] = useState(false);
     const [address, setAddress] = useState(null);
     const history = useHistory();
+    const [login, setLogin] = useState(false);
+    const [guest, setGuest] = useState(false);
+    const [guestAddress, setGuestAddress] = useState(null);
+    const [guestPhone, setGuestPhone] = useState(null);
     React.useEffect(() => { 
         addLogs("Login/Register");
         props.set(false);
@@ -49,7 +53,7 @@ const Login = (props)=>{
             data.ref("accounts").on("value", (snapshot) =>{
             let x = snapshot.val()
             for(let id in x){
-                if(x[id].email === email){
+                if(x[id].email === email && x[id].guest===false){
                     resolve(false);
                     break;
                 }
@@ -75,7 +79,8 @@ const Login = (props)=>{
                     "totalspent": 0,
                     "verificationCode": coderandom,
                     "verifyend": x,
-                    "dateCreated": todaydate()
+                    "dateCreated": todaydate(),
+                    "guest": false
                 });
                 data.ref("accounts").child(x9.key).child('addresses').push({address: address, primary: true}).then(()=>{
                     sendVerificationEmail(name, email, coderandom);
@@ -135,15 +140,19 @@ const Login = (props)=>{
     const checkAcctforLogin = (email1, password1) => {
         return new Promise((resolve, reject) =>{
             let c = [false, false];
+         
             data.ref("accounts").orderByChild('email').equalTo(email1).once("value", (snapshot) =>{
                 let x = snapshot.val();
                 if(x === null){
                     resolve(c);
                 }else{
+                    
                     let idd =null;
                     let idnnn = null;
                     for(let id in x){
-                        if(x[id].password === cyrb53(password1) &&  x[id].email === email1){
+                      
+                        if(x[id].password === cyrb53(password1) &&  x[id].email === email1 && x[id].guest===false){
+                            
                             c[0] = true;
                             idd = id;
                             idnnn = x[id];
@@ -155,6 +164,7 @@ const Login = (props)=>{
                             break; 
                         }
                     }
+                    console.log([c, idd, idnnn]);
                     resolve([c, idd, idnnn]);
                 }
             });
@@ -172,8 +182,7 @@ const Login = (props)=>{
                     resolve(c);
                 }else{
                    
-                    snapshot.forEach((d)=>{
-                        console.log(d.key, idn)    
+                    snapshot.forEach((d)=>{ 
                         if(d.key === idn){
                             
                             resolve(true);
@@ -186,7 +195,22 @@ const Login = (props)=>{
            
         });
      }
+     const iflog = () =>{
+        if(login){
+            setLogin(false);
+        }else{
+            setLogin(true);
+        }
 
+     }
+     const ifguest = () =>{
+        if(guest){
+            setGuest(false);
+        }else{
+            setGuest(true);
+        }
+
+     }
 
      const CompareDate = (dateEnds) => {
         let end = new Date(dateEnds);
@@ -225,22 +249,44 @@ const Login = (props)=>{
             }
         })
      }
-     const encryptvalues = (str1, str2)=>{
+     const encryptvalues = (str1)=>{
         return new Promise((resolve, reject)=>{
-            let x = encrypt(str1, "EATSONLINE", 1);
-            let y = encrypt(str2, "EATSONLINE", 1);
-            resolve([x,y]);
+            let x = encrypt(str1, process.env.REACT_APP_CODEP, 1);
+            resolve([x]);
         });
       }
+
+    const loginAsGuest = async() =>{
+        const id = await checkLastKey('accounts');
+        let x9 = data.ref('accounts').push({
+            "id": id,
+            "name": "Guest -"+generateCode3(),
+            "email": "GUEST",
+            "phoneNumber": guestPhone,
+            "password": "GUEST",
+            "verified": true,
+            "totalspent": 0,
+            "dateCreated": todaydate(),
+            "guest": true
+        });
+        data.ref("accounts").child(x9.key).child('addresses').push({address: guestAddress, primary: true}).then(()=>{
+            encryptvalues(x9.key).then(r=>{
+                localStorage.setItem( 'ifloggedin', true);  
+                localStorage.setItem( 'userIDs', r[0]); 
+                history.push("/");
+                window.location.reload(false);
+              });
+        });
+
+    }
     const LoginAccount = (e) => {
         e.preventDefault();
         checkAcctforLogin(email1, password1).then(data=>{
             if(data[0][0] && data[0][1]){
                 if(data[1] !== null && data[2].name !== undefined && data[2].name !==null){
-                    encryptvalues(data[1], data[2].name).then(r=>{
+                    encryptvalues(data[1]).then(r=>{
                       localStorage.setItem( 'ifloggedin', true);  
                       localStorage.setItem( 'userIDs', r[0]); 
-                      localStorage.setItem( 'valss', r[1]);
                       history.push("/");
                       window.location.reload(false);
                     });
@@ -291,6 +337,15 @@ const Login = (props)=>{
         }
         return code;
     }
+    const generateCode3= () =>{
+        let alphs = "ABCDEFGHIKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let code=""
+        for(let i=0; i<18; i++){
+            let x = Math.floor((Math.random() * 60) + 1);
+            code+=alphs.charAt(x);
+        }
+        return code;
+    }
     const sendVerificationEmail2 = (e,l) => {
 
         var templateParams = {
@@ -327,44 +382,67 @@ const Login = (props)=>{
                     <div className="user signinBx">
                         <div className="imgBx"><img src="./assets/img/Eats Online logo.png" alt=""/></div>
                         <div className="formBx">
+                        
                         <div>
-                        <form actionName="" onSubmit={LoginAccount}>
-                            <h2>LOG IN</h2>
-                            <label className="controllabel"><span className="required">*</span>Email: </label>
-                            <input type="email" name="" placeholder="Email Address" onChange={(e)=>setEmail1(e.target.value)}  required={true}/>
-                            <label className="controllabel"><span className="required">*</span>Password: </label>
-                            <input type="password" name="" placeholder="Password"  onChange={(e)=>setPassword1(e.target.value)} required={true}/>
-                            <span id="errororsuccess" style={{color:"red"}}></span><br/>
-                            <input type="submit" name="" value="Login" onClick={(e)=>setForget(false)}/>
-                            <p className="signup" style={{fontWeight: 'bold'}}>
-                            Don't have an account ? 
-                             <a href="#" onClick={toggleForm} style={{fontSize: '15px', textDecorationLine: 'underline' }}> Sign Up.</a>
-                            </p>
-                            <h5><Link onClick={(e)=>{forget?setForget(false):setForget(true); setVerification(false);}} style={{color: '#97191d', fontSize: '15px'}}>Forget your password?</Link></h5>
-                            <input type="submit" name="" value="Home" onClick={goHome} style={{top: '120px', left: '250px'}}/>
+
+                        {!login && !guest?
+                        <form style={{display:'grid'}} onSubmit={(e)=>e.preventDefault()}>
+                                {/* <div className="row"> */}
+                                    
+                                    <input type="submit" name="" value="&#xf007; LOGIN / SIGN UP" onClick={iflog} style={{maxWidth: '500px', width: '200px', height: '50px',border: '2px solid black', fontFamily: 'FontAwesome', fontWeight: 'normal', fontStyle: 'normal', textDecoration: 'inherit'}}/>
+                                    {/* </div> */}
+                                        <h1 style={{textAlign: 'center'}}>OR</h1>
+                                    {/* <div className="col-lg-6 col-md-6 col-xs-12 col-sm-6"> */}
+                                    <div>
+                                        <input type="submit" name="" value="&#xf2c0; LOGIN as GUEST"  onClick={ifguest} style={{maxWidth: '500px',  width: '200px', height: '50px',border: '2px solid black', fontFamily: 'FontAwesome', fontWeight: 'normal', fontStyle: 'normal', textDecoration: 'inherit'}}/>
+                                        </div>
+                                    {/* </div> */}
+                                    <div>
+                                    <input type="submit" id="homeLog" className="homehome" value="&#xf015; Home" onClick={goHome} style={{fontFamily: 'FontAwesome',fontWeight: 'normal',fontSize: '17px', fontStyle: 'normal', textDecoration: 'inherit', textDecoration: 'underline', top: '100px', left:'45px'}}/>        
+                                    </div>
                             </form>
-                            { 
-                                    (() => {
-                                        if(verify) {
-                                        return (<div>  <form onSubmit={(e)=>handleCode(e)}>
+                        :!guest?<form actionName="" onSubmit={LoginAccount}>
+                             <input type="submit" name="" value="Back" onClick={iflog}/>
+                        <h2>LOG IN</h2>
+                            <label className="controllabel" style={{color: 'black'}}><span className="required">*</span>Email: </label>
+                                <input type="email" name="" placeholder="Email Address" onChange={(e)=>setEmail1(e.target.value)}  required={true}/>
+                                    <label className="controllabel" style={{color: 'black'}}><span className="required">*</span>Password: </label>
+                                        <input type="password" name="" placeholder="Password"  onChange={(e)=>setPassword1(e.target.value)} required={true}/>
+                                        <span id="errororsuccess" style={{color:"red"}}></span><br/>
+                                        <input type="submit" name="" value="Login" onClick={(e)=>setForget(false)}/>
+                                            <p className="signup" style={{fontWeight: 'bold'}}>
+                                            Don't have an account ? 
+                                        <a href="#" onClick={toggleForm} style={{fontSize: '15px', textDecorationLine: 'underline' }}> Sign Up.</a>
+                                    </p>
+                            <h5><Link onClick={(e)=>{forget?setForget(false):setForget(true); setVerification(false);}} style={{color: '#97191d', fontSize: '15px'}}>Forget your password?</Link></h5>
+                    
+                            {/*dito*/}
+                        </form>:
+                        <form onSubmit={(e)=>{e.preventDefault(); loginAsGuest()}}>
+                            <input type="submit" name="" value="Back" onClick={ifguest}/>
+                            <h2>Login as Guest</h2>
+                            <input type="address" placeholder="Enter address" onChange={(e)=>setGuestAddress(e.target.value)} required/>
+                            <input type="number" placeholder="Enter phone number" onChange={(e)=>setGuestPhone(e.target.value)} required/>
+                            <input type="submit" value="Login" />
+                        </form>}
+                        
+                            { verify && !guest&& login? <div>  <form onSubmit={(e)=>handleCode(e)}>
                                             <input type="text" style={{color: 'black'}} name="code" placeholder="Verification Code" onChange={e => setCode(e.target.value)} required/>
                                         <input type="submit" value="Verify" />
                                         </form>
-                                        </div>);
-                                        }
-                                    })()
+                                        </div>:null
                                 } 
                                 {
-                                    forget?<form  onSubmit={sendEmail}>
+                                    forget && !login?<form  onSubmit={sendEmail}>
                                     <h2>Password Reset</h2>
                                     <input className="input-form" type="email"  name="email1" placeholder="Enter your email to send reset link." style={{color: 'black'}} required={true} onChange={(e)=>setEmail2(e.target.value)}/>
                                     <p style={v==="Verification link sent!"?{color:'green'}:{color:'red'}}>{v}</p>
                                     <input type="submit" value="Send"/>
                                 </form>:null
                                 } 
-                                
-                        
-                        </div>
+                                {/* <form>      
+                                    <input type="submit" name="" value="&#xf015; Home" onClick={goHome} style={{top: '110px', left: '250px', fontFamily: 'FontAwesome',fontWeight: 'normal',fontSize: '17px', fontstyle: 'normal', textDecoration: 'inherit'}}/></form> */}
+                            </div>
                         </div>
                     </div>
                     <div className="user signupBx">
@@ -372,17 +450,17 @@ const Login = (props)=>{
                             <div>
                             <form action="" onSubmit={RegisterAccount} style={{marginTop: '40px'}}>
                                 <h2>Create an account</h2>
-                                <label className="controllabel"><span className="required">*</span>Name:</label>
+                                <label className="controllabel" style={{color: 'black'}}><span className="required">*</span>Name:</label>
                                 <input type="text" name="" placeholder="Name" onChange={e => setName(e.target.value)} required={true} style={{height: '-5px'}}/>
-                                <label className="controllabel"><span className="required">*</span>Email: </label>
+                                <label className="controllabel" style={{color: 'black'}}><span className="required">*</span>Email: </label>
                                 <input type="email" name="" placeholder="Email Address" onChange={e => setEmail(e.target.value)} required={true}/>
-                                <label className="controllabel"><span className="required">*</span>Address: </label>
+                                <label className="controllabel" style={{color: 'black'}}><span className="required">*</span>Address: </label>
                                 <input type="text" name="" placeholder="Address" onChange={(e)=>setAddress(e.target.value)}/>
-                                <label className="controllabel"><span className="required">*</span>Phone Number: </label>
+                                <label className="controllabel" style={{color: 'black'}}><span className="required">*</span>Phone Number: </label>
                                 <input type="number" name="" placeholder="Phone Number" onChange={e => setPhoneNumber(e.target.value.toString())} required={true}/>
-                                <label className="controllabel"><span className="required">*</span>Password: </label>
+                                <label className="controllabel" style={{color: 'black'}}><span className="required">*</span>Password: </label>
                                 <input type="password" name="" placeholder="Create Password" onChange={e => setPassword(e.target.value)}/>
-                                <label className="controllabel"><span className="required">*</span>Confirm Password: </label>
+                                <label className="controllabel" style={{color: 'black'}}><span className="required">*</span>Confirm Password: </label>
                                 <input type="password" name="" placeholder="Confirm Password" onChange={e=>setConfirmPass(e.target.value)}/>
                                 <span id="errororsuccess2" style={{color: 'black'}} style={{color:"red", fontSize:'15px'}}></span><br/>
                                 <input type="submit" name="" value="Sign Up" />

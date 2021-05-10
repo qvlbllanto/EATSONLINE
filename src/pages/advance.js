@@ -287,7 +287,7 @@ const Advance = (props) =>{
         </div>
         </section>
         <footer id="footer">
-            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{backgroundColor: '#611b14'}:{color: 'black'}}>
+            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.idnum!==null?{backgroundColor: '#611b14'}:{color: 'black'}}>
                 <div className="container">
                     
                     <div className="row">
@@ -296,11 +296,11 @@ const Advance = (props) =>{
                                 <div className="section-title">
                                 <h2>Eats Online</h2>
                                 </div>
-                                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>
-                                <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157583842<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
+                                <p style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>
+                                <strong style={props.legitkey===true && props.logedin===true  && props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true  && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true  && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157583842<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true  && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
                                 </p>
                                 <div className="social-links mt-3">
                                     <a href="#hero" className="facebook"><i className="bx bxl-facebook"></i></a>

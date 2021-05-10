@@ -642,7 +642,7 @@ ul.sub-menu {
 }
 
 .category-products {
-    border: 1px solid #F7F7F0;
+    border: 1px solid black;
     margin-bottom: 35px;
     padding-bottom: 20px;
     padding-top: 15px;
@@ -650,7 +650,7 @@ ul.sub-menu {
 
 .left-sidebar h2,
 .brands_products h2 {
-    color: #97191d;
+    color: black;
     font-family: 'Open Sans', sans-serif;
     font-size: 18px;
     font-weight: 700;
@@ -665,7 +665,7 @@ ul.sub-menu {
 h2.title:after {
     content: " ";
     position: absolute;
-    border: 1px solid #f5f5f5;
+    border: 1px solid black;
     bottom: 8px;
     left: 0;
     width: 100%;
@@ -676,7 +676,7 @@ h2.title:after {
 .left-sidebar h2:before {
     content: " ";
     position: absolute;
-    background: #fff;
+    background: #d6faf4;
     bottom: -6px;
     width: 130px;
     height: 30px;
@@ -695,10 +695,11 @@ h2.title:before {
     z-index: -1;
     left: 50%;
     margin-left: -110px;
+    border-style: solid;
 }
 
 .category-products .panel {
-    background-color: #FFFFFF;
+    background-color: #d6faf4;
     border: 0px;
     border-radius: 0px;
     -webkit-box-shadow: none;
@@ -707,7 +708,7 @@ h2.title:before {
 }
 
 .category-products .panel-default .panel-heading {
-    background-color: white;
+    background-color: #d6faf4;
     border-radius: 10px;
     margin-left: 10px;
     margin-right: 10px;
@@ -826,7 +827,8 @@ h2.title:before {
 }
 
 h2.title {
-    color: #97191d;
+    color: black;
+    background-color: #f0c929;
     font-family: 'Open Sans', sans-serif;
     font-size: 18px;
     font-weight: 700;
@@ -834,13 +836,14 @@ h2.title {
     text-transform: uppercase;
     margin-bottom: 30px;
     position: relative;
+    border-style: solid;
 }
 
 .product-image-wrapper {
     border: 1px solid #F7F7F5;
     overflow: hidden;
     margin-bottom: 30px;
-    height: 670px;
+    height: 760px;
     width: 100%;
 }
 .product-image-wrapper2 {
@@ -862,14 +865,14 @@ h2.title {
 }
 
 .productinfo h2 {
-    color: #97191d;
+    color: black;
     font-family: 'Open Sans', sans-serif;
     font-size: 24px;
     font-weight: 700;
 }
 @media only screen and (min-width: 600px) {
     .productinfo h2 {
-      color: #97191d;
+      color: black;
       font-family: 'Open Sans', sans-serif;
       font-size: 25px;
       font-weight: 500;
@@ -1572,9 +1575,10 @@ h2.title {
 
 .breadcrumbs .breadcrumb li a {
     border-radius: 10px;
-    background: #aa2b1d;
-    color: #FFFFFF;
+    background: #f0c929;
+    color: black;
     padding: 3px 7px;
+    border-style: solid;
 }
 
 .breadcrumbs .breadcrumb>li+li:before {

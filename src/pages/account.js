@@ -172,7 +172,7 @@ const Account = (props)=>{
         }
        
         checkPhoneNumber().then((w)=>{
-            if(w[1]){
+            if(w[1] || details.guest){
                 checkPassChange(x).then((a)=>{
                    
                     if(a[1]){
@@ -180,9 +180,7 @@ const Account = (props)=>{
                             updateACCOUNT(props.idnum, u).then((j)=>{
                                 if(j){
                                     encryptvalues(u.name).then((d)=>{
-                                        localStorage.setItem( 'valss', d);
                                         setUpdating2(["Account Updated!", false]);
-                                        
                                     })  
                                 }
                             });
@@ -199,8 +197,8 @@ const Account = (props)=>{
 
                     }
                 });
-            }else{
-                document.getElementById("popup-1").classList.toggle("active");                          
+            }else{                      
+                setUpdating2(["Updating your account.. Please wait...", false]);
                 setEr3(w[0]);
             }
         });
@@ -275,7 +273,7 @@ const Account = (props)=>{
         setReserveq(false);
         setIdtoP(null);
     }
-
+    const guestSave=()=>{setUpdating2(["Updating your account.. Please wait...", true]);save()}
     return(
         <div>
               <TopSide first="Your " second="Account" third={'Total Spent: ₱'+NumberFormat(details.totalspent)} desc={"\"Manage your personal details.\""} img={["./assets/img/0 NEW SLIDER/Account.png"]} right={false}/>
@@ -371,18 +369,19 @@ const Account = (props)=>{
                     </div>
                 </div>
                 <div>
+                   
                     <div className="col-md-4 text-center">               
                         <img className="menu-img" id="image" src={details.img===undefined?"./assets/img/Eats Online logo.png":details.img} alt=""/><br/>
-                        <center><input className="form-control" type="file" style={{width: "63.4%"}} accept="image/*" onChange={filechange}/></center>
+                        <center> {!details.guest?<input className="form-control" type="file" style={{width: "63.4%"}} accept="image/*" onChange={filechange}/>:null}</center>
                     </div>
                     <div className="col-md-8 text-center"><br/>
                         <div className="row">
                             <h4 style={{color: 'black', textAlign: 'start', marginTop: '10px'}}>Name:</h4>
-                            <input className="form-control" id="name" placeholder={details.name} onChange={(e)=>setName(e.target.value)}/>
+                            <input className="form-control" id="name" placeholder={details.name} onChange={(e)=>!details.guest?setName(e.target.value):null} readOnly={details.guest}/>
                             <h4 style={{color: 'black', textAlign: 'start', marginTop: '10px'}}>Email:</h4>
                             <input className="form-control" id="email"  placeholder={details.email} readOnly={true}/>
-                            <h4 style={{color: 'black', textAlign: 'start', marginTop: '10px'}}>Password:</h4> 
-                            <input className="form-control" id="password" type="password" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;" onChange={(e)=>setPassword(e.target.value)} />
+                            {!details.guest?<h4 style={{color: 'black', textAlign: 'start', marginTop: '10px'}}>Password:</h4> :null}
+                            {!details.guest?<input className="form-control" id="password" type="password" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;" onChange={(e)=>setPassword(e.target.value)} />:null}
                             {password!==null && password!==''?<span id="passw" style={{color:'red', textAlign: 'start'}}>{er1}</span>:null}
                             {password!==null && password !== ''?<h4 style={{color: 'black', textAlign: 'start', marginTop: '10px'}}>Repeat password:</h4>:null}
                             {   (()=>{
@@ -407,7 +406,7 @@ const Account = (props)=>{
                                                <p style={{color: 'green', textAlign: 'start'}}>{updating2[0]}</p></div>:null}
                                                 
                                                <br/>
-                                               <input input type="button" className="form-1" value="Save" style={{width: '50%', marginTop: '20px'}} onClick={togglePopup}/>
+                                               <input input type="button" className="form-1" value="Save" style={{width: '50%', marginTop: '20px'}} onClick={()=>{!details.guest?togglePopup():guestSave()}}/>
                                             </div>);
                                     }
                                 })()
@@ -581,7 +580,7 @@ const Account = (props)=>{
         </section>
         </main>
         <footer id="footer">
-            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{backgroundColor: '#faff65'}:{backgroundColor: 'white', color: 'black'}}>
+            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.idnum!==null?{backgroundColor: '#faff65'}:{backgroundColor: 'white', color: 'black'}}>
                 <div className="container">
                     
                     <div className="row">
@@ -590,11 +589,11 @@ const Account = (props)=>{
                                 <div className="section-title">
                                 <h2>Eats Online</h2>
                                 </div>
-                                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>
-                                <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157583842<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
+                                <p style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>
+                                <strong style={props.legitkey===true && props.logedin===true &&  props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true &&  props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157583842<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
                                 </p>
                                 <div className="social-links mt-3">
                                     <a href="#hero" className="facebook"><i className="bx bxl-facebook"></i></a>

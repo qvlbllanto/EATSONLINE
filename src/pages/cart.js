@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { useHistory, Link } from "react-router-dom";
-import {updateCartData, checkCart, checkPasswordIfCorrect, removeAllCart, addLogs,  getCartData, buyItems,  updateCart,  NumberFormat, getAccountDetails, checkDate, Reservation} from "./functions.js";
+import {getDateforCart, updateCartData, checkCart, checkPasswordIfCorrect, removeAllCart, addLogs,  getCartData, buyItems,  updateCart,  NumberFormat, getAccountDetails, checkDate, Reservation} from "./functions.js";
 import {cyrb53} from "./encdec.js";
 import TopSide from "../components/TopSide.js";
 import { set } from 'animejs';
@@ -18,23 +18,17 @@ const Cart = (props)=>{
     const [ind, setInd] = useState(0);
     const [checkboxes, setCheckBoxes] = useState([]);
     const [totalamt, setTotalamt] = useState(0);
-    const [date, setDate] = useState(null);
-    const [valuesCh, setvaluesCh] = useState([]);
-    const [valuesCh2, setValuesCh2] = useState([]);
-    const [name, setName] = useState(null);
-    const [email, setEmail] = useState(null);
-    const [phone, setPhone] = useState(null);
-    const [time, setTime] = useState(null);
     const [message, setMessage] = useState(null);
-    const [check, setCheck] = useState(false);
     const [orderm, setOrderm] = useState([false, false]);
     const [processing, setProcessing] = useState(false);
     const [res, setRes] = useState(false);
+    const [datecart, setDateCart] = useState([]);
+    const [cDate,setcDate] = useState({});
     React.useEffect(()=>{
         if(!ch){
             props.setP("Cart");
             addLogs("Cart");
-            props.set(true);
+            props.set(true);    
             setCh(true);   
         }
     const timer = setTimeout(() => {
@@ -51,8 +45,10 @@ const Cart = (props)=>{
             }
             setTotalamt(Number(totalcartamt).toFixed(2));
             setAmount(Number(num).toFixed(2));
-            console.log(checkboxes);
         });
+        getDateforCart(cart).then((d)=>{
+            setDateCart(d);
+        })
             checkifHighRepeat();
             getAccountDetails(props.idnum).then((d)=>{
                 setAccountD(d);
@@ -77,17 +73,7 @@ const Cart = (props)=>{
     }
     const open = (e, ch) =>{
         e.preventDefault();
-        if(orderm[1]){
-            checkDateIncal().then((x)=>{
-                if(x===null){
-                    togglePopup(ch);
-                }else{
-                    alert(x);
-                }
-            })
-        }else{
          togglePopup(ch);
-        }
     }
     const togglePopup = (ch) => {
         setbuyorsave(ch);
@@ -150,7 +136,7 @@ const Cart = (props)=>{
                     setProcessing(true);
                     let x1 = null;
                     if(orderm[0]){
-                     x1 = document.getElementById('asx').checked?document.getElementById('asx').value:document.getElementById('bsx').checked?document.getElementById('bsx').value:null;
+                        x1 = document.getElementById('asx').checked?document.getElementById('asx').value:document.getElementById('bsx').checked?document.getElementById('bsx').value:null;
                     }
                      if(cart.length!==0){
                         new Promise((resolve, reject)=>{
@@ -158,6 +144,11 @@ const Cart = (props)=>{
                             let x2 = {};
                             for(let v of cart){
                                 if(checkboxes.includes(v[0])){
+                                    
+                                    if(res){
+                                        v[1]["date"] = checkIfDateinA(v[0], cDate[v[0]])>0?cDate[v[0]]:new Date().toString();
+                                        v[1]["status"] = "Pending";
+                                     }
                                     x.push(v);
                                 }else{
                                     x2[v[0]]=v[1];
@@ -166,7 +157,7 @@ const Cart = (props)=>{
                             resolve([x,x2]);
                         }).then((ca)=>{
                             if(orderm[1]){
-                            Reservation( accountD.name, accountD.email, accountD.phoneNumber, date, time, message, ca, props.idnum, amount, document.getElementById("selection").value, accountD.id).then((dx)=>{
+                            Reservation( accountD.name, accountD.email, accountD.phoneNumber, message, ca, props.idnum, amount, document.getElementById("selection").value, accountD.id).then((dx)=>{
                                 props.setAID(true);
                                 props.cart(dx);
                                 reso([true]);
@@ -245,8 +236,6 @@ const Cart = (props)=>{
                     resolve([x,x2, toBeAdvanceval, advamount, newtotalprice]);
                 }).then((ca)=>{
                     const nv = [ca[2], ca[1]];
-                    let nextDay = new Date();
-                    nextDay.setDate(nextDay.getDate() + 3); 
                     if(!clickY){
                         buyItems(ca, Number(ca[4]).toFixed(2), props.idnum, accountD.name,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
                             if(x[0]){
@@ -259,7 +248,7 @@ const Cart = (props)=>{
                         if(ca[0].length>0){
                             buyItems(ca, Number(ca[4]).toFixed(2), props.idnum, accountD.name,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
                                 if(x[0]){
-                                    Reservation( accountD.name, accountD.email, accountD.phoneNumber, nextDay, nextDay.toLocaleTimeString(), message, nv, props.idnum, Number(ca[3]).toFixed(2), document.getElementById("selection").value, accountD.id).then((dx)=>{
+                                    Reservation( accountD.name, accountD.email, accountD.phoneNumber,  message, nv, props.idnum, Number(ca[3]).toFixed(2), document.getElementById("selection").value, accountD.id).then((dx)=>{
                                         props.setAID(false);
                                         props.cart(x[1]);
                                         reso([true]);
@@ -267,7 +256,7 @@ const Cart = (props)=>{
                                 }
                             });
                         }else{
-                            Reservation( accountD.name, accountD.email, accountD.phoneNumber, nextDay, nextDay.toLocaleTimeString(), message, nv, props.idnum, Number(ca[3]).toFixed(2), document.getElementById("selection").value, accountD.id).then((dx)=>{
+                            Reservation( accountD.name, accountD.email, accountD.phoneNumber, message, nv, props.idnum, Number(ca[3]).toFixed(2), document.getElementById("selection").value, accountD.id).then((dx)=>{
                                 props.setAID(true);
                                 props.cart(dx);
                                 reso([true]);
@@ -363,6 +352,7 @@ const Cart = (props)=>{
         if(e.target.checked){
             for(let i=0; i<cart.length; i++){
                 document.getElementById("check"+i).checked = true;
+                cDate[cart[i][0]] = document.getElementById(cart[i][0]+cart[i][1].title).value;
                 x.push(cart[i][0]);
             }
             setCheckBoxes(x);
@@ -370,18 +360,21 @@ const Cart = (props)=>{
             for(let i=0; i<cart.length; i++){
                 document.getElementById("check"+i).checked = false;
             }
+            setcDate({});
             setCheckBoxes(x);
         }
         
     }
 
-    const clickCheck = (e, i) =>{
+    const clickCheck = (e, i, v) =>{
         new Promise((resolve, reject)=>{
             let checkb = checkboxes;
             if(e.target.checked){
+                cDate[i] = document.getElementById(v).value;
                 checkb.push(i);
             }else{
                 document.getElementById("allcheck").checked = false;
+                delete cDate[i];
                 checkb = arrayRemove(checkb, i);
             }
             resolve(checkb);    
@@ -394,34 +387,10 @@ const Cart = (props)=>{
        
         
     }
-    const checkDateIncal = () =>{
-        return new Promise((resolve, reject)=>{
-            if(checkDate(new Date(date))){
-                let o = [];
-                valuesCh.forEach((d)=>{
-                    o.push(d);
-                })
-                setValuesCh2(o);  
-                resolve(null); 
-            }else{
-               resolve("Date should start tomorrow and within the 2 weeks.");
-            }
-        })
-        
-    }
+
 
     const valuesForReservation = (e) =>{
-        if(e.target.name === "name"){
-            setName(e.target.value);
-        }else if(e.target.name === "email"){
-            setEmail(e.target.value);
-        }else if(e.target.name === "phone"){
-            setPhone(e.target.value);
-        }else if(e.target.name === "date"){
-            setDate(e.target.value);
-        }else if(e.target.name === "time"){
-            setTime(e.target.value);
-        }else if(e.target.name === "message"){
+        if(e.target.name === "message"){
             setMessage(e.target.value);
         }
       }
@@ -432,6 +401,20 @@ const Cart = (props)=>{
     const history = useHistory();
 
 
+    const checkIfde = () =>{
+        let v = datecart.map((d2)=>checkboxes.includes(d2[0])?d2[1].length===0?true:false:null);
+
+        v = arrayRemove(v, null);
+        return(arrayRemove(v, false).length);
+    }
+
+    const checkIfDateinA = (id, date) =>{
+
+        let data = datecart.map((d)=>d[0]===id?d[1].map((d2)=>new Date(d2[1].date).toDateString()===date?true:false):null)
+      
+        data = arrayRemove(data, null);
+        return(arrayRemove(data[0], false).length);
+    }
 
     return(
         <div>
@@ -466,6 +449,7 @@ const Cart = (props)=>{
         </section> */}
         <main id="main">
             <section id="menu" className="menu section-bg"> 
+            {/* start yes or no popup */}
             <div className="row1">
                 <div className="cartpopup" id="popup-1">
                     <div className="overlay"></div>
@@ -485,6 +469,8 @@ const Cart = (props)=>{
                     </div>
                     </div>
                 </div>
+                {/* end popup */}
+                {/* next popup */}
                 <div className="row1">
                 <div className="advancepopup" id="popup-2">
                     <div className="overlay"></div>
@@ -505,6 +491,7 @@ const Cart = (props)=>{
                     </div>
                     </div>
                 </div>
+                {/* end of next popup */}
                 <div className="container">
                     <div className="section-title">
                         <h2>Food List</h2>
@@ -514,9 +501,9 @@ const Cart = (props)=>{
                     <div className="container-fluid">
                     <div className="row" >
                         <div className="col-md-10 col-11 mx-auto"  >
-                               <div className="row">
-                                <div className="col-md-12 col-lg-8 col-11 mx-auto main_cart">
-                                    <div style={{boxShadow:'0 3px 20px #aa2b1d', margin:'10px', padding:'10px'}}>
+                               <div className="row" >
+                                <div className="col-md-12 col-lg-8 col-11 mx-auto main_cart" style={{backgroundColor:'transparent'}}>
+                                    <div style={{boxShadow:'0 3px 20px', margin:'10px', padding:'10px', backgroundColor:'white'}}>
                                     <h2 className="py-4 font-weight-bold">My Orders: {accountD.name}</h2>  
                                     
                                     <hr/>
@@ -526,10 +513,10 @@ const Cart = (props)=>{
                                         {cart.map((d, index)=>{
                                             return(
                                             
-                                            <div className="card p-4" key={index+20} style={{boxShadow:'0 3px 20px #aa2b1d', margin:'10px'}}> 
+                                            <div className="card p-4" key={index+20} style={{boxShadow:'0 3px 20px', margin:'10px'}}> 
                                              <div className="row"  >
                                                
-                                             <input type="checkbox" className="checkbox" id={"check"+index} onClick={(e)=>clickCheck(e, d[0])} style={{position: 'relative', marginLeft: '-44%', marginRight: '100%'}}/>
+                                             <input type="checkbox" className="checkbox" id={"check"+index} onClick={(e)=>clickCheck(e, d[0], d[0]+d[1].title)} style={{position: 'relative', marginLeft: '-44%', marginRight: '100%'}}/>
                                              <div className="col-md-5 col-11 mx-auto d-flex justify-content-center product_img" style={{paddingTop: '20px'}}>
                                                 <img src={d[1].link} className="img-fluid" alt={d[1].link} style={{padding:'10px', background:'transparent'}}/>
                                              </div>
@@ -543,6 +530,12 @@ const Cart = (props)=>{
                                                          <p className="mb-2">Type: {d[1].type}</p>
                                                          <p className="mb-2">Stock: {itemQty[index]} </p>
                                                          <p className="mb-3">Price: <span style={{fontSize: '15px'}}>₱</span>{NumberFormat(Number(d[1].price).toFixed(2))}</p>
+                                                         <p>Available Dates</p>
+                                                         <select className="form-control alterationTypeSelect" id={d[0]+d[1].title} style={{width: '100%', height: '35px'}} readOnly={true}>
+                                                            {datecart.map((d2, ib)=>
+                                                            d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2} readOnly={true}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib} readOnly={true}>No available date for advance order</option>
+                                                            :null)}
+                                                        </select>
                                                      <br/>
                                                      <p className="mb-3">Quantity: </p>
                                                      <ul className="pagination">
@@ -569,8 +562,8 @@ const Cart = (props)=>{
                                         })}
                                          
                                 </div>
-                                <div className="col-md-12 col-lg-4 col-11 mx-auto">
-                                <div className="right_side p-4 bg-white">
+                                <div className="col-md-12 col-lg-4 col-11 mx-auto" >
+                                <div className="right_side p-4 bg-white"  style={{boxShadow:'0 3px 20px'}}>
                                         <div className="my-custom-scrollbar" >
                                             <div className="row" >
                                                 <div className="overflow-x" >
@@ -630,18 +623,6 @@ const Cart = (props)=>{
                                                     <br/>
                                                     <div data-aos="fade-up" data-aos-delay="100">
                                                             <div className="row">
-                                                                <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'50%'}}>
-                                                                <label className="inline"><span className="required">*</span>Date: </label>
-                                                                    <input type="date" name="date" className="form-control" id="date" placeholder="Date"  onChange={valuesForReservation} required={true}/>
-                                                                    <div className="validate"></div>
-                                                                </div>
-                                                                
-                                                                <div className="col-xs-6 col-sm-3 col-md-6 form-group mt-3" style={{width:'50%'}}>
-                                                                <label className="inline"><span className="required">*</span>Time: </label>
-                                                                    <input type="time" className="form-control" name="time" id="time" placeholder="Time" onChange={valuesForReservation} required={true}/>
-                                                                    <div className="validate"></div>
-                                                                </div>
-                                                            
                                                     
                                                             </div>
                                                                 <div className="form-group mt-3">
@@ -649,7 +630,21 @@ const Cart = (props)=>{
                                                                     <textarea className="form-control" name="message" rows="5" placeholder="Message" onChange={valuesForReservation}></textarea>
                                                                     <div className="validate"></div>
                                                                 </div>
-
+                                                                <div className="form-group mt-3">
+                                                                <label className="inline">Select Delivery Date </label>
+                                                                {cart.map((d, index)=>{
+                                                                        return(
+                                                                            checkboxes.includes(d[0])?
+                                                                        <div key={index}>
+                                                                            <span>{d[1].title} </span>
+                                                                            <select className="form-control alterationTypeSelect" style={{width: '100%', height: '35px'}} onChange={(e)=>{cDate[d[0]]=e.target.value}}>
+                                                                                {datecart.map((d2, ib)=>
+                                                                                d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2} readOnly={true}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib} readOnly={true}>No available date for advance order</option>
+                                                                                :null)}
+                                                                            </select>
+                                                                        </div >:null);
+                                                                        })}
+                                                                </div>
                                                                 <hr/>
                                                                 </div>
                                                                 {/* <div className="text-center"><input type="submit" className="reservation-btn scrollto d-lg-flex" value="Order Now" style={{borderRadius: '50px'}}/></div> */}
@@ -673,7 +668,7 @@ const Cart = (props)=>{
                                                         <p style={{fontWeight:'bold', textAlign:'start'}}><span id="total_cart_amt"><span style={{fontSize: '15px'}}>₱</span>{NumberFormat(amount)}</span></p>
                                                     </div>
                                                     
-                                                   {addresses.length!==0 && cart.length!==0 && checkboxes.length!==0 ?<button type="submit" className="reservation-btn scrollto d-lg-flex" >Order Now</button>:null}
+                                                   {addresses.length!==0 && cart.length!==0 && checkboxes.length!==0  && checkIfde()===0?<button type="submit" className="reservation-btn scrollto d-lg-flex" >Order Now</button>:null}
                                                    {/* {checkifHigh().length !== 0?<p style={{marginRight: '100px'}}>Some Items exceeded the stock quantity or out of stock, please lower the value or delete the item. Items ({checkifHigh().map((d,i)=>i===0?<span style={{fontWeight: 'bold', color: 'red'}}>{d}</span>:<span>, <span style={{fontWeight: 'bold', color: 'red'}}>{d}</span></span>)})</p>:null } */}
                                                    </div>
                                                    </div>
@@ -690,7 +685,7 @@ const Cart = (props)=>{
                 </section>
             </main>
             <footer id="footer">
-            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?{backgroundColor: '#faff65'}:{backgroundColor: 'white', color: 'black'}}>
+            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.idnum!==null?{backgroundColor: '#faff65'}:{backgroundColor: 'white', color: 'black'}}>
                 <div className="container">
                     
                     <div className="row">
@@ -699,11 +694,11 @@ const Cart = (props)=>{
                                 <div className="section-title">
                                 <h2>Eats Online</h2>
                                 </div>
-                                <p style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>
-                                <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157483872<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.vals!==null && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
+                                <p style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>
+                                <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157483872<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
                                 </p>
                                 <div className="social-links mt-3">
                                     <a href="#hero" className="facebook"><i className="bx bxl-facebook"></i></a>

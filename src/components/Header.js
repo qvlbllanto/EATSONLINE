@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { useHistory, Link } from "react-router-dom";
-import {recLogin, getAccountDetails, getUpdatedHistory, getCartLength, getUpdatedHistory2} from '../pages/functions.js';
+import {getUpdatedR3, recLogin, getAccountDetails, getUpdatedHistory, getCartLength, getUpdatedHistory2} from '../pages/functions.js';
 import Chat from "../pages/Chat.js";
 
 const Header = (props) =>{
@@ -8,6 +8,7 @@ const Header = (props) =>{
     const box = document.getElementById('box');
     const [notifArr, setNotifArr] = useState([]);
     const [notifArr2, setNotifArr2] = useState([]);
+    const [notifArr3, setNotifArr3] = useState([]);
     const [accountD, setAccountD] = useState({});
     const [cart, setCart] = useState(0);
     const down = false;
@@ -37,6 +38,10 @@ const Header = (props) =>{
             });
             getUpdatedHistory2(props.idnum).then((o)=>{
                 setNotifArr2(o);
+            });
+            getUpdatedR3(props.idnum).then((d)=>{
+                setNotifArr3(d);
+                
             })
             getCartLength(props.idnum).then((d)=>{
                 setCart(d);
@@ -48,7 +53,6 @@ const Header = (props) =>{
             }else{
                 setCount(count+1);
             }
-            return () => clearTimeout(timer);
           }, 200);
           return () => clearTimeout(timer);
         }
@@ -98,8 +102,8 @@ const Header = (props) =>{
                 
                 <li className="dropdown" style={{listStyleType: 'none'}}>
 
-                        <a> <i className="fa fa-bell"></i>{notifArr.length+notifArr2.length!==0?<span className="icon-button__badge">{notifArr.length+notifArr2.length}</span>:null}</a>
-                        {notifArr.length+notifArr2.length!==0?<ul style={{width: '300px', left: '-240px'}}>
+                        <a> <i className="fa fa-bell" style={{color: '#017a73'}}></i>{notifArr.length+notifArr2.length+notifArr3.length!==0?<span className="icon-button__badge">{notifArr.length+notifArr2.length+notifArr3.length}</span>:null}</a>
+                        {notifArr.length+notifArr2.length+notifArr3.length!==0?<ul style={{width: '300px', left: '-240px'}}>
                         <div style={{ 
                             height: '200px',
                             overflowX: 'hidden',
@@ -130,14 +134,14 @@ const Header = (props) =>{
             </nav>:null}
             <nav id="navbar" className="navbar" style={{margin:'-10px'}}>
             <ul id={!props.logedin? "leftsideelogout": "leftsidee"}>
-                <li id="right10"><Link className={props.p==="Home"?"nav-link scrollto active":"nav-link scrollto"} to="/" style={{textDecoration:'none', marginLeft: 'auto', marginRight: 'auto'}}>Home</Link></li>
+                <li id="right10"><Link className={props.p==="Home"?"nav-link scrollto active":"nav-link scrollto"} to="/" style={{textDecoration:'none', marginLeft: 'auto', marginRight: 'auto', }}>Home</Link></li>
 
-                <li id="right10"><Link className={props.p==="Menu"?"nav-link scrollto active":"nav-link scrollto"} to="/menu" style={{textDecoration:'none'}}>Products</Link></li>
+                <li id="right10"><Link className={props.p==="Menu"?"nav-link scrollto active":"nav-link scrollto"} to="/menu" style={{textDecoration:'none', }}>Products</Link></li>
  
                 {/*<li id="right10"><Link className={props.p==="Advance"?"nav-link scrollto active":"nav-link scrollto"}  to={props.logedin?"/advance":"/login"} style={{textDecoration:'none'}} >Advance Order</Link></li> */}
             </ul>
                 <ul>
-                <li id="left10"><Link className={props.p==="Home"?"nav-link scrollto active":"nav-link scrollto"} to="/" style={{textDecoration:'none', marginLeft: 'auto', marginRight: 'auto'}}>Home</Link></li>
+                <li id="left10"><Link className={props.p==="Home"?"nav-link scrollto active":"nav-link scrollto"} to="/" style={{textDecoration:'none', marginLeft: 'auto', marginRight: 'auto', textShadow: '#000 0px 0px 3px, #000 0px px 3px, #000 0px 0px 3px'}}>Home</Link></li>
 
                 <li id="left10"><Link className={props.p==="Menu"?"nav-link scrollto active":"nav-link scrollto"} to="/menu" style={{textDecoration:'none'}}>Products</Link></li>
 
@@ -148,7 +152,7 @@ const Header = (props) =>{
                         if(props.logedin || props.legitkey){
                             return (<div><li className="dropdown"><Link to="#"className={props.p==="Acct"?"nav-link scrollto active":"nav-link scrollto"} style={{textDecoration:'none'}}><span>Account <i className="fa fa-user fa-2x"></i></span> <i className="bi bi-chevron-down"></i></Link>
                             <ul>
-                                <li style={{padding: '10px',}} ><h4 style={{color:'black',  fontWeight: 'bold', color: '#97191d'}}>{accountD.name}</h4></li>
+                                <li style={{padding: '10px',}} ><h4 style={{color:'black',  fontWeight: 'bold', color: '#017A73'}}>{accountD.name}</h4></li>
                                 <li><Link className={props.p==="Acct"?"nav-link scrollto active":"nav-link scrollto"} to="/account" style={{textDecoration:'none',fontSize: '15px'}}>Account</Link></li>
                                 <li><Link to="#" style={{textDecoration:'none',fontSize: '15px'}}><span onClick={logout}>Logout</span></Link></li>
                             </ul>
@@ -167,25 +171,29 @@ const Header = (props) =>{
                         </li>
                         <li className="dropdown" id="reservebutton">
                             <div onClick={toggleNotifi}></div>
-                               <a> <i className="fa fa-bell"></i>&nbsp;{notifArr.length+notifArr2.length!==0?<span className="icon-button__badge" style={{position: 'absolute', left: '90%',top:'1px'}}>{notifArr.length+notifArr2.length}</span>:null}</a>
-                               {notifArr.length+notifArr2.length!==0?
+                               <a> <i className="fa fa-bell"></i>&nbsp;{notifArr.length+notifArr2.length+notifArr3.length!==0?<span className="icon-button__badge" style={{position: 'absolute', left: '90%',top:'1px'}}>{notifArr.length+notifArr2.length+notifArr3.length}</span>:null}</a>
+                               {notifArr.length+notifArr2.length+notifArr3.length!==0?
                                 <ul style={{width: '300px', left: '-230px'}}>
                                 <div style={{ 
                                     height: '200px',
                                     overflowX: 'hidden',
                                     overflowY: 'auto'
                                 }}>
+
                                 {notifArr.map((d, index)=>{
-                                    return(<li key={index} style={{padding:"8px"}} onClick={()=>goToReceipt(d[0])}>
-                                        <h6 style={{ cursor: 'pointer', color:'black'}}><span>Item</span> {d[1].id} <span>is now being delivered. Items: {d[1].items.length}</span></h6>
-                                      <hr/>   
+                                    return(<li key={index} style={{padding:"8px"}} onClick={()=>{props.setAID(false);goToReceipt(d[0])}}>
+                                        <h6 style={{ cursor: 'pointer', color:'black'}}><span>Order</span> {d[1].id} <span>is now being delivered. Items: {d[1].items.length}</span></h6>  
                                     </li>);
                                 })}
                                 {notifArr2.map((d, index)=>{
-                                    return(<li key={index} style={{padding:"8px"}} onClick={()=>goToReceipt(d[0])}>
-                                        <h6 style={{ cursor: 'pointer', color:'black'}}><span>Item</span> {d[1].id} <span>is now being processed. Items: {d[1].items.length}</span></h6>
-                                      <hr/>   
+                                    return(<li key={index} style={{padding:"8px"}} onClick={()=>{props.setAID(false);goToReceipt(d[0])}}>
+                                        <h6 style={{ cursor: 'pointer', color:'black'}}><span>Order</span> {d[1].id} <span>is now being processed. Items: {d[1].items.length}</span></h6>
                                     </li>);
+                                })}
+                                {notifArr3.map((d, index)=>{
+                                      return(<li key={index} style={{padding:"8px"}} onClick={()=>{props.setAID(true);goToReceipt(d[0])}}>
+                                      <h6 style={{ cursor: 'pointer', color:'black'}}><span>Product</span> {d[1].title} in order {d[2]} <span>is now being {d[1].status==="Processing"?"processed":"delivered"}. Quantity: {d[1].amount}</span></h6>
+                                  </li>);
                                 })}
                                 </div>
                             </ul>:null}
