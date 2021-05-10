@@ -819,7 +819,7 @@ p{
 }
 
 .navbar .dropdown ul a:hover, .navbar .dropdown ul .active:hover, .navbar .dropdown ul li:hover > a {
-  color: #97191d;
+  color: #faff65;
 }
 
 .navbar .dropdown:hover > ul {
@@ -4288,6 +4288,7 @@ input[type="text"]{
   justify-content: flex-end;
   align-items: center;
   margin-top: 10px;
+  word-wrap: break-word;
 }
 .my-msg{
   display: flex;
@@ -4297,7 +4298,7 @@ input[type="text"]{
   background-color: rgb(44, 42, 42);
   border-radius: 25px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-  word-break: break-all;
+  word-wrap: break-word;
   padding: 10px
 }
 
@@ -4731,7 +4732,7 @@ a:hover {
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Open Sans', cursive;
   font-style: normal;
-  color:#97191d;
+  color:#000;
 }
 
 p{
@@ -8611,6 +8612,7 @@ input[type="text"]{
   justify-content: flex-end;
   align-items: center;
   margin-top: 10px;
+  word-wrap: break-word;
 }
 .my-msg{
   display: flex;
@@ -8620,7 +8622,7 @@ input[type="text"]{
   background-color: rgb(44, 42, 42);
   border-radius: 25px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-  word-break: break-all;
+  word-wrap: break-word;
   padding: 10px
 }
 
@@ -9080,7 +9082,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .navbar .dropdown ul a:hover, .navbar .dropdown ul .active:hover, .navbar .dropdown ul li:hover > a {
-  color: #97191d;
+  color: #13b0a7;
 }
 
 .navbar .dropdown:hover > ul {
@@ -9590,7 +9592,7 @@ section {
   margin: 0 0 5px 0;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color:#97191d	;
+  color:rgb(42, 236, 227)	;
   font-family: "Open Sans", sans-serif;
   font-style: normal;
 }
@@ -10713,7 +10715,7 @@ td{
   
   
   font-weight: 400;
-  border: 2px solid #ffffff;
+  border: 2px solid #fff;
 }
 
 .contact .php-email-form button[type="submit"]:hover {
@@ -10777,7 +10779,7 @@ td{
   margin-bottom: 0;
   font-family: "Open Sans", serif;
   font-style: normal;
-  color: rgb(0, 0, 0)
+  color: #fff;
 }
 
 #footer .footer-top .social-links a {
@@ -12552,6 +12554,7 @@ input[type="text"]{
   justify-content: flex-end;
   align-items: center;
   margin-top: 10px;
+  word-wrap: break-word;
 }
 .my-msg{
   display: flex;
@@ -12561,7 +12564,7 @@ input[type="text"]{
   background-color: rgb(44, 42, 42);
   border-radius: 25px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-  word-break: break-all;
+  word-wrap: break-word;
   padding: 10px
 }
 
@@ -12894,10 +12897,10 @@ b{
 }
 .form-1{
   border-radius: 50px;
-  background: #97191d;
-  color: #ffffff;
+  background: #eaec31;
+  color: black;
   font-weight: 400;
-  border: 2px solid #97191d;
+  border: 2px solid black;
   height: 40px;
 }
 .form-1:hover{

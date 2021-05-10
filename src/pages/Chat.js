@@ -72,7 +72,7 @@ const Chat = (props) =>{
                   {messages.map((d, index)=>{
                     return(d.who==='user'?<div className="out-msg" key={index}>
                     <div className="my-msg">
-                        <span className="msg">{d.message}  <br/> <span className="date">{new Date(d.date).toDateString()} {new Date(d.date).toLocaleTimeString()}</span></span>
+                        <span className="msg" style={{wordWrap:'break-word'}}>{d.message}  <br/> <span className="date">{new Date(d.date).toDateString()} {new Date(d.date).toLocaleTimeString()}</span></span>
                     </div>  
                     </div>:<div className="income-msg" key={index}>
                         <img src="./assets/img/Eats Online logo.png" className="avatar" alt=""/>

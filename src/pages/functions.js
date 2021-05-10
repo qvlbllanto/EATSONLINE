@@ -12,7 +12,6 @@ const saveLogs = (ip, page) =>{
         "date": todaydate(),
         "page": page
     });
-    //data.ref('logs').push()
 }
 const todaydate = () =>{
     let d = new Date();
@@ -40,8 +39,8 @@ const addCart = (key, title, price, description, link, idnum,seller, type, id, q
             }else{
                 resolve(false);
             }
-        })
-    })
+        });
+    });
  
     
 }
@@ -102,8 +101,8 @@ const buyItems = (items,total, idnum, name, address, payment, phone, id) =>{
                         resolve([true, ch.key]);
                      });
                 });
-            })
-        })
+            });
+        });
         
         
     });
@@ -139,7 +138,7 @@ const Reservation= (name, email, phone, message, set, uid, totalprice, add, id) 
                         resolve(x.key);
                 });
             });
-        })
+        });
         
     });
 }
@@ -150,7 +149,6 @@ const getCartData = (idnum) => {
     return new Promise(function (resolve, reject) {
       data.ref("cart").child(idnum).once("value", (snapshot) =>{
         let products = [];
-        let c = 0;
         snapshot.forEach(snap=>{
             products.push([snap.key, snap.val()]);
         });
@@ -186,12 +184,12 @@ const getCartData = (idnum) => {
                 });
             }
         });
-     })
+     });
  }
 
 const generateCode = () =>{
     let alphs = "ABCDEFGHIKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let code=""
+    let code="";
     for(let i=0; i<10; i++){
         let x = Math.floor((Math.random() * 60) + 1);
         code+=alphs.charAt(x);
@@ -226,14 +224,13 @@ const updateCart = (idnum, setss) => {
     return new Promise(function (resolve, reject) {
         data.ref('cart').child(idnum).set(setss).then(()=>{
             resolve(true);
-        })
+        });
     });
 }
 const checkCart = (setss) => {
     return new Promise((resolve, reject)=>{
         setss['date'] = todaydate();
         data.ref("products").child(setss.key).once('value', (snapshot)=>{
-
             if(snapshot.val()===null){
                 resolve(false);
             }else{
@@ -245,25 +242,25 @@ const checkCart = (setss) => {
                 }
         }
         });
-    })
+    });
    
 }
 
 const getHistory = (idn) =>{
     return new Promise((resolve, reject)=>{
         data.ref('ItemsBoughthistory').orderByChild('userid').equalTo(idn).once('value', (snapshot)=>{
-            let s = []
+            let s = [];
             snapshot.forEach((snap)=>{
                 s.push([snap.key, snap.val()]);
             });
             resolve(s);
         });
-    })
+    });
 }
 const getUpdatedHistory = (idn) =>{
     return new Promise((resolve, reject)=>{
         data.ref('ItemsBoughthistory').orderByChild('status').equalTo('Delivering').once('value', (snapshot)=>{
-            let s = []
+            let s = [];
             snapshot.forEach((snap)=>{
                 if(snap.val().userid===idn){
                     s.push([snap.key, snap.val()]);
@@ -271,12 +268,12 @@ const getUpdatedHistory = (idn) =>{
             });
             resolve(s);
         });
-    })
+    });
 }
 const getUpdatedHistory2 = (idn) =>{
     return new Promise((resolve, reject)=>{
         data.ref('ItemsBoughthistory').orderByChild('status').equalTo('Processing').once('value', (snapshot)=>{
-            let s = []
+            let s = [];
             snapshot.forEach((snap)=>{
                 if(snap.val().userid===idn){
                     s.push([snap.key, snap.val()]);
@@ -284,12 +281,12 @@ const getUpdatedHistory2 = (idn) =>{
             });
             resolve(s);
         });
-    })
+    });
 }
 const getUpdatedR3 = (idn) =>{
     return new Promise((resolve, reject)=>{
         data.ref('reservation').orderByChild('status').equalTo('Pending').once('value', (snapshot)=>{
-            let s = []
+            let s = [];
             snapshot.forEach((snap)=>{
                 if(snap.val().userid===idn){
                     for(let x of snap.val().items){
@@ -301,7 +298,7 @@ const getUpdatedR3 = (idn) =>{
             });
             resolve(s);
         });
-    })
+    });
 }
 const checkIfAcctExist = (idn) =>{
     return new Promise((resolve, reject)=>{
@@ -317,7 +314,7 @@ const checkIfAcctExist = (idn) =>{
             }
             
         });
-    })
+    });
 }
 
 const getAccountDetails = (idn) =>{
@@ -329,14 +326,14 @@ const getAccountDetails = (idn) =>{
                 }else{
                    snapshot.forEach((d)=>{
                        resolve(d.val());
-                   })
+                   });
                 }
             }catch(e){
                 resolve(false);
             }
             
         });
-    })
+    });
 }
 const deletePROFPIC = (idn) =>{
     return new Promise(function (resolve, reject) {
@@ -368,7 +365,7 @@ const checkPasswordIfCorrect = (idn, pass) =>{
         data.ref("accounts").child(idn).once("value", (snapshot) =>{
             resolve(snapshot.val().password === pass);
         });
-    })
+    });
 
 }
 
@@ -391,22 +388,21 @@ const addImage = (idn, image) =>{
             });
           }
         );
-    })
+    });
    
 }
 const updateACCOUNT = (idn, set) =>{
     return new Promise((resolve, reject) => {
         data.ref("accounts").child(idn).update(set).then((d)=>{
             resolve(true);
-        })
+        });
       
-    })
+    });
 
   }
 
 const updateStatus = (idnum, hid)=>{
     return new Promise((resolve, reject)=>{
-     
             data.ref('ItemsBoughthistory').child(hid).update({status: 'Completed', dateDelivered: todaydate()}).then((d)=>{
                 data.ref('accounts').child(idnum).once('value', (snapshot)=>{
                     let x = snapshot.val();
@@ -449,9 +445,9 @@ const cancelorder = (hid, reason)=>{
                             data.ref('products').child(d[1].key).update({numberofitems: snaps.val().numberofitems+d[1].amount});
                         }
                     });
-                })
+                });
                 resolve(true);
-            })
+            });
         });
     })
 }
@@ -460,7 +456,7 @@ const cancelorderR = (hid, reason)=>{
         data.ref('reservation').child(hid).update({status: 'Cancelled' , reason: reason}).then((d)=>{
             resolve(true);
         });
-    })
+    });
 }
 
 
@@ -487,7 +483,7 @@ const checkIfEmailExist = (email, code) =>{
         catch(e){
             resolve(false);
         }
-    })
+    });
 }
 const checkCode = (code) =>{
     return new Promise((resolve, reject)=>{
@@ -504,15 +500,15 @@ const checkCode = (code) =>{
                 resolve([false]);
             }
         });
-    })
+    });
 }
 
 const updatePass = (id, p)=>{
     return new Promise((resolve, reject)=>{
         data.ref('accounts').child(id).update({password: p, code:null}).then((d)=>{
             resolve(true);
-        })
-    })
+        });
+    });
 }
 
 const getData = (qty) => {
@@ -623,15 +619,14 @@ const getData = (qty) => {
  }
  const waitloop = (data) =>{
   return new Promise(function (resolve, reject) {
-      
-    const l = []
+    const l = [];
     const y = data[0].length;
-    var x=0
+    var x=0;
     for(x=0; x<Math.ceil(y/6); x++){
         
         l.push(x+1);
     }
-    resolve(l)
+    resolve(l);
   });
  }
  const NumberFormat = (n) =>{
@@ -696,7 +691,7 @@ const getData = (qty) => {
             });
           }
         );
-    })
+    });
   }
   const deleteReceipt= (idn) =>{
     return new Promise(function (resolve, reject) {
@@ -725,45 +720,41 @@ const getData = (qty) => {
 
 
 const getChat = (num, id, func) =>{
-   
         data.ref("chat").child(id).limitToLast(num).once("value", (snapshot)=>{
             let o = [];
             snapshot.forEach((d)=>{
                 o.push(d.val());
-            })
+            });
             func(o);
-           
-        })
+        });
   }
   const newMessage = (id) =>{
     return new Promise((resolve, reject)=>{
         data.ref("chat").child(id).limitToLast(1).once("value", (snapshot)=>{
             snapshot.forEach((d)=>{
                 resolve({[d.key]:d.val()});
-            })
-            
-        })
-    })
+            });
+        });
+    });
   }
   
   const sendChat = ( id, mes) =>{
     return new Promise((resolve, reject)=>{
         data.ref("chat").child(id).push({message: mes, who: 'user', date: new Date().toString(), readbya: false, readbyu:true}).then((d)=>{
             resolve(true);
-        })
+        });
     });
   }
 const getCurrOrder =(id)=>{
     return new Promise((resolve, reject)=>{
         data.ref("reservation").child(id).once("value", (snapshot)=>{
             resolve(snapshot.val());
-        })
-    })
+        });
+    });
 }
 const deleteAdvReceipt= (idn) =>{
     return new Promise(function (resolve, reject) {
             let ref = storage.ref(`reservation-full/${idn}`);
-            
             ref.listAll().then(dir => {
             dir.items.forEach(fileRef => {
                 var dirRef = storage.ref(fileRef.fullPath);
@@ -805,12 +796,11 @@ const addAdvReceipt = (idn, image)=>{
             });
           }
         );
-    })
+    });
   }
   const deleteDownAdvReceipt= (idn) =>{
     return new Promise(function (resolve, reject) {
             let ref = storage.ref(`reservation-down/${idn}`);
-            
             ref.listAll().then(dir => {
             dir.items.forEach(fileRef => {
                 var dirRef = storage.ref(fileRef.fullPath);
@@ -852,7 +842,7 @@ const addDownAdvReceipt = (idn, image)=>{
             });
           }
         );
-    })
+    });
   }
 
 
@@ -860,8 +850,8 @@ const getProductData = (id) =>{
     return new Promise((resolve, reject)=>{
         data.ref("products").child(id).once('value', (snapshot)=>{
             resolve(snapshot.val());
-        })
-    })
+        });
+    });
 }
 const getProductComments = (id) =>{
     return new Promise((resolve, reject)=>{
@@ -876,20 +866,20 @@ const getProductComments = (id) =>{
                 resolve(x);
             }
           
-        })
-    })
+        });
+    });
 }
 const addAddress = (id, val) =>{
     return new Promise((resolve, reject)=>{
         data.ref("accounts").child(id).child("addresses").push(val).then(()=>{
             resolve(true);
-        })
-    })
+        });
+    });
 }
 const addComment= (id, message, user, rate, email, uid) =>{
     return new Promise((resolve, reject)=>{
         data.ref("products").child(id).child('comments').push({date: new Date().toString(), message: message, user: user, rating: rate, email: email, uid:uid}).then(()=>resolve(true));
-    })
+    });
 }
 
 const removeAddress = (id, id2) =>{
@@ -898,15 +888,15 @@ const removeAddress = (id, id2) =>{
 const setPrimaryAddress = (id, id2, id3)=>{
     data.ref("accounts").child(id).child("addresses").child(id2).update({primary: false}).then(()=>{
         data.ref("accounts").child(id).child("addresses").child(id3).update({primary: true});
-    })
+    });
 }
 
 const getCartLength = (idnum) =>{
     return new Promise((resolve, reject)=>{
         data.ref("cart").child(idnum).once('value', (snapshot)=>{
             resolve(snapshot.numChildren());
-        })
-    })
+        });
+    });
 }
 
 const getType = (type, seller, mid) =>{
@@ -919,7 +909,7 @@ const getType = (type, seller, mid) =>{
                     if(snap.key!==mid){
                          x.push([snap.key, snap.val()]);
                     }
-                })
+                });
                 resolve(x);
             });
         }).then((x)=>{
@@ -931,7 +921,7 @@ const getType = (type, seller, mid) =>{
                         if(snap.key!==mid){
                              x.push([snap.key, snap.val()]);
                         }
-                    })
+                    });
                     resolve(x);
                 });
             }).then((p)=>{
@@ -939,11 +929,11 @@ const getType = (type, seller, mid) =>{
                     arr.push(d);
                 }
                 resolve(arr);
-            })
+            });
            
-        })
+        });
         
-    })
+    });
 }
 
 const addAdvanceOrderList = (idn, key, set)=>{
@@ -956,10 +946,10 @@ const addAdvanceOrderList = (idn, key, set)=>{
                     resolve(true);
                 });
             }
-        })
+        });
         
 
-    })
+    });
 }
 
 const checkLastKey = (what) =>{
@@ -974,8 +964,8 @@ const checkLastKey = (what) =>{
             }else{
                 resolve('10101');
             }
-        })
-    })
+        });
+    });
 }
 const checkk = async(v,id)=>{
     return new Promise((resolve, reject)=>{
@@ -986,12 +976,12 @@ const checkk = async(v,id)=>{
                 }else{
                     resolve(true);
                 }
-            })
+            });
         }catch(e){
             resolve(false);
         }
         
-    })
+    });
 }
 const checkifincart= async(arr, id) =>{
     let x = arr.map(async(d)=>await checkk(d[0], id));
@@ -1007,21 +997,21 @@ const checkIfItemisBought = (idnum, menuid) =>{
                     if(d[1].key===menuid && snap.val().status === "Completed"){
                         resolve(true);
                     }
-                })
-            })
+                });
+            });
             
-        })
+        });
         data.ref("reservation").orderByChild('userid').equalTo(idnum).once('value', (snapshot)=>{
             snapshot.forEach((snap)=>{
                 snap.val().items.forEach((d)=>{
                     if(d[1].key===menuid && d[1].status === "Completed"){
                         resolve(true);
                     }
-                })
-            })
+                });
+            });
             resolve(false);
-        })
-    })
+        });
+    });
    
 }
 
@@ -1029,15 +1019,15 @@ const readAll = (id, num) =>{
     data.ref("chat").child(id).limitToLast(num).once('value', (snapshot)=>{
         snapshot.forEach((snap)=>{
             data.ref("chat").child(id).child(snap.key).update({readbyu: true});
-        })
-    })
+        });
+    });
 }
 const getAllUnread = (id) =>{
     return new Promise((resolve, reject)=>{
         data.ref("chat").child(id).orderByChild('readbyu').equalTo(false).once('value', (snapshot)=>{
             resolve(snapshot.numChildren());
-        })
-    })
+        });
+    });
 }
 
 
@@ -1049,11 +1039,11 @@ const getDatesz = () => {
       data.ref("products").once("value", (snapshot) =>{
         let u = [];
         snapshot.forEach(snap=>{
-          let m = []
+          let m = [];
           for(let v in snap.val().adv){
            m.push([v, snap.val().adv[v]]);
           }
-          u.push([snap.key,m])
+          u.push([snap.key,m]);
         });
         resolve(u);
       });
@@ -1072,8 +1062,8 @@ const getDatesz = () => {
                 resolve(o);
             }
             resolve(null);
-        })
-    })
+        });
+    });
     values = await Promise.all(values);
     return(values);
   }
@@ -1086,7 +1076,7 @@ const getDateforCart = (cartd) =>{
             x.push([o[0], await getDat(o[1].key)]);
         }
         resolve(x);
-    })
+    });
 }
 
 export {getUpdatedR3, getDateforCart, getDatesz,recLogin, getAllUnread, readAll, checkIfItemisBought, checkk, checkifincart, getData2, cancelorderR, updateAdvStatus, getUpdatedHistory2, checkLastKey, viewHistory2,updateCartData, addAdvanceOrderList, checkCart, getType, getCartLength, setPrimaryAddress, removeAddress, addAddress, getProductComments, addComment, getProductData, deleteDownAdvReceipt, addDownAdvReceipt, addAdvReceipt,deleteAdvReceipt, getCurrOrder, newMessage, getChat, sendChat, deleteReceipt, addReceipt, checkDate, getAdvanceOrder, NumberFormat,getData, waitloop, updatePass, checkCode, checkIfEmailExist, cancelorder, updateStatus,getUpdatedHistory, viewHistory, updateACCOUNT, addImage, checkPasswordIfCorrect, deletePROFPIC, getAccountDetails, sendContact,checkIfAcctExist, getHistory, updateCart, removeAllCart,addLogs, todaydate, addCart, Reservation, generateCode, endDateofVerification, getCartData, deleteITM, buyItems};

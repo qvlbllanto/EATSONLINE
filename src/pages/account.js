@@ -580,7 +580,7 @@ const Account = (props)=>{
         </section>
         </main>
         <footer id="footer">
-            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.idnum!==null?{backgroundColor: '#faff65'}:{backgroundColor: 'white', color: 'black'}}>
+            <div className="footer-top " style={props.legitkey===true && props.logedin===true && props.idnum!==null? {backgroundColor: '#353333'}:{backgroundColor: '#353333', color: 'black'}}>
                 <div className="container">
                     
                     <div className="row">
