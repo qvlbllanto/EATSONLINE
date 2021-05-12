@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {sendContact, addLogs, addCart , Reservation, getData, waitloop, NumberFormat, checkDate} from "./functions.js"
+import {topSoldProd, sendContact, addLogs, addCart , Reservation, getData, waitloop, NumberFormat, checkDate} from "./functions.js"
 import { useHistory, Link} from "react-router-dom";
 import TopSide from "../components/TopSide.js";
 import $ from 'jquery';
@@ -10,6 +10,7 @@ const Home = (props)=>{
     const [message2, setMessage2] = useState(null);
     const [subject2, setSubject2] = useState(null);
     const [successful, setSuccessful] = useState(null);
+    const [featured, setFeatured] = useState([]);
     const [ch, setCh] = useState(false);
     const history = useHistory();
     React.useEffect(() => { 
@@ -21,7 +22,15 @@ const Home = (props)=>{
             setCh(true);
             // document.getElementById("home_hero").scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });
         }
-    
+        const timer = setTimeout(() => {
+            topSoldProd().then((d)=>{
+                setFeatured(d);
+            })
+           }, 500);
+        return () => clearTimeout(timer);
+        
+
+       
     });
 
 
@@ -59,7 +68,7 @@ const Home = (props)=>{
                 </div>
             </div>
          
-        <TopSide right={true} first="Welcome to " second="Eats Online" desc="Delivering great food for more than a year!" img={["./assets/img/0 NEW SLIDER/Slider Image 0.png","./assets/img/0 NEW SLIDER/Slider Image 1.png", "./assets/img/0 NEW SLIDER/Slider Image 2.png", "./assets/img/0 NEW SLIDER/Slider Image 3.png"]}/>
+        <TopSide right={true} first="Welcome to " second="Eats Online" desc="Your One-stop shop for Regional delicacies" img={["./assets/img/0 NEW SLIDER/Slider Image 0.png","./assets/img/0 NEW SLIDER/Slider Image 1.png", "./assets/img/0 NEW SLIDER/Slider Image 2.png", "./assets/img/0 NEW SLIDER/Slider Image 3.png"]}/>
     
         <main id="main">
         <section id="home_menu" className="menu section-bg">
@@ -68,27 +77,31 @@ const Home = (props)=>{
                     <h1>Featured Products</h1>
                 </div>
                 <div className="container-all">
-                    <div className="featured-container">
-                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 1.png" onClick={()=>history.push("/menu")} alt=""/>
+                    {featured.slice(0,6).map((d, i)=>
+                    <div className="featured-container" key={i}>
+                    <img src={d[1].link}  style={{width:'100%', height:'250px', imageRendering: "-webkit-optimize-contrast"}} onClick={()=>history.push({
+                                                                                                    pathname: '/menu',
+                                                                                                    ch: true,
+                                                                                                    val:{
+                                                                                                        type: d[1].type,
+                                                                                                        seller: d[1].seller,
+                                                                                                        id: d[0]
+                                                                                                    }
+                                                                                                    })} alt="" />
+                    
+                </div>
+                    
+                    )}
+                    {/* <div className="featured-container">
+                        <img src="assets/img/Featured1.png" onClick={()=>history.push("/menu")} alt=""  style={{width:'100%', height:'185px', imageRendering: "-webkit-optimize-contrast"}}/>
                         
                     </div>
+                    
                     <div className="featured-container">
-                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 2.png" onClick={()=>history.push({
-                                                                                                        pathname: '/menu',
-                                                                                                        ch: true,
-                                                                                                        val:{
-                                                                                                            type: "Bangus",
-                                                                                                            seller: "ANGELES FRIED CHICKEN",
-                                                                                                            id: "-MZgrmuuPvrgzL5KOSnk"
-                                                                                                        }
-                                                                                                        })} alt="" />
-                        
+                        <img src="assets/img/Featured3.png"  style={{width:'100%', height:'185px', imageRendering: "-webkit-optimize-contrast"}}onClick={()=>history.push("/menu")} alt=""/>
                     </div>
                     <div className="featured-container">
-                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 3.png"  onClick={()=>history.push("/menu")} alt=""/>
-                    </div>
-                    <div className="featured-container">
-                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 4.png" onClick={()=>history.push({
+                        <img src="assets/img/Featured4.png"  style={{width:'100%', height:'185px', imageRendering: "-webkit-optimize-contrast"}} onClick={()=>history.push({
                                                                                                         pathname: '/menu',
                                                                                                         ch: true,
                                                                                                         val:{
@@ -99,10 +112,10 @@ const Home = (props)=>{
                                                                                                         })} alt=""/>
                     </div>
                     <div className="featured-container">
-                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 5.png" onClick={()=>history.push("/menu")} alt=""/>
+                        <img src="assets/img/Featured5.png" style={{width:'100%', height:'185px', imageRendering: "-webkit-optimize-contrast"}} onClick={()=>history.push("/menu")} alt=""/>
                     </div>
                     <div className="featured-container">
-                        <img src="assets/img/0 NEW FEATURED (RECTANGLE)/Featured 6.png" onClick={()=>history.push({
+                        <img src="assets/img/Featured6.png"  style={{width:'100%', height:'185px', imageRendering: "-webkit-optimize-contrast"}}  onClick={()=>history.push({
                                                                                                         pathname: '/menu',
                                                                                                         ch: true,
                                                                                                         val:{
@@ -111,7 +124,7 @@ const Home = (props)=>{
                                                                                                             id: "-MZgx6o1kGo6Zut9am2c"
                                                                                                         }
                                                                                                         })} alt=""/>
-                    </div>
+                    </div> */}
                 </div>
   
                 {/*<div className="row" data-aos="fade-up" data-aos-delay="100"  >

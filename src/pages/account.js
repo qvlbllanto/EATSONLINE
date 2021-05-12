@@ -34,7 +34,8 @@ const Account = (props)=>{
     const [reason, setReason] = useState('');
     const [reserveq, setReserveq] = useState(false);
     const [idtopass, setIdtoP] = useState(null);
-    React.useEffect(()=>{
+    const [showhide, setShowHide] = useState(false);
+    React.useEffect(()=>{ 
         if(!ch){
             props.setP("Acct");
             addLogs("Accounts");
@@ -319,8 +320,21 @@ const Account = (props)=>{
                             <form onSubmit={(e)=>cancel(e, idToDel)}>
                                 <h1 id="popuptitle" style={{color: 'black', fontSize: '20px'}}>Are you sure, you want to cancel your order?</h1>
                                 {/* Reason:  */}
-                                <textarea className="form-control" placeholder="Reason..." id = "reas" onChange={(e)=>setReason(e.target.value)} style={{height: '120px'}} required={true}/>
-                                <p style={{color: 'red'}}>Note: Kindly type your reason for cancellation of order. </p> 
+                                <p style={{color: 'red'}}>Please Select Reason</p>
+                                <select name="slct" style={{marginBottom: '20px'}} id = "reas" onChange={(e)=>{e.target.value==="9"?setShowHide(true):setShowHide(false);setReason(e.target.value);}}>
+                                    <option selected disabled>Choose Reason</option>
+                                    <option value="Want to change payment method">Want to change payment method</option>
+                                    <option value="Change/Combine order">Change/Combine order</option>
+                                    <option value="Delivery time is too long">Delivery time is too long</option>
+                                    <option value="Duplicate Order">Duplicate Order</option>
+                                    <option value="Sourcing payment issue">Sourcing payment issue</option>
+                                    <option value="Change of mind">Change of mind</option>
+                                    <option value="Decided for alternative product7">Decided for alternative product</option>
+                                    <option value="Fees-shipping costs">Fees-shipping costs</option>
+                                    <option value="9">Others</option>
+                                </select>
+                                {showhide?<textarea className="form-control" placeholder="Reason..." id = "reas" onChange={(e)=>setReason(e.target.value)} style={{marginBottom: '20px', height: '75px' }} required={true}/>:null}
+                                
                                 <input type="submit" className="btn btn-danger my-cart-btn" value="Yes" style={{fontSize: '15px'}}/>&nbsp;&nbsp;&nbsp;
                                 <input type="button" className="btn btn-danger my-cart-btn" data-id="1" onClick={(e)=>document.getElementById("popup-2").classList.toggle("active")} /*data-summary="summary 1" data-price="100" data-quantity="1" data-image="assets/img/Eats Online logo.png"*/ value="No"  style={{fontSize: '15px'}}/>
                             </form>
@@ -414,12 +428,12 @@ const Account = (props)=>{
                             
                         </div>
                         <br/>
-                        <h3 style={{color: 'black', textAlign: 'start'}}>Address</h3>
+                        <h3 style={{color: '#0d4340', textAlign: 'start'}}>Address</h3>
                         <hr style={{color: 'black'}}/>
                         <div className="row" style={{width: 'auto'}}>
                        {address.map((d, i)=>{
                            return(<div key={i}>
-                            <hr style={{color: '#aa2b1d', height: '5px'}}/>
+                            <hr style={{color: '#0d4340', height: '5px'}}/>
                                <input key={i} readOnly={true} className="form-control" value={d[1].address} id={"chAdd"+i} style={{borderWidth: '0', height:'auto', marginBottom: '12px'}} />
                                {d[1].primary?<h5 style={{color: 'black', textAlign: 'end'}}><span>Primary Address</span></h5>
                                :<h5 style={{color: 'black', textAlign: 'end'}}>
@@ -503,7 +517,7 @@ const Account = (props)=>{
                                         <td data-label="TotalPrice" style={{cursor:'pointer', fontSize:'15px'}} onClick={(e)=>{toReceipt(e, d[0])}}>₱{NumberFormat(d[1].totalprice)}</td>
                                         <td data-label="Status" style={{cursor:'pointer'}} onClick={(e)=>{toReceipt(e, d[0])}} ><div className="flex-btn"></div>    
                                             <p style={{fontSize:'15px'}} className={d[1].status==="Pending" || d[1].status==="Delivering" || d[1].status==="Cancelled"?d[1].status==="Cancelled"?"label label-error":d[1].status==="Pending" ?"label label-warning":"label label-info":"label label-success"}>{d[1].status}</p></td>
-                                            <td style={{textAlign: 'center'}} onClick={(e)=>{setIdtoP(d[0]); setReserveq(false); document.getElementById("popup-3").classList.toggle("active"); }}><i class="fas fa-receipt" style={{cursor:'pointer'}}>View</i></td>
+                                            <td style={{textAlign: 'center'}} onClick={(e)=>{setIdtoP(d[0]); setReserveq(false); document.getElementById("popup-3").classList.toggle("active"); }}><i className="fas fa-receipt" style={{cursor:'pointer'}}>View</i></td>
                                         {d[1].status==="Pending"?<td data-label="Cancel Order" style={{textAlign: 'center'}}><i className="fas fa-trash-alt btndelete" style={{cursor:'pointer'}} onClick={(e)=>{setidToDel(d[0]); setWhat("T"); document.getElementById("popup-2").classList.toggle("active"); }}></i></td>:<td data-label="Cancel Order" >---</td>}
                                     </tr> 
                                     );
@@ -536,9 +550,7 @@ const Account = (props)=>{
                                         <th>No.</th>
                                         <th>Order ID</th>
                                         <th>Order Date</th>
-                                        <th>Delivery Date and Time</th>
                                         <th>Total Price</th>
-                                        <th>Total Price of item</th>
                                         <th>Payment Status</th>
                                         <th>Total Item</th>
                                         <th>Message</th>
@@ -554,16 +566,14 @@ const Account = (props)=>{
                                         <td data-label="No." style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}}>{index+1}</td>
                                         <td data-label="Order ID" style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}}>{d[1].id}</td>
                                         <td data-label="Order Date" style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}} >{new Date(d[1].dateBought).toDateString()} {new Date(d[1].dateBought).toLocaleTimeString()}</td>
-                                        <td data-label="Delivery Date and Time" style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}}>{new Date(d[1].date).toDateString()} {new Date(new Date(d[1].date).toDateString()+" "+d[1].time).toLocaleTimeString()}</td>
                                         <td data-label="Total Price" style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}}>₱{NumberFormat(d[1].totalprice)}</td>
-                                        <td data-label="Balance" style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}}>₱{NumberFormat(Number(d[1].balance))}</td>
                                         <td data-label="Payment Status" style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}}>{d[1].pstatus}</td>
                                         <td data-label="Total Item" style={{cursor:'pointer',textAlign: 'center'}} onClick={(e)=>{toReceipt2(e, d[0])}}>{d[1].items.length}</td>
 
                                         <td data-label="Message" style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}}>{d[1].message}</td>
                                         <td data-label="Order Status" style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}}><div className="flex-btn"></div>    
                                             <p style={{cursor:'pointer'}} onClick={(e)=>{toReceipt2(e, d[0])}} className={d[1].status==="Pending" || d[1].status==="Delivering" || d[1].status==="Cancelled"?d[1].status==="Cancelled"?"label label-error":d[1].status==="Pending" ?"label label-warning":"label label-info":"label label-success"}>{d[1].status}</p></td>
-                                            <td style={{textAlign: 'center'}}  onClick={()=>{setIdtoP(d[0]); setReserveq(true);  document.getElementById("popup-3").classList.toggle("active");}}><i class="fas fa-receipt" style={{ cursor:'pointer'}}>View</i></td>
+                                            <td style={{textAlign: 'center'}}  onClick={()=>{setIdtoP(d[0]); setReserveq(true);  document.getElementById("popup-3").classList.toggle("active");}}><i className="fas fa-receipt" style={{ cursor:'pointer'}}>View</i></td>
                                         {d[1].status==="Pending"?<td data-label="Cancel Order" style={{textAlign: 'center'}} ><i className="fas fa-trash-alt btndelete" style={{cursor:'pointer'}} onClick={(e)=>{setidToDel(d[0]); setWhat("R"); document.getElementById("popup-2").classList.toggle("active"); }}></i></td>:<td data-label="Cancel Order">---</td>}
                                         
                                     </tr>

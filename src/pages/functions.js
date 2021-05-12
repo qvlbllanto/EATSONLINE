@@ -442,7 +442,7 @@ const cancelorder = (hid, reason)=>{
                 snapshot.val().items.forEach((d)=>{
                     data.ref('products').child(d[1].key).once('value', (snaps)=>{
                         if(snapshot.val()!==null){
-                            data.ref('products').child(d[1].key).update({numberofitems: snaps.val().numberofitems+d[1].amount});
+                            data.ref('products').child(d[1].key).update({numberofitems: snaps.val().numberofitems+d[1].amount, totalsold: snaps.val().totalsold-d[1].amount});
                         }
                     });
                 });
@@ -1064,7 +1064,9 @@ const getDatesz = () => {
             resolve(null);
         });
     });
-    values = await Promise.all(values);
+    if(values.length!==0){
+         values = await Promise.all(values);
+    }
     return(values);
   }
 
@@ -1079,4 +1081,19 @@ const getDateforCart = (cartd) =>{
     });
 }
 
-export {getUpdatedR3, getDateforCart, getDatesz,recLogin, getAllUnread, readAll, checkIfItemisBought, checkk, checkifincart, getData2, cancelorderR, updateAdvStatus, getUpdatedHistory2, checkLastKey, viewHistory2,updateCartData, addAdvanceOrderList, checkCart, getType, getCartLength, setPrimaryAddress, removeAddress, addAddress, getProductComments, addComment, getProductData, deleteDownAdvReceipt, addDownAdvReceipt, addAdvReceipt,deleteAdvReceipt, getCurrOrder, newMessage, getChat, sendChat, deleteReceipt, addReceipt, checkDate, getAdvanceOrder, NumberFormat,getData, waitloop, updatePass, checkCode, checkIfEmailExist, cancelorder, updateStatus,getUpdatedHistory, viewHistory, updateACCOUNT, addImage, checkPasswordIfCorrect, deletePROFPIC, getAccountDetails, sendContact,checkIfAcctExist, getHistory, updateCart, removeAllCart,addLogs, todaydate, addCart, Reservation, generateCode, endDateofVerification, getCartData, deleteITM, buyItems};
+const topSoldProd = () =>{
+    return new Promise((resolve, reject)=>{
+        data.ref("products").once('value', (snapshot)=>{
+            let x =[];
+            snapshot.forEach((snap)=>{
+               x.push([snap.key, snap.val()]);
+            })
+            x.sort((a, b)=>a[1].totalsold - b[1].totalsold);
+            x.reverse();
+            resolve(x);
+            
+        })
+    })
+}
+
+export {topSoldProd, getUpdatedR3, getDateforCart, getDatesz,recLogin, getAllUnread, readAll, checkIfItemisBought, checkk, checkifincart, getData2, cancelorderR, updateAdvStatus, getUpdatedHistory2, checkLastKey, viewHistory2,updateCartData, addAdvanceOrderList, checkCart, getType, getCartLength, setPrimaryAddress, removeAddress, addAddress, getProductComments, addComment, getProductData, deleteDownAdvReceipt, addDownAdvReceipt, addAdvReceipt,deleteAdvReceipt, getCurrOrder, newMessage, getChat, sendChat, deleteReceipt, addReceipt, checkDate, getAdvanceOrder, NumberFormat,getData, waitloop, updatePass, checkCode, checkIfEmailExist, cancelorder, updateStatus,getUpdatedHistory, viewHistory, updateACCOUNT, addImage, checkPasswordIfCorrect, deletePROFPIC, getAccountDetails, sendContact,checkIfAcctExist, getHistory, updateCart, removeAllCart,addLogs, todaydate, addCart, Reservation, generateCode, endDateofVerification, getCartData, deleteITM, buyItems};

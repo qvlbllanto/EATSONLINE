@@ -43,15 +43,16 @@ p{
 }
 
 .btn:hover{
-    background: rgb(209, 205, 205);
-    color: #97191d;
+    background: #002d2a;
+    color: white;
+    border: 2px solid black;
 }
 .btn:focus {
     border-radius: 50px;
-    background: #97191d;
+    background: #eaec31;
     color: #ffffff;
     font-weight: 400;
-    border: 2px solid #97191d;
+    border: 2px solid black;
     /* outline: none; */
     -webkit-box-shadow: none;
     box-shadow: none;
@@ -120,8 +121,8 @@ a#scrollUp i {
 .pagination .active span:hover,
 .pagination .active a:focus,
 .pagination .active span:focus {
-    background-color: #97191d;
-    border-color: #97191d;
+    background-color: #002d2a;
+    border-color: black;
     color: #FFFFFF;
     cursor: default;
     z-index: 2;
@@ -142,7 +143,7 @@ a#scrollUp i {
 }
 
 .pagination li a:hover {
-    background: #97191d;
+    background: #002d2a;
     color: #fff;
 }
 
@@ -255,7 +256,7 @@ a#scrollUp i {
 }
 
 .product-information span span {
-    color: #97191d;
+    color: #002d2a;
     float: left;
     font-family: 'Open Sans', sans-serif;
     font-size: 30px;
@@ -332,13 +333,13 @@ a#scrollUp i {
 }
 
 #reviews ul li a i {
-    color: #97191d;
+    color: #eaec31;
     padding-right: 8px;
 }
 
 #reviews ul li a:hover {
     background: #fff;
-    color: #97191d;
+    color: #eaec31;
 }
 
 #reviews p {

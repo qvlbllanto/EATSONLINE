@@ -1,3 +1,4 @@
+
 import React, {useState} from 'react';
 import { useHistory, Link } from "react-router-dom";
 import {getDateforCart, updateCartData, checkCart, checkPasswordIfCorrect, removeAllCart, addLogs,  getCartData, buyItems,  updateCart,  NumberFormat, getAccountDetails, checkDate, Reservation} from "./functions.js";
@@ -12,7 +13,6 @@ const Cart = (props)=>{
     const [addresses, setAddresses] = useState([]);
     const [ch,setCh] = useState(false);
     const [primaryadd, setPrimaryAdd] = useState(null);
-    const [outofstock, setOutofStock] = useState([]);
     const [higherthan, setHigherthan] = useState([]);
     const [itemQty, setItemQty] = useState([]);
     const [ind, setInd] = useState(0);
@@ -24,12 +24,19 @@ const Cart = (props)=>{
     const [res, setRes] = useState(false);
     const [datecart, setDateCart] = useState([]);
     const [cDate,setcDate] = useState({});
+    const [ifExceed, setExcd] = useState([]);
+    const [dateOfExc, setdateOfE] = useState({});
+    const [itemstoadv, setItemstoadv] = useState([]);
+    const [codoradv, setCodoradv] = useState(null);
+    const [mes, setMes] = useState([false, null]);
     React.useEffect(()=>{
         if(!ch){
             props.setP("Cart");
             addLogs("Cart");
             props.set(true);    
-            setCh(true);   
+            setCh(true); 
+            let checkedBoxes = document.getElementsByName("color")
+            console.log(checkedBoxes);
         }
     const timer = setTimeout(() => {
         getCartData(props.idnum).then((x) =>{
@@ -69,10 +76,15 @@ const Cart = (props)=>{
         let x = v.map(async(d)=>await updateCartData(props.idnum, d[1], d[0]));
         x = await Promise.all(x);
         setItemQty(arrayRemove(  x.map((d)=>d[1]), null));
-        setOutofStock(arrayRemove( x.map((d)=>d[0]), null));
     }
     const open = (e, ch) =>{
         e.preventDefault();
+        setMes([false, null]);
+        setProcessing(false);
+        if(!validateForms)
+        {
+            return false;
+        }
          togglePopup(ch);
     }
     const togglePopup = (ch) => {
@@ -136,26 +148,41 @@ const Cart = (props)=>{
                     setProcessing(true);
                     let x1 = null;
                     if(orderm[0]){
-                        x1 = document.getElementById('asx').checked?document.getElementById('asx').value:document.getElementById('bsx').checked?document.getElementById('bsx').value:null;
+                        x1 = codoradv
                     }
                      if(cart.length!==0){
                         new Promise((resolve, reject)=>{
                             let x = [];
                             let x2 = {};
+                            let ch = false;
+                            let valuarr = [];
                             for(let v of cart){
                                 if(checkboxes.includes(v[0])){
                                     
                                     if(res){
-                                        v[1]["date"] = checkIfDateinA(v[0], cDate[v[0]])>0?cDate[v[0]]:new Date().toString();
+                                        v[1]["date"] = checkIfDateinA(v[0], cDate[v[0]])>0?cDate[v[0]]:null;
                                         v[1]["status"] = "Pending";
+                                        if(v[1]["date"]===null){
+                                            ch=true;
+                                            valuarr.push(v[1].title);
+                                        }
                                      }
+                                     
                                     x.push(v);
                                 }else{
                                     x2[v[0]]=v[1];
                                 }
                             }
-                            resolve([x,x2]);
+                            if(ch){
+                                resolve([null, valuarr.join(", "), true]);
+                            }else{
+                                resolve([x,x2]);
+                            }
                         }).then((ca)=>{
+                            if(ca[2]){
+                                setMes([true, "Select a date again for ("+ca[1]+")"]);
+                                setProcessing(false);
+                            }else{
                             if(orderm[1]){
                             Reservation( accountD.name, accountD.email, accountD.phoneNumber, message, ca, props.idnum, amount, document.getElementById("selection").value, accountD.id).then((dx)=>{
                                 props.setAID(true);
@@ -171,7 +198,9 @@ const Cart = (props)=>{
                                     }
                                 });
                             }
+                        }
                         });
+                        
                     }
                 }else{
                     document.getElementById("popup-1").classList.toggle("active");
@@ -184,11 +213,106 @@ const Cart = (props)=>{
     }
      
     const confirmIfAdv = (conf) =>{
+        setMes([false, null]);
+        setProcessing(false);
         buy2(conf).then((d)=>{
             if(d[0]){
                 setProcessing(false);
                 history.push('/receipt');
+            }else{
+                setItemstoadv(d[1][2]);
+                setProcessing(false);
+                setExcd(d[1]);
+                document.getElementById("popup-2").classList.toggle("active");
+                document.getElementById("popup-3").classList.toggle("active");
             }
+        })
+    }
+
+    const confirmIfAdv2 = (conf) =>{
+        setMes([false, null]);
+        setProcessing(false);
+        buy3(conf, ifExceed).then((d)=>{
+            if(d[0]){
+                setProcessing(false);
+                history.push("/receipt");
+            }
+        })
+    }
+    const buy3 = (ch, v) =>{
+        return new Promise((resolve) =>{
+            setProcessing(true);
+            new Promise((res, rej)=>{
+                let newv = [];  
+                let ch = false;
+                let valuarr = [];
+                for(let val of v[2]){
+                    let values = val;
+                    values[1]["date"] = checkIfDateinA(values[0], dateOfExc[values[0]])>0?dateOfExc[values[0]]:null;
+                    values[1]["status"] = "Pending";
+                   
+                    if(values[1]["date"]!==null){
+                        newv.push(values);
+                    }else{
+                        ch=true;
+                        valuarr.push(val[1].title);
+                            
+                    }
+                }
+                if(ch){
+                    res([true, valuarr.join(", ")]);
+                }else{
+                    res([false, newv]);
+                }
+            }).then((d)=>{
+                if(d[0]){
+                    setMes([true, "Select a date again for (" + d[1]+")"]);
+                    setProcessing(false);
+                    resolve([false]);
+                }else{
+                const nv = [d[1], v[1]];
+                let x1 = null;
+                if(orderm[0]){
+                    x1 = codoradv
+                }
+                if(ch){
+                    if(v[0].length>0){
+                        buyItems(v, Number(v[4]).toFixed(2), props.idnum, accountD.name,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
+                            if(x[0]){
+                                if(d.length!==0){
+                                    Reservation( accountD.name, accountD.email, accountD.phoneNumber,  message, nv, props.idnum, Number(v[3]).toFixed(2), document.getElementById("selection").value, accountD.id).then((dx)=>{
+                                        props.setAID(false);
+                                        props.cart(x[1]);
+                                        resolve([true]);
+                                    });
+                                }else{
+                                    props.setAID(false);
+                                    props.cart(x[1]);
+                                    resolve([true]);
+                                }
+                            }
+                        });
+                    }else{
+                        if(d.length!==0){
+                            Reservation( accountD.name, accountD.email, accountD.phoneNumber, message, nv, props.idnum, Number(v[3]).toFixed(2), document.getElementById("selection").value, accountD.id).then((dx)=>{
+                                props.setAID(true);
+                                props.cart(dx);
+                                resolve([true]);
+                            });
+                        }
+                    }
+                    
+                }else{
+                    buyItems(v, Number(v[4]).toFixed(2), props.idnum, accountD.name,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
+                        if(x[0]){
+                            props.setAID(false);
+                            props.cart(x[1]);
+                            resolve([true]);
+                        }
+                    });
+                }
+                }
+            });
         })
     }
 
@@ -197,7 +321,7 @@ const Cart = (props)=>{
             setProcessing(true);
             let x1 = null;
             if(orderm[0]){
-                x1 = document.getElementById('asx').checked?document.getElementById('asx').value:document.getElementById('bsx').checked?document.getElementById('bsx').value:null;
+                x1 = codoradv
             }
                 if(cart.length!==0){
                 new Promise((resolve, reject)=>{
@@ -234,8 +358,8 @@ const Cart = (props)=>{
                     let newtotalprice = amount;
                     newtotalprice-=advamount;
                     resolve([x,x2, toBeAdvanceval, advamount, newtotalprice]);
-                }).then((ca)=>{
-                    const nv = [ca[2], ca[1]];
+                }).then(async(ca)=>{
+                    
                     if(!clickY){
                         buyItems(ca, Number(ca[4]).toFixed(2), props.idnum, accountD.name,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
                             if(x[0]){
@@ -244,25 +368,8 @@ const Cart = (props)=>{
                                 reso([true]);
                             }
                         });
-                    }else{
-                        if(ca[0].length>0){
-                            buyItems(ca, Number(ca[4]).toFixed(2), props.idnum, accountD.name,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
-                                if(x[0]){
-                                    Reservation( accountD.name, accountD.email, accountD.phoneNumber,  message, nv, props.idnum, Number(ca[3]).toFixed(2), document.getElementById("selection").value, accountD.id).then((dx)=>{
-                                        props.setAID(false);
-                                        props.cart(x[1]);
-                                        reso([true]);
-                                    });
-                                }
-                            });
-                        }else{
-                            Reservation( accountD.name, accountD.email, accountD.phoneNumber, message, nv, props.idnum, Number(ca[3]).toFixed(2), document.getElementById("selection").value, accountD.id).then((dx)=>{
-                                props.setAID(true);
-                                props.cart(dx);
-                                reso([true]);
-                            });
-                        }
-                        
+                    }else{  
+                        reso([false, ca]);
                     }
                 });
             }
@@ -319,6 +426,8 @@ const Cart = (props)=>{
         
     }
     const confirmation = () =>{
+        setMes([false, null]);
+        setProcessing(false);
         if(buyorsave==="Buy"){
             buyNow().then((d)=>{
                 if(d[0]){
@@ -352,6 +461,7 @@ const Cart = (props)=>{
         if(e.target.checked){
             for(let i=0; i<cart.length; i++){
                 document.getElementById("check"+i).checked = true;
+                dateOfExc[cart[i][0]] = document.getElementById(cart[i][0]+cart[i][1].title).value;
                 cDate[cart[i][0]] = document.getElementById(cart[i][0]+cart[i][1].title).value;
                 x.push(cart[i][0]);
             }
@@ -361,6 +471,7 @@ const Cart = (props)=>{
                 document.getElementById("check"+i).checked = false;
             }
             setcDate({});
+            setdateOfE({});
             setCheckBoxes(x);
         }
         
@@ -370,10 +481,12 @@ const Cart = (props)=>{
         new Promise((resolve, reject)=>{
             let checkb = checkboxes;
             if(e.target.checked){
+                dateOfExc[i] = document.getElementById(v).value;
                 cDate[i] = document.getElementById(v).value;
                 checkb.push(i);
             }else{
                 document.getElementById("allcheck").checked = false;
+                delete dateOfExc[i];
                 delete cDate[i];
                 checkb = arrayRemove(checkb, i);
             }
@@ -415,7 +528,30 @@ const Cart = (props)=>{
         data = arrayRemove(data, null);
         return(arrayRemove(data[0], false).length);
     }
+    const checker = (arr, value) => { 
+        return arr.filter(function(ele){ 
+            return ele[0] === value; 
+        });
+    }
+    const checkIf = (key, arr) =>{
+        return(checker(arr, key).length>0);
+    }
+    // const checkChecked = () =>{
+    //     for(let d of cart){
+    //         if(checkboxes.includes(d[0])){
 
+    //         }
+    //     }
+    //     let c = cart.map((d)=> checkboxes.includes(d[0])?
+    //     checkIf(d[0], itemstoadv)?)
+    // }
+
+    const validateForms = () =>{
+        if(orderm[0] && codoradv==null){
+            return(false);
+        }
+        return(true);
+    }
     return(
         <div>
               <TopSide right={false} first="Your " second="Cart" third={'Total cart price: ₱'+ NumberFormat(totalamt)} desc={"Manage your order here!"} img={["./assets/img/0 NEW SLIDER/Cart.png"]}/>
@@ -459,11 +595,12 @@ const Cart = (props)=>{
                         <form>
                             <h1 id="popuptitle" style={{color: 'black'}}>Are you sure?</h1>
                             <br/>
+                            {mes[0]?<span>{mes[1]}</span>:null}
                             {processing?
                                 <span>Please Wait...</span>:
                                 <div>
-                                <input type="button" className="btn btn-danger my-cart-btn"  onClick={()=>confirmation()} value="Yes" style={{fontSize: '15px'}}/>&nbsp;&nbsp;&nbsp;
-                                <input type="button" className="btn btn-danger my-cart-btn" data-id="1"onClick={(e)=>togglePopup(null)}
+                                <input type="button" className="btn my-cart-btn"  onClick={()=>confirmation()} value="Yes" style={{fontSize: '15px'}}/>&nbsp;&nbsp;&nbsp;
+                                <input type="button" className="btn my-cart-btn" data-id="1"onClick={(e)=>togglePopup(null)}
                                 data-summary="summary 1" data-price="100" data-quantity="1" data-image="assets/img/Eats Online logo.png" value="No"  style={{fontSize: '15px'}}/>
                         </div>}</form>
                     </div>
@@ -474,24 +611,62 @@ const Cart = (props)=>{
                 <div className="row1">
                 <div className="advancepopup" id="popup-2">
                     <div className="overlay"></div>
-                    <div className="advancecontent1">
-                    <div className="close-btn" onClick={(e) => document.getElementById("popup-2").classList.toggle("active")}>&times;</div>
-                    <br/>
-                    <form>
-                        <h1 id="popuptitle" style={{color: 'black'}}>Some products exceeded the stock, do you want to advance order?</h1>
-                     <br/>
-                     {processing?
-                     <span>Please Wait...</span>:
-                     <div>
-                     <input type="button" className="btn btn-danger my-cart-btn"  onClick={()=>confirmIfAdv(true)} value="Yes" style={{fontSize: '15px'}}/>&nbsp;&nbsp;&nbsp;
-                     <input type="button" className="btn btn-danger my-cart-btn" data-id="1" onClick={()=>confirmIfAdv(false)}
-                    data-summary="summary 1" data-price="100" data-quantity="1" data-image="assets/img/Eats Online logo.png" value="No"  style={{fontSize: '15px'}}/>
-                       </div> }
-                    </form>
-                    </div>
+                        <div className="advancecontent1">
+                            <div className="close-btn" onClick={(e) => document.getElementById("popup-2").classList.toggle("active")}>&times;</div>
+                                <br/>
+                                <form>
+                                        <h1 id="popuptitle" style={{color: 'black'}}>Some products exceeded the stock, do you want to advance order?</h1>
+                                        <br/>
+                                        {processing?
+                                    <span>Please Wait...</span>:
+                                    <div>
+                                        <input type="button" className="btn btn-danger my-cart-btn"  onClick={()=>confirmIfAdv(true)} value="Yes" style={{fontSize: '15px'}}/>&nbsp;&nbsp;&nbsp;
+                                        <input type="button" className="btn btn-danger my-cart-btn" data-id="1" onClick={()=>confirmIfAdv(false)}
+                                        data-summary="summary 1" data-price="100" data-quantity="1" data-image="assets/img/Eats Online logo.png" value="No"  style={{fontSize: '15px'}}/>
+                                    </div> }
+                            </form>
+                        </div>
                     </div>
                 </div>
                 {/* end of next popup */}
+                {/* next CHOICE DATE popup */}
+                <div className="row1">
+                <div className="choicedatepopup" id="popup-3">
+                    <div className="overlay"></div>
+                        <div className="choicedatecontent1">
+                            <div className="close-btn"  onClick={(e) => document.getElementById("popup-3").classList.toggle("active")}>&times;</div>
+                                <br/>
+                                <h3 id="popuptitle"  style={{color: 'black'}}>Advance Order <br/>Select Delivery Date</h3>
+                            <form className="choicedateform">
+                                {cart.map((d, index)=>{
+                                        return(
+                                            checkboxes.includes(d[0])?
+                                            checkIf(d[0], itemstoadv)?
+                                        <div key={index}>
+                                            <span>{d[1].title} </span>
+                                            <select className="form-control alterationTypeSelect" style={{width: '100%', height: '35px'}}  onClick={(e)=>{dateOfExc[d[0]]=e.target.value}}>
+                                                {datecart.map((d2, ib)=>
+                                                d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2} readOnly={true}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib} readOnly={true}>No available date for advance order</option>
+                                                :null)}
+                                            </select>
+                                        </div >:null:null);
+                                        })}
+                                    <br/>
+                                    {mes[0]?<span>{mes[1]}</span>:null}
+                                    {processing?
+                                    <span>Please Wait...</span>:
+                                <div>
+                                    
+                                </div> }
+                                </form>
+                                <input type="button" className="btn btn-danger my-cart-btn"  onClick={()=>confirmIfAdv2(true)} value="Continue" style={{fontSize: '15px', marginTop:'10px'}}/>&nbsp;&nbsp;&nbsp;
+                                    <input type="button" className="btn btn-danger my-cart-btn" data-id="1" onClick={()=>confirmIfAdv2(false)}
+                                    data-summary="summary 1" data-price="100" data-quantity="1" data-image="assets/img/Eats Online logo.png" value="Cancel Advance"  style={{fontSize: '15px', marginTop: '10px'}}/>
+                           
+                        </div>
+                    </div>
+                </div>
+                {/* end of next CHOICE DATE popup */}
                 <div className="container">
                     <div className="section-title">
                         <h2>Food List</h2>
@@ -531,7 +706,7 @@ const Cart = (props)=>{
                                                          <p className="mb-2">Stock: {itemQty[index]} </p>
                                                          <p className="mb-3">Price: <span style={{fontSize: '15px'}}>₱</span>{NumberFormat(Number(d[1].price).toFixed(2))}</p>
                                                          <p>Available Dates</p>
-                                                         <select className="form-control alterationTypeSelect" id={d[0]+d[1].title} style={{width: '100%', height: '35px'}} readOnly={true}>
+                                                         <select className="form-control alterationTypeSelect" id={d[0]+d[1].title} style={{width: '60%', height: '35px'}} readOnly={true}>
                                                             {datecart.map((d2, ib)=>
                                                             d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2} readOnly={true}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib} readOnly={true}>No available date for advance order</option>
                                                             :null)}
@@ -602,8 +777,8 @@ const Cart = (props)=>{
                                                     
                                                     <label className="control-label"> <span className="required">*</span>Order Method: </label>
                                                     <label>
-                                                        <input type="radio" name="colorRadio2" id="opr" value="C.O.D" required={true} onClick={()=>{setRes(false);setOrderm([true, false])}}/> Order Now
-                                                        <input type="radio" name="colorRadio2" id="oaor" value="Online Payment" style={{marginLeft: '10px'}} required={true} onClick={()=>{setRes(true);setOrderm([false, true])}} /> Advance Order
+                                                        <input type="radio" name="colorRadio2" id="opr" value="C.O.D" required={true} onClick={()=>{setRes(false);setOrderm([true, false]); }}/> Order Now
+                                                        <input type="radio" name="colorRadio2" id="oaor" value="Online Payment" style={{marginLeft: '10px'}} required={true} onClick={()=>{setRes(true);setOrderm([false, true]);}} /> Advance Order
                                                     </label>
                                                     <hr/>
                                                     {orderm[0]? <div>
@@ -611,8 +786,8 @@ const Cart = (props)=>{
                                                         <br/>
                                                         <label className="control-label"> <span className="required">*</span>Payment Method: </label>
                                                         <label>
-                                                            <input type="radio" name="colorRadio" id="asx" value="C.O.D"  required={true} /> Pay C.O.D 
-                                                            <input type="radio" name="colorRadio" id="bsx" value="Online Payment"   style={{marginLeft: '10px'}} required={true}/> Online Payment
+                                                            <input type="radio" name="colorRadio" id="asx" value="C.O.D"  required={true} onClick={(e)=>setCodoradv(e.target.value)}/> Pay C.O.D 
+                                                            <input type="radio" name="colorRadio" id="bsx" value="Online Payment"   style={{marginLeft: '10px'}} onClick={(e)=>setCodoradv(e.target.value)} required={true}/> Online Payment
                                                         </label>
                                                         <hr/>
                                                     </div>
@@ -637,7 +812,7 @@ const Cart = (props)=>{
                                                                             checkboxes.includes(d[0])?
                                                                         <div key={index}>
                                                                             <span>{d[1].title} </span>
-                                                                            <select className="form-control alterationTypeSelect" style={{width: '100%', height: '35px'}} onChange={(e)=>{cDate[d[0]]=e.target.value}}>
+                                                                            <select className="form-control alterationTypeSelect" style={{width: '100%', height: '35px'}} onClick={(e)=>{cDate[d[0]]=e.target.value}}>
                                                                                 {datecart.map((d2, ib)=>
                                                                                 d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2} readOnly={true}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib} readOnly={true}>No available date for advance order</option>
                                                                                 :null)}
@@ -668,8 +843,8 @@ const Cart = (props)=>{
                                                         <p style={{fontWeight:'bold', textAlign:'start'}}><span id="total_cart_amt"><span style={{fontSize: '15px'}}>₱</span>{NumberFormat(amount)}</span></p>
                                                     </div>
                                                     
-                                                   {addresses.length!==0 && cart.length!==0 && checkboxes.length!==0  && checkIfde()===0?<button type="submit" className="reservation-btn scrollto d-lg-flex" >Order Now</button>:null}
-                                                   {/* {checkifHigh().length !== 0?<p style={{marginRight: '100px'}}>Some Items exceeded the stock quantity or out of stock, please lower the value or delete the item. Items ({checkifHigh().map((d,i)=>i===0?<span style={{fontWeight: 'bold', color: 'red'}}>{d}</span>:<span>, <span style={{fontWeight: 'bold', color: 'red'}}>{d}</span></span>)})</p>:null } */}
+                                                   {addresses.length!==0 && cart.length!==0 && checkboxes.length!==0?res?checkIfde()===0?<button type="submit" className="reservation-btn scrollto d-lg-flex" >Order Now</button>:null:<button type="submit" className="reservation-btn scrollto d-lg-flex" >Order Now</button>:null}
+                                                   {/* {checkifHigh().length !== 0?<p style={{marginRight: '100px'}}>Some Items exceeded the stock quantity or 0 Stock, please lower the value or delete the item. Items ({checkifHigh().map((d,i)=>i===0?<span style={{fontWeight: 'bold', color: 'red'}}>{d}</span>:<span>, <span style={{fontWeight: 'bold', color: 'red'}}>{d}</span></span>)})</p>:null } */}
                                                    </div>
                                                    </div>
                                                 </form>

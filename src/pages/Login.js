@@ -433,7 +433,7 @@ const Login = (props)=>{
                                         </div>:null
                                 } 
                                 {
-                                    forget && !login?<form  onSubmit={sendEmail}>
+                                    forget && !guest && login?<form  onSubmit={sendEmail}>
                                     <h2>Password Reset</h2>
                                     <input className="input-form" type="email"  name="email1" placeholder="Enter your email to send reset link." style={{color: 'black'}} required={true} onChange={(e)=>setEmail2(e.target.value)}/>
                                     <p style={v==="Verification link sent!"?{color:'green'}:{color:'red'}}>{v}</p>

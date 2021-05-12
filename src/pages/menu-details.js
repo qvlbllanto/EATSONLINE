@@ -58,9 +58,9 @@ const MenuDetails = (props) =>{
 	 const goLogin = () =>{
         history.push('/login');
       }
-	const addProdtoCartR = (menuid, title, price, desc, link, seller, type , id) => {
+	const addProdtoCartR = (menuid, title, price, desc, link, seller, type , id, qt) => {
         if(props.logedin){
-            addCart(menuid, title, price, desc, link, props.idnum, seller, type, id, qty);
+            addCart(menuid, title, price, desc, link, props.idnum, seller, type, id, qt);
         }else{
             goLogin();
         }
@@ -80,10 +80,10 @@ const MenuDetails = (props) =>{
 						<h2>{val.title}</h2>
 						<span>
 							<span>₱{NumberFormat(Number(val.price).toFixed(2))}</span>
-							{!c?parseInt(val.numberofitems)!==0?<button type="button" className="btn1 btn-fefault cart"  style={{borderRadius: '50px'}} onClick={()=>addProdtoCartR(props.menu, val.title, val.price, val.description, val.link, val.seller, val.type, val.id)}>
+							{!c?<button type="button" className="btn1 btn-fefault cart"  style={{borderRadius: '50px'}} onClick={()=>addProdtoCartR(props.menu, val.title, val.price, val.description, val.link, val.seller, val.type, val.id, qty)}>
 								<i className="fa fa-shopping-cart"></i>
-								{props.toCart?'Add to cart':'Add to List'}
-							</button>:null:null}
+								Add to cart
+							</button>:null}
 						</span>
 
 											{/* + - */}
@@ -101,16 +101,16 @@ const MenuDetails = (props) =>{
 											</ul>
 											</div>:<p>This product is already in your cart</p>}
 														
-												<p><b>Stock: </b>{parseInt(val.numberofitems)!==0?val.numberofitems: <span style={{fontWeight: 'bold'}}>Out of Stock!</span>}</p>
+												<p><b>Stock: </b>{val.numberofitems}</p>
 												<p><b>Category:</b>{val.type}</p>
 												<p><b>Supplier:</b> {val.seller}</p>
 												<p>Available Dates</p>
-						<select className="form-control alterationTypeSelect" style={{width: '100%', height: '35px'}}>
+						<select className="form-control alterationTypeSelect" style={{width: '85%', height: '35px'}}>
 							{props.dates.map((d2, ib)=>
 							d2[0]===props.menu?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib}>No available date for advance order</option>
 							:null)}
 						</select>
-						<a href=""><img src="images/product-details/share.png" className="share img-responsive"  alt="" /></a>
+		
 					</div>
 
 					
@@ -135,7 +135,7 @@ const MenuDetails = (props) =>{
 								<li><a><i className="fa fa-calendar-o"></i>{new Date(d.date).toDateString()}</a></li>
 							</ul>
 							<p style={{textAlign: 'left'}}>Rating: {}{Array(parseInt(d.rating)).fill(null).map((o,i)=>{
-								return(<label key={i} style={{ pointerEvents: 'none', color: 'red', margin: 1}}>☆</label>);
+								return(<label key={i} style={{ pointerEvents: 'none', color: '#002d2a', margin: 1}}>☆</label>);
 							})}</p>
 							<p style={{textAlign: 'left'}}><b>{d.message}</b></p>
 							
@@ -179,7 +179,7 @@ const MenuDetails = (props) =>{
 											<h2>₱{NumberFormat(Number(d[1].price).toFixed(2))}</h2>
 											<p>{d[1].title}</p>
 											<a style={{cursor:'pointer', margin: '10px'}} className="btn btn-default" onClick={()=>{props.changeM(d[0], d[1].type, d[1].seller); document.getElementById("o").scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });}}><i className="fa fa-shopping-cart"></i>View</a>
-											<a style={{cursor:'pointer',margin: '10px'}} className="btn btn-default" onClick={(e)=>parseInt(d[1].numberofitems)>0?addProdtoCartR(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id):null}><i className="fa fa-shopping-cart"></i>{parseInt(d[1].numberofitems)>0?props.toCart?'Add to cart': 'Add to list':'Out of Stock'}</a>
+											<a style={{cursor:'pointer',margin: '10px'}} className="btn btn-default" onClick={(e)=>addProdtoCartR(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id, 1)}><i className="fa fa-shopping-cart"></i>{'Add to cart'}</a>
 				
 											</div>
 										</div>
@@ -200,7 +200,7 @@ const MenuDetails = (props) =>{
 												<h2>₱{NumberFormat(Number(d[1].price).toFixed(2))}</h2>
 												<p>{d[1].title}</p>
 												<a style={{cursor:'pointer', margin: '10px'}} className="btn btn-default" onClick={()=>{props.changeM(d[0], d[1].type, d[1].seller); document.getElementById("o").scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });}}><i className="fa fa-shopping-cart"></i>View</a>
-												<a style={{cursor:'pointer',margin: '10px'}} className="btn btn-default" onClick={(e)=>parseInt(d[1].numberofitems)>0?addProdtoCartR(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id):null}><i className="fa fa-shopping-cart"></i>{parseInt(d[1].numberofitems)>0?props.toCart?'Add to cart': 'Add to list':'Out of Stock'}</a>
+												<a style={{cursor:'pointer',margin: '10px'}} className="btn btn-default" onClick={(e)=>addProdtoCartR(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id, 1)}><i className="fa fa-shopping-cart"></i>{'Add to cart'}</a>
 												</div>
 											</div>
 										</div>

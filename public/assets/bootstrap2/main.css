@@ -188,7 +188,7 @@ a#scrollUp i {
 
 .dropdown-menu li a:hover,
 .dropdown-menu li a:focus {
-    background-color: #97191d;
+    background-color: #002d2a;
     color: #FFFFFF;
     font-family: 'Open Sans', sans-serif;
     text-decoration: none;
@@ -220,7 +220,7 @@ a#scrollUp i {
 }
 
 .shop-menu ul li a:hover {
-    color: #97191d;
+    color: #002d2a;
     background: #fff;
 }
 
@@ -255,7 +255,7 @@ a#scrollUp i {
 .mainmenu ul li a.active,
 .shop-menu ul li a.active {
     background: none;
-    color: #97191d;
+    color: #002d2a;
 }
 
 .search_box input {
@@ -496,8 +496,8 @@ ul.sub-menu {
 }
 
 .single-widget ul li a:hover {
-    background: none;
-    color: #97191d;
+    background: #002d2a;
+    color: white;
 }
 
 .searchform input {
@@ -527,7 +527,7 @@ ul.sub-menu {
 
 .searchform button:hover,
 .searchform button:focus {
-    background-color: #97191d;
+    background-color: #002d2a;
 }
 
 .searchform p {
@@ -623,7 +623,7 @@ ul.sub-menu {
 }
 
 .item button:hover {
-    background: #97191d;
+    background: #002d2a;
 }
 
 .control-carousel {
@@ -634,7 +634,7 @@ ul.sub-menu {
 }
 
 .control-carousel:hover {
-    color: #97191d;
+    color: white;
 }
 
 .right {
@@ -650,7 +650,7 @@ ul.sub-menu {
 
 .left-sidebar h2,
 .brands_products h2 {
-    color: black;
+    color: #002d2a;
     font-family: 'Open Sans', sans-serif;
     font-size: 18px;
     font-weight: 700;
@@ -915,7 +915,7 @@ h2.title {
 }
 
 .product-overlay {
-    background: rgba(255,253,175);
+    background: #4cbfba;
     top: 0;
     display: none;
     height: 0;
@@ -951,8 +951,9 @@ h2.title {
 }
 
 .product-overlay .add-to-cart:hover {
-    background: rgb(209, 205, 205);
-    color: #97191d;
+    background: #002d2a;
+    color: white;
+    border: 2px solid black;
 }
 
 .product-overlay p {
@@ -973,7 +974,7 @@ h2.title {
 }
 
 .add-to-cart:hover {
-    background: #97191d;
+    background: #002d2a;
     border: 0 none;
     border-radius: 0;
     color: #FFFFFF;
@@ -988,7 +989,7 @@ h2.title {
 }
 
 .add-to-cart:hover {
-    background: #97191d;
+    background: #002d2a;
     color: #FFFFFF;
 }
 
@@ -1009,8 +1010,8 @@ h2.title {
 }
 
 .choose ul li a:hover {
-    background: none;
-    color: #97191d;
+    background: #002d2a;
+    color: white;
 }
 
 .category-tab {
@@ -1037,7 +1038,7 @@ h2.title {
 }
 
 .category-tab ul li a:hover {
-    background: #97191d;
+    background: #002d2a;
     color: #fff;
 }
 
@@ -1048,7 +1049,7 @@ h2.title {
     -moz-border-left-colors: none;
     -moz-border-right-colors: none;
     -moz-border-top-colors: none;
-    background-color: #97191d;
+    background-color: #002d2a;
     border: 0px;
     color: #FFFFFF;
     cursor: default;
@@ -1077,14 +1078,15 @@ h2.title {
 }
 
 .recommended-item-control i {
-    background: none repeat scroll 0 0 #97191d;
-    color: #FFFFFF;
+    background: none repeat scroll 0 0 #eaec31;
+    color: black;
     font-size: 20px;
     padding: 4px 10px;
 }
 
 .recommended-item-control i:hover {
-    background: #ccccc6;
+    background: #002d2a;
+    color: white;
 }
 
 .recommended_items h2 {}
@@ -1141,8 +1143,8 @@ h2.title {
 .pagination .active span:hover,
 .pagination .active a:focus,
 .pagination .active span:focus {
-    background-color: #97191d;
-    border-color: #97191d;
+    background-color: #002d2a;
+    border-color: black;
     color: #FFFFFF;
     cursor: default;
     z-index: 2;
@@ -1163,7 +1165,7 @@ h2.title {
 }
 
 .pagination li a:hover {
-    background: #97191d;
+    background: #002d2a;
     color: #fff;
 }
 
@@ -1277,7 +1279,7 @@ h2.title {
 }
 
 .product-information span span {
-    color: #97191d;
+    color: #002d2a;
     float: left;
     font-family: 'Open Sans', sans-serif;
     font-size: 30px;
@@ -1311,18 +1313,19 @@ h2.title {
 
 .cart {
     border-radius: 50px;
-    background: #97191d;
-    color: #ffffff;
+    background: #eaec31;
+    color: black;
+    border: 2px solid black;
     font-weight: 400;
-    border: 2px solid #97191d;
     font-family: 'Open Sans', sans-serif;
     font-size: 15px;
     margin-bottom: 10px;
     margin-left: 20px;
 }
 .cart:hover{
-    background: rgb(209, 205, 205);
-    color: #97191d;
+    background: #002d2a;
+    color: white;
+    border: 2px solid black;
 }
 
 .shop-details-tab {
@@ -1359,13 +1362,13 @@ h2.title {
 }
 
 #reviews ul li a i {
-    color: #97191d;
+    color: #eaec31;
     padding-right: 8px;
 }
 
 #reviews ul li a:hover {
     background: #fff;
-    color: #97191d;
+    color: #eaec31;
 }
 
 #reviews p {
@@ -1407,17 +1410,17 @@ h2.title {
 
 #reviews button{
     border-radius: 50px;
-    background: #97191d;
-    color: #ffffff;
+    background: #eaec31;
+    color: black;
     font-weight: 400;
-    border: 2px solid #97191d;
+    border: 2px solid black;
     height: 40px;
     font-family: 'Open Sans', sans-serif;
     font-size: 14px;
   }
 #reviews button:hover{
-    background: rgb(209, 205, 205);
-    color: #97191d;
+    background: #002d2a;
+    color: white;
   }
 
 /*************************
@@ -1591,8 +1594,8 @@ h2.title {
 }
 
 #cart_items .cart_info .cart_menu {
-    background: #97191d;
-    color: #fff;
+    background: #eaec31;
+    color: black;
     font-size: 16px;
     font-family: 'Open Sans', sans-serif;
     font-weight: normal;
@@ -1641,7 +1644,7 @@ h2.title {
 }
 
 #cart_items .cart_info .cart_total_price {
-    color: #97191d;
+    color: #002d2a;
     font-size: 24px;
 }
 
@@ -1787,9 +1790,9 @@ textarea {
 
 .update,
 .check_out {
-    background: #97191d;
+    background: #eaec31;
     border-radius: 0;
-    color: #FFFFFF;
+    color: black;
     margin-top: 18px;
     border: none;
     padding: 5px 15px;
@@ -1868,7 +1871,7 @@ textarea {
     margin-right: 10px;
     border-radius: 50%;
     padding: 5px;
-    background: #97191d;
+    background: #eaec31;
     color: #fff;
     font-size: 14px;
     padding: 2px 3px;
@@ -1894,7 +1897,7 @@ textarea {
 }
 
 .shopper-info .btn-primary {
-    background: #97191d;
+    background: #eaec31;
     border: 0 none;
     border-radius: 0;
     margin-right: 15px;
@@ -1973,7 +1976,7 @@ textarea {
 }
 
 #cart_items .cart_info .table.table-condensed.total-result span {
-    color: #97191d;
+    color: #002d2a;
     font-weight: 700;
     font-size: 16px
 }
@@ -2064,7 +2067,7 @@ textarea {
 }
 
 .blog-post-area .single-blog-post .btn-primary {
-    background: #97191d;
+    background: #eaec31;
     border: medium none;
     border-radius: 0;
     color: #FFFFFF;
@@ -2087,7 +2090,7 @@ textarea {
 
 .pagination-area .pagination li a:hover,
 .pagination-area .pagination li .active {
-    background: #97191d;
+    background: #002d2a;
     color: #fff
 }
 
@@ -2113,7 +2116,7 @@ textarea {
 }
 
 .pager-area .pager li a:hover {
-    background: #97191d;
+    background: #002d2a;
     color: #fff
 }
 
@@ -2232,7 +2235,7 @@ textarea {
 
 .blog-socials ul li a:hover {
     color: #fff;
-    background: red
+    background: #002d2a;
 }
 
 .media-list .btn-primary,
@@ -2344,7 +2347,7 @@ textarea {
 
 .replay-box form input:hover,
 .text-area textarea:hover {
-    border: 1px solid #97191d;
+    border: 1px solid #eaec31;
 }
 
 .text-area {
@@ -2357,10 +2360,11 @@ textarea {
 }
 
 .btn.btn-primary {
-    background: #97191d;
+    background: #eaec31;
     border: 0 none;
     border-radius: 0;
     margin-top: 16px;
+    color: black
 }
 
 .blank-arrow {

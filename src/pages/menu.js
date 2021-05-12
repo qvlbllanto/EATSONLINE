@@ -1,4 +1,5 @@
- import React from 'react';
+
+import React from 'react';
 import { useState } from 'react';
 import { useHistory, Link } from "react-router-dom";
 import {getDatesz, checkifincart, addLogs, getData,getData2, waitloop, NumberFormat, addCart} from "./functions.js"
@@ -269,8 +270,8 @@ const Menu = (props) =>{
 				elements[i].lastChild.style.backgroundColor="#696763"
 				elements[i].lastChild.lastChild.style.color="white";
 			}else{
-				elements[i].style.backgroundColor="white";
-				elements[i].lastChild.style.backgroundColor="white"
+				elements[i].style.backgroundColor="transparent";
+				elements[i].lastChild.style.backgroundColor="transparent"
 				elements[i].lastChild.lastChild.style.color="#696763";
 			}
 		}
@@ -279,8 +280,8 @@ const Menu = (props) =>{
 		toggletoHighlight("panel-heading", e.target.innerHTML);
 	}
     return (
-		<div>        
-			<TopSide right={false} first="Our " second="Menu" desc="We sell food that will satisfy your taste!" img={["./assets/img/0 NEW SLIDER/Menu.png"]}/>
+		<div>
+			<TopSide right={false} first="Our " second="Menu" desc="Your One-stop shop for Regional delicacies" img={["./assets/img/0 NEW SLIDER/Menu.png"]}/>
 		{/* <section id="home_hero" className="d-flex align-items-center">
 		
 		<div id="myCarouel" className="fullscreen carousel slide " data-ride="carousel">
@@ -393,7 +394,7 @@ const Menu = (props) =>{
 												<h2>{d[1].title}</h2>
 												<p>By: {d[1].seller}</p>
 												<p>Category: {d[1].type}</p>
-												<p style={{fontSize: '14px'}}>Stock: <span style={parseInt(d[1].numberofitems)<=0?{fontWeight: 'bold'}:null}>{parseInt(d[1].numberofitems)!==0?d[1].numberofitems:'Out of Stock!'}</span></p>
+												<p style={{fontSize: '14px'}}>Stock: <span style={parseInt(d[1].numberofitems)<=0?{fontWeight: 'bold'}:null}>{parseInt(d[1].numberofitems)!==0?d[1].numberofitems:'0 Stock!'}</span></p>
 												<p>Available Dates</p>
 												<select className="form-control alterationTypeSelect" style={{width: '90%', height: '35px', marginLeft:'5%', marginRight:'5%'}}>
 													{dates.map((d2, ib)=>
@@ -413,7 +414,7 @@ const Menu = (props) =>{
 									<div style={{position:'absolute', bottom: 20, width:'88%', marginBottom: '10px'}}>
 										<center>
 									
-										{!incart[startOfList+i]?parseInt(d[1].numberofitems)>0?
+										{!incart[startOfList+i]?
 										<div className="text-center">
 											<p style={{fontWeight:'bold'}}>Quantity</p>
 											<ul className="pagination" style={{marginLeft:'50px'}} >
@@ -425,10 +426,10 @@ const Menu = (props) =>{
 													<button className="page-link" style={{borderRadius: '30px', display: 'inline-flex', top: 12, right: 45}} onClick={()=>qty[startOfList+i]>1?reduceamt(startOfList+i):null}><i className="fas fa-minus"></i> </button>
 												</li>
 											</ul>
-										</div>:null:<p style={{fontSize: '15px', fontWeight:'bold'}}>THIS PRODUCT IS ALREADY IN YOUR CART</p>}
+										</div>:<p style={{fontSize: '15px', fontWeight:'bold'}}>THIS PRODUCT IS ALREADY IN YOUR CART</p>}
 										
 									<div className="text-center" >
-									{!incart[startOfList+i]?parseInt(d[1].numberofitems)>0?<a onClick={(e)=>addProdtoCart(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id, qty[startOfList+i])} className="btn btn-default" style={{borderRadius: '50px', marginBottom: '40px',  fontSize: '15px' ,position: 'relative'}}><i className="fa fa-shopping-cart"></i>Add to Cart</a>:null:null}
+									{!incart[startOfList+i]?<a onClick={(e)=>addProdtoCart(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id, qty[startOfList+i])} className="btn btn-default" style={{borderRadius: '50px', marginBottom: '40px',  fontSize: '15px' ,position: 'relative'}}><i className="fa fa-shopping-cart"></i>Add to Cart</a>:null}
 									</div>
 
 									<div className="choose" >
@@ -465,7 +466,7 @@ const Menu = (props) =>{
 												<h2>{d[1].title}</h2>
 												<p>By: {d[1].seller}</p>
 												<p>Category: {d[1].type}</p>
-												<p style={{fontSize: '14px', fontWeight:'bold'}}>Stock: {parseInt(d[1].numberofitems)!==0?d[1].numberofitems:'Out of Stock!'}</p>
+												<p style={{fontSize: '14px', fontWeight:'bold'}}>Stock: {parseInt(d[1].numberofitems)!==0?d[1].numberofitems:'0 Stock!'}</p>
 												<p>Available Dates</p>
 												<select className="form-control alterationTypeSelect" style={{width: '90%', height: '35px', marginLeft:'5%', marginRight:'5%'}}>
 													{dates.map((d2, ib)=>
@@ -484,7 +485,7 @@ const Menu = (props) =>{
 									</div>
 									<div style={{position:'absolute', bottom: 20, width:'88%', marginBottom: '10px'}}>
 										<center>
-										{!incart[startOfList+i]?parseInt(d[1].numberofitems)>0?
+										{!incart[startOfList+i]?
 										<div className="text-center">
 										<p style={{fontWeight:'bold'}}>Quantity</p>
 										<ul className="pagination" style={{marginLeft:'50px'}} >
@@ -499,9 +500,9 @@ const Menu = (props) =>{
 											</li>
 											
 												</ul>
-										</div>	:null:<p style={{fontSize: '15px', fontWeight:'bold'}}>THIS PRODUCT IS ALREADY IN YOUR CART</p>}
+										</div>	:<p style={{fontSize: '15px', fontWeight:'bold'}}>THIS PRODUCT IS ALREADY IN YOUR CART</p>}
 									<div className="text-center">
-									{!incart[startOfList+i]?parseInt(d[1].numberofitems)>0?<a onClick={(e)=>addProdtoCart(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id,  qty[startOfList+i])} className="btn btn-default" style={{borderRadius: '50px', marginBottom: '40px',  fontSize: '15px' ,position: 'relative'}}><i className="fa fa-shopping-cart"></i>Add to Cart</a>:null:null}
+									{!incart[startOfList+i]?<a onClick={(e)=>addProdtoCart(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id,  qty[startOfList+i])} className="btn btn-default" style={{borderRadius: '50px', marginBottom: '40px',  fontSize: '15px' ,position: 'relative'}}><i className="fa fa-shopping-cart"></i>Add to Cart</a>:null}
 									</div>
 									<div className="choose" >
 									<h5><a href="#">Ratings: ({startOfList+i<rate.length?rate[startOfList+i][1]: 0})</a></h5>
@@ -549,11 +550,11 @@ const Menu = (props) =>{
                                 <div className="section-title">
                                 <h2>Eats Online</h2>
                                 </div>
-                                <p style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>
-                                <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157483872<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
+                                <p style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'white'}}>
+                                <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'white'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'white'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'white'}}>Phone:</strong> 09157483872<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'white'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
                                 </p>
                                 <div className="social-links mt-3">
 									<a href="#hero" className="facebook"><i className="bx bxl-facebook"></i></a>

@@ -176,7 +176,7 @@ const Receipt = (props) => {
                                                             <th><h5 style={{color:'black'}}><strong>Price</strong></h5></th>
                                                             {props.reserve? <th><h5 style={{color:'black'}}><strong>Order Date</strong></h5></th>:null}
                                                             {props.reserve? <th><h5 style={{color:'black'}}><strong>Item Status</strong></h5></th>:null}
-                                                        
+                                                            {props.reserve? <th><h5 style={{color:'black'}}><strong>Delivery fee</strong></h5></th>:null}
                                                         </tr>
                                                     </thead>
                                                     <tbody className="thead-dark">
@@ -187,8 +187,9 @@ const Receipt = (props) => {
                                                                 <td data-label="Qty" style={{paddingLeft:'40px'}}>{val[1].amount}</td>
                                                                 <td data-label="Price">₱{NumberFormat(Number(val[1].price*val[1].amount).toFixed(2))}</td>
                                                                 {props.reserve? <td  data-label="Order Date">{val[1].date}</td>:null}
-                                                                {props.reserve? <td  data-label="Item Status">{val[1].status}</td>:null}
-                         
+                                                                {props.reserve? <td  data-label="Item Status">
+                                                                <p style={{fontSize:'15px'}} className={val[1].status==="Pending" || val[1].status==="Delivering" || val[1].status==="Cancelled"?val[1].status==="Cancelled"?"label label-error":val[1].status==="Pending" ?"label label-warning":"label label-info":"label label-success"}>{val[1].status}</p></td>:null}
+                                                                {props.reserve? <td  data-label="Delivery fee">₱{val[1].deliveryfee!==undefined?Number(NumberFormat(val[1].deliveryfee)).toFixed(2):Number(0).toFixed(2)}</td>:null}
                                                             </tr>
                                                             /*<p style={{fontSize: '15px'}}>{val[1].title} x{val[1].amount}</p>
                                                             &nbsp;&nbsp;

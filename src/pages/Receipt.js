@@ -166,8 +166,9 @@ const Receipt = (props) => {
                                                             {/*<th><h5><strong>Type</strong></h5></th>*/}
                                                             <th><h5 style={{color:'black'}}><strong>Quantity</strong></h5></th>
                                                             <th><h5 style={{color:'black'}}><strong>Price</strong></h5></th>
-                                                            {props.reserve? <th><h5 style={{color:'black'}}><strong>Order Date</strong></h5></th>:null}
+                                                            {props.reserve? <th><h5 style={{color:'black'}}><strong>Delivery Date</strong></h5></th>:null}
                                                             {props.reserve? <th><h5 style={{color:'black'}}><strong>Item Status</strong></h5></th>:null}
+                                                            {props.reserve? <th><h5 style={{color:'black'}}><strong>Delivery fee</strong></h5></th>:null}
                                                         </tr>
                                                     </thead>
                                                     <tbody className="thead-dark">
@@ -178,8 +179,9 @@ const Receipt = (props) => {
                                                                 {/*<td data-label="Type">{val[1].type}</td>*/}
                                                                 <td data-label="Qty" style={{paddingLeft:'40px'}}>{val[1].amount}</td>
                                                                 <td data-label="Price">₱{NumberFormat(Number(val[1].price*val[1].amount).toFixed(2))}</td>
-                                                                {props.reserve? <td  data-label="Order Date">{val[1].date}</td>:null}
+                                                                {props.reserve? <td  data-label="Delivery Date">{val[1].date}</td>:null}
                                                                 {props.reserve? <td  data-label="Item Status">{val[1].status}</td>:null}
+                                                                {props.reserve? <td  data-label="Delivery fee">₱{val[1].deliveryfee!==undefined?Number(NumberFormat(val[1].deliveryfee)).toFixed(2):Number(0).toFixed(2)}</td>:null}
                                                             </tr>
                                                             /*<p style={{fontSize: '15px'}}>{val[1].title} x{val[1].amount}</p>
                                                             &nbsp;&nbsp;
@@ -217,16 +219,16 @@ const Receipt = (props) => {
                                             <div className="pt-5">
                                                 <div className="card">
                                                     <ul className="nav nav-pills mb-3"> 
-                                                        <li><a href="#nav-tab-card" className="nav-link" data-toggle="pill" style={tab[0]?{fontSize: '13px' ,backgroundColor:  '#97191d', color: 'white'}:{fontSize: '13px'}} onClick={()=>setTab([true, false, false])}>Upload Receipt</a></li>
+                                                        <li><a href="#nav-tab-card" className="nav-link" data-toggle="pill" style={tab[0]?{fontSize: '13px' ,backgroundColor:  '#eaec31', color: 'black'}:{fontSize: '13px'}} onClick={()=>setTab([true, false, false])}>Upload Receipt</a></li>
                                                         {/* <li><a href="#nav-tab-bank" className="nav-link" data-toggle="pill"><i className="fa fa-credit-card"></i>Online Payment Details</a></li>
                                                         &nbsp;&nbsp;&nbsp;<li><a href="#nav-tab-bank1" className="nav-link" data-toggle="pill"><i className="fa fa-credit-card"></i>Gcash Details</a></li> */}
                                                         <a href="#" className="nav-link" data-toggle="pill" id="c" style={{visibility:'hidden'}}></a>
                                                         <li className="dropdown" style={{cursor:'pointer'}} onClick={(e)=>{document.getElementById("c").click();}}>
                                                             
-                                                            <a className="dropdown-toggle" data-toggle="dropdown"  style={tab[1] || tab[2]?{fontSize: '13px' ,backgroundColor:  '#97191d', color: 'white'}:{fontSize: '13px'}} >Online Payment Details</a>
+                                                            <a className="dropdown-toggle" data-toggle="dropdown"  style={tab[1] || tab[2]?{fontSize: '13px' ,backgroundColor:  '#eaec31', color: 'black'}:{fontSize: '13px'}} >Online Payment Details</a>
                                                             <ul className="dropdown-menu nav nav-pills mb-3" >
-                                                                <li  style={{width:'100%'}}><a href="#nav-tab-bank" className="nav-link" data-toggle="pill" style={tab[1]?{backgroundColor:  '#97191d', color: 'white'}:{backgroundColor: 'white', color: 'black'}}  onClick={()=>setTab([false, true, false])}>Bank Details</a></li>
-                                                                <li  style={{width:'100%' }}><a href="#nav-tab-bank1" className="nav-link" data-toggle="pill" style={tab[2]?{left: '-1.3%', backgroundColor:  '#97191d', color: 'white'}:{left: '-1.3%',backgroundColor: 'white', color: 'black'}} onClick={()=>setTab([false, false, true])}> Gcash Details</a></li>                     
+                                                                <li  style={{width:'100%'}}><a href="#nav-tab-bank" className="nav-link" data-toggle="pill" style={tab[1]?{backgroundColor: '#002d2a', color: 'white'}:{backgroundColor:  '#eaec31', color: 'black'}}  onClick={()=>setTab([false, true, false])}>Bank Details</a></li>
+                                                                <li  style={{width:'100%' }}><a href="#nav-tab-bank1" className="nav-link" data-toggle="pill" style={tab[2]?{left: '-1.3%', backgroundColor: '#002d2a', color: 'white'}:{left: '-1.3%',backgroundColor:  '#eaec31', color: 'black'}} onClick={()=>setTab([false, false, true])}> Gcash Details</a></li>                     
                                                             </ul>
                                                         </li>
                                                        
@@ -246,23 +248,21 @@ const Receipt = (props) => {
                                                     </div>
 
                                                     <div className="tab-pane fade" id="nav-tab-bank">
-                                                        <p>Bank account details</p>
-                                                        <dl>
-                                                            <dt>BANK:</dt>
-                                                            <dd>BANK NAME</dd>
-                                                            <dt>Account Number:</dt>
-                                                            <dd>account number</dd>
-                                                        </dl>
+                                                        <p style={{fontWeight: 'bold'}}>Bank account details</p>
+                                                            <div className="qrbox">
+                                                                <img className="qrbox" src="https://github.com/hirokbanik/qrcode/blob/master/default.png?raw=true" alt="qr-code" />
+                                                                {/* <textarea></textarea>
+                                                                <button>Generate QR Code</button> */}
+                                                            </div>
                                                         <p><strong>Note:</strong>You can pay here!</p>                          
                                                     </div>
                                                     <div className="tab-pane fade" id="nav-tab-bank1">
-                                                        <p>Gcash account details</p>
-                                                        <dl>
-                                                            <dt>ACCOUNT NAME:</dt>
-                                                            <dd>name</dd>
-                                                            <dt>Mobile Number:</dt>
-                                                            <dd>mobile number</dd>
-                                                        </dl>
+                                                        <p style={{fontWeight: 'bold'}}>Gcash account details</p>
+                                                            <div className="qrbox">
+                                                                <img className="qrbox" src="https://github.com/hirokbanik/qrcode/blob/master/default.png?raw=true" alt="qr-code" />
+                                                                {/* <textarea></textarea>
+                                                                <button>Generate QR Code</button> */}
+                                                            </div>
                                                         <p><strong>Note:</strong>You can pay here!</p>                          
                                                     </div>
                                                     
@@ -272,10 +272,10 @@ const Receipt = (props) => {
                                         }
                                         <br/><br/>
                                             
-                                            {items.status==='Delivering'?<div><button type="button" className="btn btn-primary" onClick={done1} style={{borderRadius: '50px'}}>{!con1?'Item Received':'Cancel'}</button>
+                                            {items.status==='Delivering' && !props.reserve?<div><button type="button" className="btn btn-primary" onClick={done1} style={{borderRadius: '50px'}}>{!con1?'Item Received':'Cancel'}</button>
                                             <p style={{fontSize:"13px", marginTop: '5px', color:'green'}}><strong>Note:</strong> Click only if the items are received successfully</p></div> :null}
                                     
-                                            {con1 && items.status==='Delivering'?<form  style={{borderRadius: '50px'}} onSubmit={(e)=>props.reserve?confirm2(e):confirm(e)}> 
+                                            {con1 && items.status==='Delivering'  && !props.reserve?<form  style={{borderRadius: '50px'}} onSubmit={(e)=>props.reserve?confirm2(e):confirm(e)}> 
                                                 <span style={{fontSize:"13px"}}>Please Enter your password to confirm</span>
                                                 <input type="password" className="form-control"placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;" onChange={(e)=>setPw(e.target.value)} required={true} />
                                                 <br/> <input type="submit" className="btn btn-primary" id="confirm" value="Confirm"  style={{borderRadius: '50px'}} />
