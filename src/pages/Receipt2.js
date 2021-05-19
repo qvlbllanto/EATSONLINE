@@ -155,11 +155,12 @@ const Receipt = (props) => {
                                         <h5 style={{color:'black', textAlign: 'start'}}>Order Date: {new Date(items.dateBought).toDateString()} {new Date(items.dateBought).toLocaleTimeString()}</h5>
                     
                                         {props.reserve?<h5 style={{color:'black', textAlign: 'start'}}>Message:  {items.message}</h5>:null}
-                                        <h5 style={{color:'black' , textAlign: 'end' , display: 'block', marginTop: '-125px'}}>Order Status: {items.status.toUpperCase()}</h5>
-                                            {items.status==="Cancelled"?<h5 style={{color:'black', textAlign: 'end'}}>Reason for Cancellation:</h5>:null}
-                                            {items.status==="Cancelled"?<p style={{fontWeight:'normal', color:'#97191d',textAlign: 'end'}}>{items.reason}</p>:null}
-                                            <h5 style={{color:'black', textAlign: 'end' , display: 'block'}}>Payment Status: {items.pstatus}</h5>
-                                            {!props.reserve?<h5 style={{color:'black', textAlign: 'end' , display: 'block'}}>Payment Mode: {items.payment}</h5>:null}
+                                        <hr/>
+                                        <h5 style={{color:'black' , textAlign: 'start' , display: 'block'}}>Order Status: {items.status.toUpperCase()}</h5>
+                                            {items.status==="Cancelled"?<h5 style={{color:'black', textAlign: 'start'}}>Reason for Cancellation:</h5>:null}
+                                            {items.status==="Cancelled"?<p style={{fontWeight:'normal', color:'#97191d',textAlign: 'start'}}>{items.reason}</p>:null}
+                                            <h5 style={{color:'black', textAlign: 'start' , display: 'block'}}>Payment Status: {items.pstatus}</h5>
+                                            {!props.reserve?<h5 style={{color:'black', textAlign: 'start' , display: 'block'}}>Payment Mode: {items.payment}</h5>:null}
                                             {items.status.toUpperCase()==="DELIVERING"?
                                             <div className="total-amt d-flex justify-content-between font-weight-bold">
                                                     <p style={{fontWeight: 'bold'}}>Delivery fee</p>

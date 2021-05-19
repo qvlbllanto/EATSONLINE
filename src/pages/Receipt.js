@@ -1,6 +1,6 @@
 import React, {useState} from 'react'; 
 import { useHistory, Link } from "react-router-dom";
-import {updateAdvStatus, deleteReceipt, addReceipt, checkPasswordIfCorrect, viewHistory,viewHistory2, updateStatus, addLogs, NumberFormat, addAdvReceipt, deleteAdvReceipt} from "./functions.js";
+import {getQR, updateAdvStatus, deleteReceipt, addReceipt, checkPasswordIfCorrect, viewHistory,viewHistory2, updateStatus, addLogs, NumberFormat, addAdvReceipt, deleteAdvReceipt} from "./functions.js";
 import {cyrb53} from "./encdec.js"
 import axios from 'axios';
 import $ from 'jquery';
@@ -11,31 +11,48 @@ const Receipt = (props) => {
     const [pw, setPw] = useState(null);
     const [image, setImage] = useState(null);
     const [tab, setTab] = useState([false, false, false]);
+    const [gc, setgc] = useState(null);
+    const [ba, setBa] = useState(null);
+    const [ch, setCh] = useState(false);
     React.useEffect(()=>{
-        addLogs("Receipt");
-        props.set(false);
-        if(props.reserve){
-            viewHistory2(props.hid).then((d)=>{
-                console.log(d);
-                setItems(d);
-                let num = 0;
-                for (let i of d.items){
-                    num+=(i[1].price*i[1].amount);
-                }
-                setAmount(Number(num).toFixed(2));
-            })
-        }else{
-            viewHistory(props.hid).then((d)=>{
-                console.log(d);
-                setItems(d);
-                let num = 0;
-                for (let i of d.items){
-                    num+=(i[1].price*i[1].amount);
-                }
-                setAmount(Number(num).toFixed(2));
-            })
+        
+        if(!ch){
+            addLogs("Receipt");
+            props.set(false);
+            setCh(true);
         }
-    }, []);
+        const timer = setTimeout(() => {
+            getQR('bank').then((d)=>{
+                setBa(d);
+            })
+            getQR('gcash').then((a)=>{
+                setgc(a);
+            })
+            if(props.reserve){
+                viewHistory2(props.hid).then((d)=>{
+                    console.log(d);
+                    setItems(d);
+                    let num = 0;
+                    for (let i of d.items){
+                        num+=(i[1].price*i[1].amount);
+                    }
+                    setAmount(Number(num).toFixed(2));
+                })
+            }else{
+                viewHistory(props.hid).then((d)=>{
+                    console.log(d);
+                    setItems(d);
+                    let num = 0;
+                    for (let i of d.items){
+                        num+=(i[1].price*i[1].amount);
+                    }
+                    setAmount(Number(num).toFixed(2));
+                })
+            }
+           }, 500);
+        return () => clearTimeout(timer);
+       
+    });
 
     const submitReceipt = (e) =>{
         e.preventDefault();
@@ -219,10 +236,6 @@ const Receipt = (props) => {
                                             <div className="pt-5">
                                                 <div className="card">
                                                     <ul className="nav nav-pills mb-3"> 
-                                                        <li><a href="#nav-tab-card" className="nav-link" data-toggle="pill" style={tab[0]?{fontSize: '13px' ,backgroundColor:  '#eaec31', color: 'black'}:{fontSize: '13px'}} onClick={()=>setTab([true, false, false])}>Upload Receipt</a></li>
-                                                        {/* <li><a href="#nav-tab-bank" className="nav-link" data-toggle="pill"><i className="fa fa-credit-card"></i>Online Payment Details</a></li>
-                                                        &nbsp;&nbsp;&nbsp;<li><a href="#nav-tab-bank1" className="nav-link" data-toggle="pill"><i className="fa fa-credit-card"></i>Gcash Details</a></li> */}
-                                                        <a href="#" className="nav-link" data-toggle="pill" id="c" style={{visibility:'hidden'}}></a>
                                                         <li className="dropdown" style={{cursor:'pointer'}} onClick={(e)=>{document.getElementById("c").click();}}>
                                                             
                                                             <a className="dropdown-toggle" data-toggle="dropdown"  style={tab[1] || tab[2]?{fontSize: '13px' ,backgroundColor:  '#eaec31', color: 'black'}:{fontSize: '13px'}} >Online Payment Details</a>
@@ -231,6 +244,10 @@ const Receipt = (props) => {
                                                                 <li  style={{width:'100%' }}><a href="#nav-tab-bank1" className="nav-link" data-toggle="pill" style={tab[2]?{left: '-1.3%', backgroundColor: '#002d2a', color: 'white'}:{left: '-1.3%',backgroundColor:  '#eaec31', color: 'black'}} onClick={()=>setTab([false, false, true])}> Gcash Details</a></li>                     
                                                             </ul>
                                                         </li>
+                                                        <li><a href="#nav-tab-card" className="nav-link" data-toggle="pill" style={tab[0]?{fontSize: '13px' ,backgroundColor:  '#eaec31', color: 'black'}:{fontSize: '13px'}} onClick={()=>setTab([true, false, false])}>Upload Receipt</a></li>
+                                                        {/* <li><a href="#nav-tab-bank" className="nav-link" data-toggle="pill"><i className="fa fa-credit-card"></i>Online Payment Details</a></li>
+                                                        &nbsp;&nbsp;&nbsp;<li><a href="#nav-tab-bank1" className="nav-link" data-toggle="pill"><i className="fa fa-credit-card"></i>Gcash Details</a></li> */}
+                                                        <a href="#" className="nav-link" data-toggle="pill" id="c" style={{visibility:'hidden'}}></a>
                                                        
                                                     </ul>
                                                 </div>
@@ -250,19 +267,24 @@ const Receipt = (props) => {
                                                     <div className="tab-pane fade" id="nav-tab-bank">
                                                         <p style={{fontWeight: 'bold'}}>Bank account details</p>
                                                             <div className="qrbox">
-                                                                <img className="qrbox" src="https://github.com/hirokbanik/qrcode/blob/master/default.png?raw=true" alt="qr-code" />
+                                                                <img className="qrbox" src={ba} alt="qr-code" />
                                                                 {/* <textarea></textarea>
                                                                 <button>Generate QR Code</button> */}
                                                             </div>
+                                                            <br/>
+                                                                <p>Account Holder: <span style={{fontWeight:'bold'}}>Juan Dela Cruz</span></p>
+                                                                <p>Account Number: <span style={{fontWeight:'bold'}}>090909090909</span></p>
+                                                                <p>Bank Name: <span style={{fontWeight:'bold'}}>BPO</span></p>
                                                         <p><strong>Note:</strong>You can pay here!</p>                          
                                                     </div>
                                                     <div className="tab-pane fade" id="nav-tab-bank1">
                                                         <p style={{fontWeight: 'bold'}}>Gcash account details</p>
                                                             <div className="qrbox">
-                                                                <img className="qrbox" src="https://github.com/hirokbanik/qrcode/blob/master/default.png?raw=true" alt="qr-code" />
-                                                                {/* <textarea></textarea>
-                                                                <button>Generate QR Code</button> */}
+                                                                <img className="qrbox" src={gc} alt="qr-code" />
                                                             </div>
+                                                            <br/>
+                                                            <p>Gcash Holder: <span style={{fontWeight:'bold'}}>Juan Dela Cruz</span></p>
+                                                            <p>Gcash Number: <span style={{fontWeight:'bold'}}>090909090909</span></p>
                                                         <p><strong>Note:</strong>You can pay here!</p>                          
                                                     </div>
                                                     

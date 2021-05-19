@@ -217,8 +217,12 @@ const Cart = (props)=>{
         setProcessing(false);
         buy2(conf).then((d)=>{
             if(d[0]){
-                setProcessing(false);
-                history.push('/receipt');
+                if(d[1]){
+                    setProcessing(false);
+                    history.push('/receipt');
+                }else{
+                    document.getElementById("popup-2").classList.toggle("active");
+                }
             }else{
                 setItemstoadv(d[1][2]);
                 setProcessing(false);
@@ -361,13 +365,17 @@ const Cart = (props)=>{
                 }).then(async(ca)=>{
                     
                     if(!clickY){
+                        if(ca[0].length>0){
                         buyItems(ca, Number(ca[4]).toFixed(2), props.idnum, accountD.name,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
                             if(x[0]){
                                 props.setAID(false);
                                 props.cart(x[1]);
-                                reso([true]);
+                                reso([true, true]);
                             }
                         });
+                        }else{
+                            reso([true, false]);
+                        }
                     }else{  
                         reso([false, ca]);
                     }

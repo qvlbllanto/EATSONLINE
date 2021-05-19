@@ -387,14 +387,14 @@ const Menu = (props) =>{
 								return(
 								
 								<div className="col-sm-4" key={i} >
-								<div className="product-image-wrapper" style={{borderWidth: '1px',  borderColor: 'black', borderRadius: '10px'}}>
+								<div className="product-image-wrapper" style={{borderWidth: '4px',  borderColor: 'black', borderRadius: '10px'}}>
 									<div className="single-products">
 											<div className="productinfo text-center" >
 												<img src={d[1].link} alt={d[1].link} style={{width: '100%', height: '230px'}}/>
 												<h2>{d[1].title}</h2>
 												<p>By: {d[1].seller}</p>
 												<p>Category: {d[1].type}</p>
-												<p style={{fontSize: '14px'}}>Stock: <span style={parseInt(d[1].numberofitems)<=0?{fontWeight: 'bold'}:null}>{parseInt(d[1].numberofitems)!==0?d[1].numberofitems:'0 Stock!'}</span></p>
+												<p style={{fontSize: '14px'}}>Stock: <span style={parseInt(d[1].numberofitems)<=0?{fontWeight: 'bold'}:null}>{parseInt(d[1].numberofitems)!==0?d[1].numberofitems:'For Advanced Order'}</span></p>
 												<p>Available Dates</p>
 												<select className="form-control alterationTypeSelect" style={{width: '90%', height: '35px', marginLeft:'5%', marginRight:'5%'}}>
 													{dates.map((d2, ib)=>
@@ -568,7 +568,7 @@ const Menu = (props) =>{
             </div>
             <div className="container" >
                 <div className="copyright">
-                    &copy; Copyright <strong><span>Eats Online</span></strong>. All Rights Reserved
+                    &copy; Copyright <strong><span style={{color: '#eaec31', textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000', letterSpacing: '3px'}}>Eats Online</span></strong>. All Rights Reserved
                 </div>
             </div>
         </footer>

@@ -68,7 +68,7 @@ const Home = (props)=>{
                 </div>
             </div>
          
-        <TopSide right={true} first="Welcome to " second="Eats Online" desc="Your One-stop shop for Regional delicacies" img={["./assets/img/0 NEW SLIDER/Slider Image 0.png","./assets/img/0 NEW SLIDER/Slider Image 1.png", "./assets/img/0 NEW SLIDER/Slider Image 2.png", "./assets/img/0 NEW SLIDER/Slider Image 3.png"]}/>
+        <TopSide right={true} first="Welcome to " second="Eats Online" desc="Your One-stop Shop for Regional Delicacies!" img={["./assets/img/0 NEW SLIDER/Slider Image 0.png","./assets/img/0 NEW SLIDER/Slider Image 1.png", "./assets/img/0 NEW SLIDER/Slider Image 2.png", "./assets/img/0 NEW SLIDER/Slider Image 3.png"]}/>
     
         <main id="main">
         <section id="home_menu" className="menu section-bg">
@@ -391,7 +391,7 @@ const Home = (props)=>{
               <label className="controllabel"><span className="required">*</span>Message: </label>
                 <textarea className="form-control" name="message2" rows="8" placeholder="Message" onChange={(e)=>setMessage2(e.target.value)} required style={{background: '#2aece3', color:'black'}}></textarea>
               </div>
-                <span style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'black'}:{color: 'black'}}>{successful}</span>
+                <span style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white'}:{color: 'white'}}>{successful}</span>
               
                 <div className="text-center">
                   <button type="submit" >Send Message</button>
@@ -413,7 +413,7 @@ const Home = (props)=>{
                 <a href="#hero" className="instagram"><i className="bx bxl-instagram"></i></a>
                 <a href="#hero" className="twitter"><i className="fab fa-google-plus-g"></i></a>
             </div>
-                    &copy; Copyright <strong><span style={{color: '#eaec31', textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000', letterSpacing: '1px'}}>Eats Online</span></strong>. All Rights Reserved
+                    &copy; Copyright <strong><span style={{color: '#eaec31', textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000', letterSpacing: '3px'}}>Eats Online</span></strong>. All Rights Reserved
                 </div>
             </div>
         </footer>

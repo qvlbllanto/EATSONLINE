@@ -60,7 +60,7 @@ const sendContact = (name, subject, email, message) =>{
 
 const viewHistory = ( hid) =>{
     return new Promise((resolve, reject)=>{
-        data.ref('ItemsBoughthistory').child(hid).once('value', (snapshot)=>{
+        data.ref('transaction').child(hid).once('value', (snapshot)=>{
             resolve(snapshot.val());
         });
     });
@@ -74,7 +74,7 @@ const viewHistory2 = ( hid) =>{
 }
 const buyItems = (items,total, idnum, name, address, payment, phone, id) =>{
     return new Promise((resolve, reject)=>{
-        let ch = data.ref('ItemsBoughthistory').push({
+        let ch = data.ref('transaction').push({
             "name": name,
             "totalprice": total,
             "items": items[0],
@@ -89,8 +89,8 @@ const buyItems = (items,total, idnum, name, address, payment, phone, id) =>{
         });
         ch.then(()=>{
             data.ref('cart').child(idnum).set(items[1]).then(()=>{
-                data.ref('ItemsBoughthistory').child(ch.key).update({id: (generateCode().substring(3)+ch.key.substring(6, 9)).replace("-","").replace("_","")}).then((d)=>{
-                    data.ref('ItemsBoughthistory').child(ch.key).child('items').once('value',(snapshot)=>{
+                data.ref('transaction').child(ch.key).update({id: (generateCode().substring(3)+ch.key.substring(6, 9)).replace("-","").replace("_","")}).then((d)=>{
+                    data.ref('transaction').child(ch.key).child('items').once('value',(snapshot)=>{
                         snapshot.forEach((snap)=>{
                             data.ref('products').orderByKey().equalTo(snap.val()[1].key).once('value',(s)=>{
                                 s.forEach((x)=>{
@@ -248,7 +248,7 @@ const checkCart = (setss) => {
 
 const getHistory = (idn) =>{
     return new Promise((resolve, reject)=>{
-        data.ref('ItemsBoughthistory').orderByChild('userid').equalTo(idn).once('value', (snapshot)=>{
+        data.ref('transaction').orderByChild('userid').equalTo(idn).once('value', (snapshot)=>{
             let s = [];
             snapshot.forEach((snap)=>{
                 s.push([snap.key, snap.val()]);
@@ -259,7 +259,7 @@ const getHistory = (idn) =>{
 }
 const getUpdatedHistory = (idn) =>{
     return new Promise((resolve, reject)=>{
-        data.ref('ItemsBoughthistory').orderByChild('status').equalTo('Delivering').once('value', (snapshot)=>{
+        data.ref('transaction').orderByChild('status').equalTo('Delivering').once('value', (snapshot)=>{
             let s = [];
             snapshot.forEach((snap)=>{
                 if(snap.val().userid===idn){
@@ -272,7 +272,7 @@ const getUpdatedHistory = (idn) =>{
 }
 const getUpdatedHistory2 = (idn) =>{
     return new Promise((resolve, reject)=>{
-        data.ref('ItemsBoughthistory').orderByChild('status').equalTo('Processing').once('value', (snapshot)=>{
+        data.ref('transaction').orderByChild('status').equalTo('Processing').once('value', (snapshot)=>{
             let s = [];
             snapshot.forEach((snap)=>{
                 if(snap.val().userid===idn){
@@ -403,10 +403,10 @@ const updateACCOUNT = (idn, set) =>{
 
 const updateStatus = (idnum, hid)=>{
     return new Promise((resolve, reject)=>{
-            data.ref('ItemsBoughthistory').child(hid).update({status: 'Completed', dateDelivered: todaydate()}).then((d)=>{
+            data.ref('transaction').child(hid).update({status: 'Completed', dateDelivered: todaydate()}).then((d)=>{
                 data.ref('accounts').child(idnum).once('value', (snapshot)=>{
                     let x = snapshot.val();
-                    data.ref('ItemsBoughthistory').child(hid).once('value', (snaps)=>{
+                    data.ref('transaction').child(hid).once('value', (snaps)=>{
                         let y=snaps.val().totalprice;
                         data.ref('accounts').child(idnum).update({totalspent: parseFloat((Number(x.totalspent)+Number(y)).toFixed(2))}).then((d)=>{
                             resolve(true);
@@ -437,8 +437,8 @@ const updateAdvStatus = (idnum, hid)=>{
 }
 const cancelorder = (hid, reason)=>{
     return new Promise((resolve, reject)=>{
-        data.ref('ItemsBoughthistory').child(hid).update({status: 'Cancelled', reason: reason}).then((d)=>{
-            data.ref('ItemsBoughthistory').child(hid).once('value', (snapshot)=>{
+        data.ref('transaction').child(hid).update({status: 'Cancelled', reason: reason}).then((d)=>{
+            data.ref('transaction').child(hid).once('value', (snapshot)=>{
                 snapshot.val().items.forEach((d)=>{
                     data.ref('products').child(d[1].key).once('value', (snaps)=>{
                         if(snapshot.val()!==null){
@@ -685,7 +685,7 @@ const getData = (qty) => {
             .child(image.name)
             .getDownloadURL()
             .then(url => {
-                data.ref('ItemsBoughthistory').child(idn).update({receipt: url}).then((ch)=>{
+                data.ref('transaction').child(idn).update({receipt: url}).then((ch)=>{
                     resolve(true);
                 });
             });
@@ -991,7 +991,7 @@ const checkifincart= async(arr, id) =>{
 
 const checkIfItemisBought = (idnum, menuid) =>{
     return new Promise((resolve, reject)=>{
-        data.ref("ItemsBoughthistory").orderByChild('userid').equalTo(idnum).once('value', (snapshot)=>{
+        data.ref("transaction").orderByChild('userid').equalTo(idnum).once('value', (snapshot)=>{
             snapshot.forEach((snap)=>{
                 snap.val().items.forEach((d)=>{
                     if(d[1].key===menuid && snap.val().status === "Completed"){
@@ -1095,5 +1095,13 @@ const topSoldProd = () =>{
         })
     })
 }
+const getQR = (what) =>{
+    return new Promise((resolve, reject)=>{
+      data.ref(what).once('value', (snapshot)=>{
+        
+        resolve(snapshot.val()===null?null:snapshot.val().url);
+      })
+    })
+  }
 
-export {topSoldProd, getUpdatedR3, getDateforCart, getDatesz,recLogin, getAllUnread, readAll, checkIfItemisBought, checkk, checkifincart, getData2, cancelorderR, updateAdvStatus, getUpdatedHistory2, checkLastKey, viewHistory2,updateCartData, addAdvanceOrderList, checkCart, getType, getCartLength, setPrimaryAddress, removeAddress, addAddress, getProductComments, addComment, getProductData, deleteDownAdvReceipt, addDownAdvReceipt, addAdvReceipt,deleteAdvReceipt, getCurrOrder, newMessage, getChat, sendChat, deleteReceipt, addReceipt, checkDate, getAdvanceOrder, NumberFormat,getData, waitloop, updatePass, checkCode, checkIfEmailExist, cancelorder, updateStatus,getUpdatedHistory, viewHistory, updateACCOUNT, addImage, checkPasswordIfCorrect, deletePROFPIC, getAccountDetails, sendContact,checkIfAcctExist, getHistory, updateCart, removeAllCart,addLogs, todaydate, addCart, Reservation, generateCode, endDateofVerification, getCartData, deleteITM, buyItems};
+export {getQR, topSoldProd, getUpdatedR3, getDateforCart, getDatesz,recLogin, getAllUnread, readAll, checkIfItemisBought, checkk, checkifincart, getData2, cancelorderR, updateAdvStatus, getUpdatedHistory2, checkLastKey, viewHistory2,updateCartData, addAdvanceOrderList, checkCart, getType, getCartLength, setPrimaryAddress, removeAddress, addAddress, getProductComments, addComment, getProductData, deleteDownAdvReceipt, addDownAdvReceipt, addAdvReceipt,deleteAdvReceipt, getCurrOrder, newMessage, getChat, sendChat, deleteReceipt, addReceipt, checkDate, getAdvanceOrder, NumberFormat,getData, waitloop, updatePass, checkCode, checkIfEmailExist, cancelorder, updateStatus,getUpdatedHistory, viewHistory, updateACCOUNT, addImage, checkPasswordIfCorrect, deletePROFPIC, getAccountDetails, sendContact,checkIfAcctExist, getHistory, updateCart, removeAllCart,addLogs, todaydate, addCart, Reservation, generateCode, endDateofVerification, getCartData, deleteITM, buyItems};
