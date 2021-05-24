@@ -11,8 +11,8 @@ const Receipt = (props) => {
     const [pw, setPw] = useState(null);
     const [image, setImage] = useState(null);
     const [tab, setTab] = useState([false, false, false]);
-    const [gc, setgc] = useState(null);
-    const [ba, setBa] = useState(null);
+    const [gc, setgc] = useState({});
+    const [ba, setBa] = useState({});
     const [ch, setCh] = useState(false);
     React.useEffect(()=>{
         
@@ -179,10 +179,10 @@ const Receipt = (props) => {
                                                     <table className="table" style={{width:'100%'}}>
                                                     <thead className="thead-dark" >
                                                         <tr>
-                                                            <th><h5 style={{color:'black'}}><strong>Name</strong></h5></th>
+                                                            <th><h5 style={{color:'white'}}><strong>Name</strong></h5></th>
                                                             {/*<th><h5><strong>Type</strong></h5></th>*/}
-                                                            <th><h5 style={{color:'black'}}><strong>Quantity</strong></h5></th>
-                                                            <th><h5 style={{color:'black'}}><strong>Price</strong></h5></th>
+                                                            <th><h5 style={{color:'white'}}><strong>Quantity</strong></h5></th>
+                                                            <th><h5 style={{color:'white'}}><strong>Price</strong></h5></th>
                                                             {props.reserve? <th><h5 style={{color:'black'}}><strong>Delivery Date</strong></h5></th>:null}
                                                             {props.reserve? <th><h5 style={{color:'black'}}><strong>Item Status</strong></h5></th>:null}
                                                             {props.reserve? <th><h5 style={{color:'black'}}><strong>Delivery fee</strong></h5></th>:null}
@@ -267,24 +267,24 @@ const Receipt = (props) => {
                                                     <div className="tab-pane fade" id="nav-tab-bank">
                                                         <p style={{fontWeight: 'bold'}}>Bank account details</p>
                                                             <div className="qrbox">
-                                                                <img className="qrbox" src={ba} alt="qr-code" />
+                                                                <img className="qrbox" src={ba.url} alt="qr-code" />
                                                                 {/* <textarea></textarea>
                                                                 <button>Generate QR Code</button> */}
                                                             </div>
                                                             <br/>
-                                                                <p>Account Holder: <span style={{fontWeight:'bold'}}>Juan Dela Cruz</span></p>
-                                                                <p>Account Number: <span style={{fontWeight:'bold'}}>090909090909</span></p>
-                                                                <p>Bank Name: <span style={{fontWeight:'bold'}}>BPO</span></p>
+                                                                <p>Account Holder: <span style={{fontWeight:'bold'}}>{ba.holder}</span></p>
+                                                                <p>Account Number: <span style={{fontWeight:'bold'}}>{ba.number}</span></p>
+                                                                <p>Bank Name: <span style={{fontWeight:'bold'}}>{ba.bank}</span></p>
                                                         <p><strong>Note:</strong>You can pay here!</p>                          
                                                     </div>
                                                     <div className="tab-pane fade" id="nav-tab-bank1">
                                                         <p style={{fontWeight: 'bold'}}>Gcash account details</p>
                                                             <div className="qrbox">
-                                                                <img className="qrbox" src={gc} alt="qr-code" />
+                                                                <img className="qrbox" src={gc.url} alt="qr-code" />
                                                             </div>
                                                             <br/>
-                                                            <p>Gcash Holder: <span style={{fontWeight:'bold'}}>Juan Dela Cruz</span></p>
-                                                            <p>Gcash Number: <span style={{fontWeight:'bold'}}>090909090909</span></p>
+                                                            <p>Gcash Holder: <span style={{fontWeight:'bold'}}>{gc.holder}</span></p>
+                                                            <p>Gcash Number: <span style={{fontWeight:'bold'}}>{gc.number}</span></p>
                                                         <p><strong>Note:</strong>You can pay here!</p>                          
                                                     </div>
                                                     

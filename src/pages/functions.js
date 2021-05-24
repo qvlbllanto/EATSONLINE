@@ -1099,7 +1099,7 @@ const getQR = (what) =>{
     return new Promise((resolve, reject)=>{
       data.ref(what).once('value', (snapshot)=>{
         
-        resolve(snapshot.val()===null?null:snapshot.val().url);
+        resolve(snapshot.val()===null?{}:snapshot.val());
       })
     })
   }

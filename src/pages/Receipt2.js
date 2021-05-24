@@ -172,9 +172,9 @@ const Receipt = (props) => {
                                                     <table className="table" style={{width:'100%'}}>
                                                     <thead className="thead-dark" >
                                                         <tr>
-                                                            <th><h5 style={{color:'black'}}><strong>Name</strong></h5></th>
-                                                            <th><h5 style={{color:'black'}}><strong>Quantity</strong></h5></th>
-                                                            <th><h5 style={{color:'black'}}><strong>Price</strong></h5></th>
+                                                            <th><h5 style={{color:'white'}}><strong>Name</strong></h5></th>
+                                                            <th><h5 style={{color:'white'}}><strong>Quantity</strong></h5></th>
+                                                            <th><h5 style={{color:'white'}}><strong>Price</strong></h5></th>
                                                             {props.reserve? <th><h5 style={{color:'black'}}><strong>Order Date</strong></h5></th>:null}
                                                             {props.reserve? <th><h5 style={{color:'black'}}><strong>Item Status</strong></h5></th>:null}
                                                             {props.reserve? <th><h5 style={{color:'black'}}><strong>Delivery fee</strong></h5></th>:null}

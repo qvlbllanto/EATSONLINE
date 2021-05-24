@@ -24,8 +24,6 @@ const Login = (props)=>{
     const history = useHistory();
     const [login, setLogin] = useState(false);
     const [guest, setGuest] = useState(false);
-    const [guestAddress, setGuestAddress] = useState(null);
-    const [guestPhone, setGuestPhone] = useState(null);
     React.useEffect(() => { 
         addLogs("Login/Register");
         props.set(false);
@@ -262,21 +260,22 @@ const Login = (props)=>{
             "id": id,
             "name": "Guest -"+generateCode3(),
             "email": "GUEST",
-            "phoneNumber": guestPhone,
+            "phoneNumber": '',
             "password": "GUEST",
             "verified": true,
             "totalspent": 0,
             "dateCreated": todaydate(),
             "guest": true
         });
-        data.ref("accounts").child(x9.key).child('addresses').push({address: guestAddress, primary: true}).then(()=>{
+        x9.then(()=>{
             encryptvalues(x9.key).then(r=>{
                 localStorage.setItem( 'ifloggedin', true);  
                 localStorage.setItem( 'userIDs', r[0]); 
                 history.push("/");
                 window.location.reload(false);
               });
-        });
+        })
+              
 
     }
     const LoginAccount = (e) => {
@@ -394,7 +393,7 @@ const Login = (props)=>{
                                         <h1 style={{textAlign: 'center'}}>OR</h1>
                                     {/* <div className="col-lg-6 col-md-6 col-xs-12 col-sm-6"> */}
                                     <div>
-                                        <input type="submit" name="" value="&#xf2c0; LOGIN as GUEST"  onClick={ifguest} style={{maxWidth: '500px',  width: '200px', height: '50px',border: '2px solid black', fontFamily: 'FontAwesome', fontWeight: 'normal', fontStyle: 'normal', textDecoration: 'inherit'}}/>
+                                        <input type="submit" name="" value="&#xf2c0; LOGIN as GUEST"  onClick={loginAsGuest} style={{maxWidth: '500px',  width: '200px', height: '50px',border: '2px solid black', fontFamily: 'FontAwesome', fontWeight: 'normal', fontStyle: 'normal', textDecoration: 'inherit'}}/>
                                         </div>
                                     {/* </div> */}
                                     <div>
@@ -418,13 +417,7 @@ const Login = (props)=>{
                     
                             {/*dito*/}
                         </form>:
-                        <form onSubmit={(e)=>{e.preventDefault(); loginAsGuest()}}>
-                            <input type="submit" name="" value="Back" onClick={ifguest}/>
-                            <h2>Login as Guest</h2>
-                            <input type="address" placeholder="Enter address" onChange={(e)=>setGuestAddress(e.target.value)} required/>
-                            <input type="number" placeholder="Enter phone number" onChange={(e)=>setGuestPhone(e.target.value)} required/>
-                            <input type="submit" value="Login" />
-                        </form>}
+                      null}
                         
                             { verify && !guest&& login? <div>  <form onSubmit={(e)=>handleCode(e)}>
                                             <input type="text" style={{color: 'black'}} name="code" placeholder="Verification Code" onChange={e => setCode(e.target.value)} required/>

@@ -345,7 +345,7 @@ const Menu = (props) =>{
 									</div>
 								</div>
 								{category.map((d, index)=>{
-									return(
+									return(!d.toLowerCase().includes("others")?
 										<div className="panel panel-default" key={index}>
 									<div className="panel-heading">
 										<h4 className="panel-title" >
@@ -355,8 +355,22 @@ const Menu = (props) =>{
 										</h4>
 									</div>
 								</div>
-									)
+									:null)
 								})}
+								{category.map((d, index)=>{
+									return(d.toLowerCase().includes("others")?
+										<div className="panel panel-default" key={index}>
+									<div className="panel-heading">
+										<h4 className="panel-title" >
+											<a style={{cursor: 'pointer'}}  onClick={(e)=>{highlight(e);change("type", d, false)}}>
+												{d}
+											</a>
+										</h4>
+									</div>
+								</div>
+									:null)
+								})}
+								
 								</div>
 						</div>
 						<div className="left-sidebar">
@@ -395,10 +409,10 @@ const Menu = (props) =>{
 												<p>By: {d[1].seller}</p>
 												<p>Category: {d[1].type}</p>
 												<p style={{fontSize: '14px'}}>Stock: <span style={parseInt(d[1].numberofitems)<=0?{fontWeight: 'bold'}:null}>{parseInt(d[1].numberofitems)!==0?d[1].numberofitems:'For Advanced Order'}</span></p>
-												<p>Available Dates</p>
 												<select className="form-control alterationTypeSelect" style={{width: '90%', height: '35px', marginLeft:'5%', marginRight:'5%'}}>
+												<option selected disabled >Check for available Dates</option>
 													{dates.map((d2, ib)=>
-													d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib}>No available date for advance order</option>
+													d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2} disabled >{new Date(d3[1].date).toDateString()}</option>):<option key={ib} disabled>No available date for advance order</option>
 													:null)}
 												</select>
 											</div>
@@ -467,10 +481,10 @@ const Menu = (props) =>{
 												<p>By: {d[1].seller}</p>
 												<p>Category: {d[1].type}</p>
 												<p style={{fontSize: '14px', fontWeight:'bold'}}>Stock: {parseInt(d[1].numberofitems)!==0?d[1].numberofitems:'0 Stock!'}</p>
-												<p>Available Dates</p>
 												<select className="form-control alterationTypeSelect" style={{width: '90%', height: '35px', marginLeft:'5%', marginRight:'5%'}}>
+												<option selected disabled >Check for available Dates</option>
 													{dates.map((d2, ib)=>
-													d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib}>No available date for advance order</option>
+													d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2} disabled>{new Date(d3[1].date).toDateString()}</option>):<option key={ib} disabled>No available date for advance order</option>
 													:null)}
 												</select>
 												</div>

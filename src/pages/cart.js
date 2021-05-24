@@ -240,6 +240,9 @@ const Cart = (props)=>{
             if(d[0]){
                 setProcessing(false);
                 history.push("/receipt");
+            }else{
+           
+                document.getElementById("popup-3").classList.toggle("active");
             }
         })
     }
@@ -269,7 +272,7 @@ const Cart = (props)=>{
                     res([false, newv]);
                 }
             }).then((d)=>{
-                if(d[0]){
+                if(d[0] && ch){
                     setMes([true, "Select a date again for (" + d[1]+")"]);
                     setProcessing(false);
                     resolve([false]);
@@ -297,23 +300,31 @@ const Cart = (props)=>{
                             }
                         });
                     }else{
-                        if(d.length!==0){
+                        if(d.length>0){
                             Reservation( accountD.name, accountD.email, accountD.phoneNumber, message, nv, props.idnum, Number(v[3]).toFixed(2), document.getElementById("selection").value, accountD.id).then((dx)=>{
                                 props.setAID(true);
                                 props.cart(dx);
                                 resolve([true]);
                             });
+                        }else{
+                            resolve([false]);
+                           
                         }
                     }
                     
                 }else{
-                    buyItems(v, Number(v[4]).toFixed(2), props.idnum, accountD.name,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
-                        if(x[0]){
-                            props.setAID(false);
-                            props.cart(x[1]);
-                            resolve([true]);
-                        }
-                    });
+                    if(v[0].length>0){
+                        buyItems(v, Number(v[4]).toFixed(2), props.idnum, accountD.name,document.getElementById("selection").value, x1, accountD.phoneNumber, accountD.id).then((x)=>{
+                            if(x[0]){
+                                props.setAID(false);
+                                props.cart(x[1]);
+                                resolve([true]);
+                            }
+                        });
+                     }else{
+                        resolve([false]);
+                       
+                    }
                 }
                 }
             });
@@ -638,6 +649,7 @@ const Cart = (props)=>{
                 </div>
                 {/* end of next popup */}
                 {/* next CHOICE DATE popup */}
+                
                 <div className="row1">
                 <div className="choicedatepopup" id="popup-3">
                     <div className="overlay"></div>
@@ -645,20 +657,24 @@ const Cart = (props)=>{
                             <div className="close-btn"  onClick={(e) => document.getElementById("popup-3").classList.toggle("active")}>&times;</div>
                                 <br/>
                                 <h3 id="popuptitle"  style={{color: 'black'}}>Advance Order <br/>Select Delivery Date</h3>
+                                <center>
+                            <div style={{overflowY:'scroll', height: '250px'}}>
                             <form className="choicedateform">
                                 {cart.map((d, index)=>{
                                         return(
                                             checkboxes.includes(d[0])?
                                             checkIf(d[0], itemstoadv)?
+                                        
                                         <div key={index}>
                                             <span>{d[1].title} </span>
                                             <select className="form-control alterationTypeSelect" style={{width: '100%', height: '35px'}}  onClick={(e)=>{dateOfExc[d[0]]=e.target.value}}>
+                                            
                                                 {datecart.map((d2, ib)=>
-                                                d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2} readOnly={true}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib} readOnly={true}>No available date for advance order</option>
+                                                d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2} readOnly={true}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib} readOnly={true} disabled>No available date for advance order</option>
                                                 :null)}
                                             </select>
                                         </div >:null:null);
-                                        })}
+                                         })}
                                     <br/>
                                     {mes[0]?<span>{mes[1]}</span>:null}
                                     {processing?
@@ -667,13 +683,16 @@ const Cart = (props)=>{
                                     
                                 </div> }
                                 </form>
+                                </div>
+                                </center>
                                 <input type="button" className="btn btn-danger my-cart-btn"  onClick={()=>confirmIfAdv2(true)} value="Continue" style={{fontSize: '15px', marginTop:'10px'}}/>&nbsp;&nbsp;&nbsp;
                                     <input type="button" className="btn btn-danger my-cart-btn" data-id="1" onClick={()=>confirmIfAdv2(false)}
-                                    data-summary="summary 1" data-price="100" data-quantity="1" data-image="assets/img/Eats Online logo.png" value="Cancel Advance"  style={{fontSize: '15px', marginTop: '10px'}}/>
+                                    data-summary="summary 1" data-price="100" data-quantity="1" data-image="assets/img/Eats Online logo.png" value="Cancel Advance and continue"  style={{fontSize: '15px', marginTop: '10px'}}/>
                            
                         </div>
                     </div>
                 </div>
+               
                 {/* end of next CHOICE DATE popup */}
                 <div className="container">
                     <div className="section-title">
@@ -713,10 +732,10 @@ const Cart = (props)=>{
                                                          <p className="mb-2">Type: {d[1].type}</p>
                                                          <p className="mb-2">Stock: {itemQty[index]} </p>
                                                          <p className="mb-3">Price: <span style={{fontSize: '15px'}}>₱</span>{NumberFormat(Number(d[1].price).toFixed(2))}</p>
-                                                         <p>Available Dates</p>
                                                          <select className="form-control alterationTypeSelect" id={d[0]+d[1].title} style={{width: '60%', height: '35px'}} readOnly={true}>
+                                                         <option readOnly={true} selected disabled>Check for available dates</option>
                                                             {datecart.map((d2, ib)=>
-                                                            d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2} readOnly={true}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib} readOnly={true}>No available date for advance order</option>
+                                                            d2[0]===d[0]?d2[1].length!==0?d2[1].map((d3, i2)=><option key={i2} disabled readOnly={true}>{new Date(d3[1].date).toDateString()}</option>):<option key={ib} disabled readOnly={true}>No available date for advance order</option>
                                                             :null)}
                                                         </select>
                                                      <br/>

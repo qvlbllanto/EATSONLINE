@@ -1499,6 +1499,7 @@ section {
   display: block;
 }
 .billingpopup.active .billingcontent1{
+  width: fit-content;
   transition: all .5s ease;
   transform: translate(-50%,-50%) scale(1);
 }
@@ -5723,6 +5724,7 @@ section {
   display: block;
 }
 .billingpopup.active .billingcontent1{
+  width: fit-content;
   transition: all .5s ease;
   transform: translate(-50%,-50%) scale(1);
 }
@@ -9560,6 +9562,7 @@ section {
   display: block;
 }
 .billingpopup.active .billingcontent1{
+  width: fit-content;
   transition: all .5s ease;
   transform: translate(-50%,-50%) scale(1);
 }
@@ -12534,7 +12537,9 @@ button:hover {
 */
 
 form.choicedateform{
-  height: 300px;
-  width: 400px;
+  height: auto;
+  /* width: 400px; */
+  width: fit-content;
+  margin-left: 20px;
   overflow-y: auto;
 }
