@@ -1,6 +1,6 @@
 import React, {useState} from 'react'; 
 import { useHistory, Link } from "react-router-dom";
-import {getQR, updateAdvStatus, deleteReceipt, addReceipt, checkPasswordIfCorrect, viewHistory,viewHistory2, updateStatus, addLogs, NumberFormat, addAdvReceipt, deleteAdvReceipt} from "./functions.js";
+import {getAccountDetails, getQR, updateAdvStatus, deleteReceipt, addReceipt, checkPasswordIfCorrect, viewHistory,viewHistory2, updateStatus, addLogs, NumberFormat, addAdvReceipt, deleteAdvReceipt} from "./functions.js";
 import {cyrb53} from "./encdec.js"
 import axios from 'axios';
 import $ from 'jquery';
@@ -14,6 +14,7 @@ const Receipt = (props) => {
     const [gc, setgc] = useState({});
     const [ba, setBa] = useState({});
     const [ch, setCh] = useState(false);
+    const [guest, setGuest] = useState(false);
     React.useEffect(()=>{
         
         if(!ch){
@@ -22,6 +23,9 @@ const Receipt = (props) => {
             setCh(true);
         }
         const timer = setTimeout(() => {
+            getAccountDetails(props.idnum).then((d)=>{
+                setGuest(d.guest);
+            });
             getQR('bank').then((d)=>{
                 setBa(d);
             })
@@ -87,8 +91,22 @@ const Receipt = (props) => {
              reader.readAsDataURL(file);
         }
       };
-    const confirm = (e) =>{
+    const confirm = (e, ch) =>{
         e.preventDefault();
+        if(ch){
+            updateStatus(props.idnum, props.hid).then((a)=>{
+                if(a){
+                viewHistory(props.hid).then((x)=>{
+                    setItems(x);
+                    let num = 0;
+                    for (let i of x.items){
+                        num+=(i[1].price*i[1].amount);
+                    }
+                    setAmount(Number(num).toFixed(2));
+                });
+                }
+            });
+        }else{
         checkPasswordIfCorrect(props.idnum, cyrb53(pw)).then((d)=>{
             if(d){
                 updateStatus(props.idnum, props.hid).then((a)=>{
@@ -107,8 +125,19 @@ const Receipt = (props) => {
             }
         });
     }
-    const confirm2 = (e) =>{
+    }
+    const confirm2 = (e, ch) =>{
         e.preventDefault();
+        if(ch){
+            viewHistory2(props.hid).then((x)=>{
+                setItems(x);
+                let num = 0;
+                for (let i of x.items){
+                    num+=(i[1].price*i[1].amount);
+                }
+                setAmount(Number(num).toFixed(2));
+            }); 
+        }else{
         checkPasswordIfCorrect(props.idnum, cyrb53(pw)).then((d)=>{
             if(d){
                 updateAdvStatus(props.idnum, props.hid).then((a)=>{
@@ -126,6 +155,7 @@ const Receipt = (props) => {
                 });
             }
         });
+    }
     }
     const done1 = () =>{
         if (con1) 
@@ -294,7 +324,7 @@ const Receipt = (props) => {
                                         }
                                         <br/><br/>
                                             
-                                            {items.status==='Delivering' && !props.reserve?<div><button type="button" className="btn btn-primary" onClick={done1} style={{borderRadius: '50px'}}>{!con1?'Item Received':'Cancel'}</button>
+                                            {items.status==='Delivering' && !props.reserve?<div><button type="button" className="btn btn-primary" onClick={(e)=>guest?props.reserve?confirm2(e, true):confirm(e, true):done1(e)} style={{borderRadius: '50px'}}>{!con1?'Item Received':'Cancel'}</button>
                                             <p style={{fontSize:"13px", marginTop: '5px', color:'green'}}><strong>Note:</strong> Click only if the items are received successfully</p></div> :null}
                                     
                                             {con1 && items.status==='Delivering'  && !props.reserve?<form  style={{borderRadius: '50px'}} onSubmit={(e)=>props.reserve?confirm2(e):confirm(e)}> 
