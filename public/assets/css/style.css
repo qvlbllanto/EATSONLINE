@@ -12543,3 +12543,67 @@ form.choicedateform{
   margin-left: 20px;
   overflow-y: auto;
 }
+/* .ribbon-wrapper {
+  margin: 50px auto;
+  width: 280px;
+  height: 370px;
+  background: white;
+  border: 1px solid #333;
+  position: relative;
+  z-index: 90;
+  overflow: hidden;
+  position: absolute;
+  top: -3px;
+  left: -3px;
+} */
+.ribbon-wrapper .ribbon {
+  font: bold 15px sans-serif;
+  color: #333;
+  text-align: center;
+  -webkit-transform: rotate(-45deg);
+  /* -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg); */
+  position: absolute;
+  padding: 7px 0;
+  top: 20px;
+  left: -45px;
+  width: 160px;
+  background-color: #ebb134;
+  color: #fff;
+  font-size: 20px;
+}
+.ribbon-wrapper-menu .ribbon-menu {
+  font: bold 15px sans-serif;
+  color: #333;
+  text-align: center;
+  -webkit-transform: rotate(-45deg);
+  /* -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg); */
+  position: absolute;
+  padding: 7px 0;
+  top: 25px;
+  left: -50px;
+  width: 160px;
+  background-color: #ebb134;
+  color: #fff;
+  font-size: 20px;
+}
+.ribbon-wrapper-over .ribbon-over {
+  font: bold 15px sans-serif;
+  color: #333;
+  text-align: center;
+  -webkit-transform: rotate(-45deg);
+  /* -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg); */
+  position: absolute;
+  padding: 7px 0;
+  top: -125px;
+  left: -45px;
+  width: 200px;
+  background-color: #ebb134;
+  color: #fff;
+  font-size: 20px;
+}

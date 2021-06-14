@@ -3,7 +3,7 @@
 
 import React, {useState} from 'react';
 import { useHistory, Link } from "react-router-dom";
-import { checkIfItemisBought, checkk, getProductData, getAccountDetails, NumberFormat, addCart, addComment, getProductComments, getType, addAdvanceOrderList} from "./functions";
+import { todaydate, checkIfItemisBought, checkk, getProductData, getAccountDetails, NumberFormat, addCart, addComment, getProductComments, getType, addAdvanceOrderList} from "./functions";
 
 const MenuDetails = (props) =>{
 	const [message, setMessage] = useState(null);
@@ -18,6 +18,8 @@ const MenuDetails = (props) =>{
 	const [qty, setQty] = useState(1);
 	const [c , sc] = useState(false);
 	const [ifcommented, setIfCommented] = useState(false);
+	const [value, setValue] = useState(false);
+	const [arrofD, setarrofD] = useState([]);
     React.useEffect(()=>{
 		if(!ch){
 			document.getElementById("main").scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });
@@ -25,9 +27,13 @@ const MenuDetails = (props) =>{
 		}
 		const timer = setTimeout(() => {
 			getType(props.type, props.seller, props.menu).then((d)=>{
-				setRecommended(d);
+				setRecommended(d[0]);
+				setarrofD(d[1]);
 			})
-			getProductData(props.menu).then((d)=>{
+			getProductData(props.menu).then(async(d)=>{
+				const tday = await todaydate();
+				const check = d.startD!==undefined || d.discount!==undefined || d.endD!==undefined?d.discount>0?(new Date(tday).toDateString()===new Date(d.startD).toDateString() || new Date(tday)>=new Date(d.startD)) && (new Date(tday) <= new Date(d.endD) || new Date(tday).toDateString() === new Date(d.endD).toDateString()):false:false;
+				setValue(check);
 				setVal(d)
 			});
 			checkk(props.menu, props.idnum).then((d)=>{
@@ -58,19 +64,24 @@ const MenuDetails = (props) =>{
 	 const goLogin = () =>{
         history.push('/login');
       }
-	const addProdtoCartR = (menuid, title, price, desc, link, seller, type , id, qt) => {
+	const addProdtoCartR = (menuid, title, price, desc, link, seller, type , id, qt, val, start, end) => {
         if(props.logedin){
-            addCart(menuid, title, price, desc, link, props.idnum, seller, type, id, qt);
+            addCart(menuid, title, price, desc, link, props.idnum, seller, type, id, qt, val, start, end);
         }else{
             goLogin();
         }
     }
+
     return(
 		<div className="col-sm-9 padding-right" id="o">
 			<div className="product-details">
 				<div className="col-sm-5">
 					<div className="view-product">
-						<img src={val.link} alt="" />
+					<div className="ribbon-wrapper-menu">
+					{val.discount>0 && val.discount!==undefined &&value?<div className="ribbon-menu">{val.discount}% Off</div>:null}
+							<img src={val.link} alt="" />
+						</div>
+						
 					</div>
 				</div>
 
@@ -79,8 +90,10 @@ const MenuDetails = (props) =>{
 					<div className="product-information">
 						<h2>{val.title}</h2>
 						<span>
-							<span>₱{NumberFormat(Number(val.price).toFixed(2))}</span>
-							{!c?<button type="button" className="btn1 btn-fefault cart"  style={{borderRadius: '50px'}} onClick={()=>addProdtoCartR(props.menu, val.title, val.price, val.description, val.link, val.seller, val.type, val.id, qty)}>
+
+						{value?<div><p>Old Price ₱{NumberFormat(Number(val.price).toFixed(2))}</p><span><strong>New Price: ₱{NumberFormat(Number(val.price-(val.price*(val.discount/100))).toFixed(2))}</strong></span></div>:<span> ₱{NumberFormat(Number(val.price).toFixed(2))}</span>}
+
+							{!c?<button type="button" className="btn1 btn-fefault cart"  style={{borderRadius: '50px'}} onClick={()=>addProdtoCartR(props.menu, val.title, val.price, val.description, val.link, val.seller, val.type, val.id, qty, val.discount!==undefined?val.discount:null, val.startD!==undefined?val.startD:null, val.endD!==undefined?val.endD:null)}>
 								<i className="fa fa-shopping-cart"></i>
 								Add to cart
 							</button>:null}
@@ -100,7 +113,7 @@ const MenuDetails = (props) =>{
 												</li>
 											</ul>
 											</div>:<p>This product is already in your cart</p>}
-														
+											{/* {val.discount>0 && val.discount!==undefined &&value?<p><b>Discount: </b>{val.discount}%</p>:null} */}
 												<p><b>Stock: </b>{val.numberofitems}</p>
 												<p><b>Category:</b>{val.type}</p>
 												<p><b>Supplier:</b> {val.seller}</p>
@@ -176,10 +189,10 @@ const MenuDetails = (props) =>{
 										<div className="single-products">
 											<div className="productinfo text-center">
 												<img src={d[1].link} alt={d[1].link} style={{height: '120px'}}/>
-											<h2>₱{NumberFormat(Number(d[1].price).toFixed(2))}</h2>
+												{arrofD[i] ?<h2>₱{NumberFormat(Number(d[1].price-(d[1].price*(d[1].discount/100))).toFixed(2))}</h2>:<h2>₱{NumberFormat(Number(d[1].price).toFixed(2))}</h2>}
 											<p>{d[1].title}</p>
 											<a style={{cursor:'pointer', margin: '10px'}} className="btn btn-default" onClick={()=>{props.changeM(d[0], d[1].type, d[1].seller); document.getElementById("o").scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });}}><i className="fa fa-shopping-cart"></i>View</a>
-											<a style={{cursor:'pointer',margin: '10px'}} className="btn btn-default" onClick={(e)=>addProdtoCartR(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id, 1)}><i className="fa fa-shopping-cart"></i>{'Add to cart'}</a>
+											<a style={{cursor:'pointer',margin: '10px'}} className="btn btn-default" onClick={(e)=>addProdtoCartR(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id, 1, d[1].discount!==undefined?d[1].discount:null, d[1].startD!==undefined?d[1].startD:null, d[1].endD!==undefined?d[1].endD:null)}><i className="fa fa-shopping-cart"></i>{'Add to cart'}</a>
 				
 											</div>
 										</div>
@@ -197,10 +210,10 @@ const MenuDetails = (props) =>{
 											<div className="single-products">
 												<div className="productinfo text-center">
 													<img src={d[1].link} alt={d[1].link}  style={{height: '120px'}} />
-												<h2>₱{NumberFormat(Number(d[1].price).toFixed(2))}</h2>
+												{arrofD[((ind+1)*3)+i] ?<h2>₱{NumberFormat(Number(d[1].price-(d[1].price*(d[1].discount/100))).toFixed(2))}</h2>:<h2>₱{NumberFormat(Number(d[1].price).toFixed(2))}</h2>}
 												<p>{d[1].title}</p>
 												<a style={{cursor:'pointer', margin: '10px'}} className="btn btn-default" onClick={()=>{props.changeM(d[0], d[1].type, d[1].seller); document.getElementById("o").scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });}}><i className="fa fa-shopping-cart"></i>View</a>
-												<a style={{cursor:'pointer',margin: '10px'}} className="btn btn-default" onClick={(e)=>addProdtoCartR(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id, 1)}><i className="fa fa-shopping-cart"></i>{'Add to cart'}</a>
+												<a style={{cursor:'pointer',margin: '10px'}} className="btn btn-default" onClick={(e)=>addProdtoCartR(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id, 1, d[1].discount!==undefined?d[1].discount:null, d[1].startD!==undefined?d[1].startD:null, d[1].endD!==undefined?d[1].endD:null)}><i className="fa fa-shopping-cart"></i>{'Add to cart'}</a>
 												</div>
 											</div>
 										</div>

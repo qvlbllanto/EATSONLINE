@@ -360,7 +360,7 @@ const Home = (props)=>{
               <div className="email">
                 <i className="bi bi-envelope" style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white'}:{color: 'white'}}></i>
                 <h4 style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white', fontSize: '20px'}:{color: 'white', fontSize: '20px'}}>Email:</h4>
-                <p style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white', fontSize: '18px'}:{color: 'white', fontSize: '18px'}}>EATSONLINE.2021@gmail.com</p>
+                <p style={props.legitkey===true && props.logedin===true && props.idnum!==null?{color: 'white', fontSize: '18px'}:{color: 'white', fontSize: '18px'}}>eats.onlne@gmail.com</p>
               </div>
 
               <div className="phone">

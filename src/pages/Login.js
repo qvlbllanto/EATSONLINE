@@ -5,8 +5,7 @@ import {data} from "../firebase";
 import { checkLastKey, todaydate, generateCode, addLogs, endDateofVerification, checkIfEmailExist} from "./functions.js";
 import {encrypt, cyrb53} from "./encdec.js"
 import emailjs ,{ init } from 'emailjs-com';
-
-init("user_gR4vjiZWG1kHvFh2dC23L");
+init(process.env.REACT_APP_JSEMID);
 const Login = (props)=>{
     const [idn, setId] = useState(null);
     const [idnvalues, setIdnValues] = useState({});
@@ -36,9 +35,9 @@ const Login = (props)=>{
             email: e,
             messsage: "Thanks for registering to EATS ONLINE, here is your verification code,",
         };
-        let template ="service_gkqzauk";
-        let id = "template_3kpnkpt";
-        emailjs.send(template,id,templateParams, )
+        let id =process.env.REACT_APP_RESVERID;
+        let template =process.env.REACT_APP_RESVERTEMP;
+        emailjs.send(id, template, templateParams, )
             .then(function(response) {
                 console.log('SUCCESS!', response.status, response.text);
               }, function(error) {
@@ -67,6 +66,7 @@ const Login = (props)=>{
             if(ch){
                 const id = await checkLastKey('accounts');
                 let coderandom = generateCode2();
+                
                 let x9 = data.ref('accounts').push({
                     "id": id,
                     "name": name,
@@ -77,7 +77,7 @@ const Login = (props)=>{
                     "totalspent": 0,
                     "verificationCode": coderandom,
                     "verifyend": x,
-                    "dateCreated": todaydate(),
+                    "dateCreated": await todaydate(),
                     "guest": false
                 });
                 data.ref("accounts").child(x9.key).child('addresses').push({address: address, primary: true}).then(()=>{
@@ -90,7 +90,7 @@ const Login = (props)=>{
             }
         }) 
     }
-    const RegisterAccount = (e) => {
+    const RegisterAccount = async(e) => {
         e.preventDefault();
             let re = /[A-Z]/;
             let re2 = /[a-z]/;
@@ -129,7 +129,9 @@ const Login = (props)=>{
                 return false;
             }
             if(password === confirmPass){
-                var l = endDateofVerification();
+               
+                var l = await endDateofVerification();
+                
                 saveDatatoFirebase(l);
             }else{
                 document.getElementById("errororsuccess2").innerHTML = "Password did not match!";
@@ -223,7 +225,7 @@ const Login = (props)=>{
          
         e.preventDefault();
         console.log(code)
-        checkForCode().then(d=>{
+        checkForCode().then(async(d)=>{
             if(d){
                 if(CompareDate(idnvalues.verifyend)){
                     data.ref('accounts').child(idn).update({verified:true, verifyend: null, verificationCode:null}).then(()=>{
@@ -234,7 +236,7 @@ const Login = (props)=>{
                         document.getElementById("errororsuccess").innerHTML = "Code Expired. <br/> <span style='color: green'>New Code Sent!</span>"
                     })
                 }else{
-                    data.ref('accounts').child(idn).update({verificationCode: generateCode2(), verifyend: endDateofVerification()}).then(()=>{
+                    data.ref('accounts').child(idn).update({verificationCode: generateCode2(), verifyend: await endDateofVerification()}).then(()=>{
                         data.ref('accounts').child(idn).once('value', (snapshot)=>{
                             sendVerificationEmail(snapshot.val().name, snapshot.val().email, snapshot.val().verificationCode);
                             document.getElementById("errororsuccess").innerHTML = "Code Expired. <br/> <span style='color: green'>New Code Sent!</span>"
@@ -264,7 +266,7 @@ const Login = (props)=>{
             "password": "GUEST",
             "verified": true,
             "totalspent": 0,
-            "dateCreated": todaydate(),
+            "dateCreated": await todaydate(),
             "guest": true
         });
         x9.then(()=>{
@@ -353,9 +355,9 @@ const Login = (props)=>{
             email: e,
             message: "Here is the link for resetting your password,"
         };
-        let template ="service_gkqzauk";
-        let id = "template_3kpnkpt";
-        emailjs.send(template,id,templateParams, )
+        let id =process.env.REACT_APP_RESVERID;
+        let template =process.env.REACT_APP_RESVERTEMP;
+        emailjs.send(id,template, templateParams, )
             .then(function(response) {
                 setV('Verification link sent!');
               }, function(error) {

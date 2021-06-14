@@ -1,7 +1,8 @@
 import {browserName, fullBrowserVersion,  osName, osVersion, deviceType} from "react-device-detect";
 import {data, storage} from "../firebase";
 import publicIP from 'react-native-public-ip';
-const saveLogs = (ip, page) =>{
+import axios from "axios";
+const saveLogs = async(ip, page) =>{
     data.ref('logs').push().set({
         "IP" : ip,
         "OS" : osName,
@@ -9,33 +10,46 @@ const saveLogs = (ip, page) =>{
         "deviceType": deviceType,
         "browser": browserName,
         "browserVersion": fullBrowserVersion,
-        "date": todaydate(),
+        "date": await todaydate(),
         "page": page
     });
 }
-const todaydate = () =>{
-    let d = new Date();
-    return d.toUTCString();
-  }
-const addCart = (key, title, price, description, link, idnum,seller, type, id, qty) =>{
+const fetchCurrDate = async() =>{
+    const y = await axios.get("http://worldclockapi.com/api/json/utc/now").then((data)=>{
+       return(new Date(data.data.currentFileTime/ 10000 - 11644473600000));
+   });
+     return y;
+   }
+   
+   const todaydate = async() =>{
+       let d = new Date(await fetchCurrDate());
+       return d.toString();
+     }
+const addCart = (key, title, price, description, link, idnum,seller, type, id, qty, disc, startD, endD) =>{
     return new Promise((resolve, reject)=>{
-        data.ref('cart').child(idnum).orderByChild('key').equalTo(key).once('value', (snapshot)=>{
+        data.ref('cart').child(idnum).orderByChild('key').equalTo(key).once('value', async(snapshot)=>{
             if(snapshot.val()===null){
+                if(title===undefined || price === undefined || description===undefined){
+                    resolve(false);
+                }else{
                 data.ref('cart').child(idnum).push({
                     "title": title,
                     "price": price,
                     "desc": description,
-                    "date": todaydate(),
+                    "date": await todaydate(),
                     "link": link,
                     "type": type,
                     "seller": seller,
                     "amount": qty,
                     "key":key,
-                    "id": id
+                    "id": id,
+                    "discount":disc,
+                    "startD":startD,
+                    "endD":endD
                 }).then(()=>{
                     resolve(true);
                 });
-               
+            }
             }else{
                 resolve(false);
             }
@@ -45,13 +59,13 @@ const addCart = (key, title, price, description, link, idnum,seller, type, id, q
     
 }
 const sendContact = (name, subject, email, message) =>{
-    return new Promise((resolve, reject)=>{
+    return new Promise(async(resolve, reject)=>{
         data.ref('contactus').push().set({
             "name": name,
             "subject": subject,
             "email": email,
             "message": message,
-            "date_created": todaydate()
+            "date_created": await todaydate()
         }).then((d)=>{
             resolve(true);
         });
@@ -73,12 +87,12 @@ const viewHistory2 = ( hid) =>{
     });
 }
 const buyItems = (items,total, idnum, name, address, payment, phone, id) =>{
-    return new Promise((resolve, reject)=>{
+    return new Promise(async(resolve, reject)=>{
         let ch = data.ref('transaction').push({
             "name": name,
             "totalprice": total,
             "items": items[0],
-            "dateBought": todaydate(),
+            "dateBought": await todaydate(),
             "status": "Pending",
             "pstatus": "Not Paid",
             "address": address,
@@ -115,7 +129,7 @@ const deleteITM = (idnum, cart) =>{
     });
 }
 const Reservation= (name, email, phone, message, set, uid, totalprice, add, id) =>{
-    return new Promise(function (resolve, reject) {
+    return new Promise(async(resolve, reject)=> {
         let x = data.ref('reservation').push({
             "name" : name,
             "email": email,
@@ -130,7 +144,7 @@ const Reservation= (name, email, phone, message, set, uid, totalprice, add, id) 
             "proof": null,
             "address": add,
             "pstatus": "Not Paid",
-            "dateBought": todaydate()
+            "dateBought": await todaydate()
         });
         x.then(()=>{
             data.ref('cart').child(uid).set(set[1]).then(()=>{
@@ -170,6 +184,9 @@ const getCartData = (idnum) => {
                 vals["desc"]=o.description;
                 vals["link"]=o.link;
                 vals["price"]=o.price;
+                vals["discount"]=o.discount;
+                vals["startD"] = o.startD;
+                vals["endD"] = o.endD;
                 if(o.numberofitems<=0){
                     itemsoutofstock = vals["key"];
                 }
@@ -206,8 +223,8 @@ const addLogs = (page) =>{
         saveLogs("unknown", page);
     });
 }
-const endDateofVerification = () =>{
-    let d = new Date();
+const endDateofVerification = async() =>{
+    let d = new Date(await todaydate());
     var n = parseInt(d.getTime())+86400000;
     var x = new Date(n);
     return x.toString();
@@ -228,8 +245,8 @@ const updateCart = (idnum, setss) => {
     });
 }
 const checkCart = (setss) => {
-    return new Promise((resolve, reject)=>{
-        setss['date'] = todaydate();
+    return new Promise(async(resolve, reject)=>{
+        setss['date'] = await todaydate();
         data.ref("products").child(setss.key).once('value', (snapshot)=>{
             if(snapshot.val()===null){
                 resolve(false);
@@ -402,8 +419,8 @@ const updateACCOUNT = (idn, set) =>{
   }
 
 const updateStatus = (idnum, hid)=>{
-    return new Promise((resolve, reject)=>{
-            data.ref('transaction').child(hid).update({status: 'Completed', dateDelivered: todaydate()}).then((d)=>{
+    return new Promise(async(resolve, reject)=>{
+            data.ref('transaction').child(hid).update({status: 'Completed', dateDelivered: await todaydate()}).then((d)=>{
                 data.ref('accounts').child(idnum).once('value', (snapshot)=>{
                     let x = snapshot.val();
                     data.ref('transaction').child(hid).once('value', (snaps)=>{
@@ -419,9 +436,9 @@ const updateStatus = (idnum, hid)=>{
 
 }
 const updateAdvStatus = (idnum, hid)=>{
-    return new Promise((resolve, reject)=>{
+    return new Promise(async(resolve, reject)=>{
      
-            data.ref('reservation').child(hid).update({status: 'Completed', dateDelivered: todaydate()}).then((d)=>{
+            data.ref('reservation').child(hid).update({status: 'Completed', dateDelivered: await todaydate()}).then((d)=>{
                 data.ref('accounts').child(idnum).once('value', (snapshot)=>{
                     let x = snapshot.val();
                     data.ref('reservation').child(hid).once('value', (snaps)=>{
@@ -512,18 +529,22 @@ const updatePass = (id, p)=>{
 }
 
 const getData = (qty) => {
-    return new Promise(function (resolve, reject) {
-      data.ref("products").once("value", (snapshot) =>{
+    return new Promise((resolve, reject)=> {
+      data.ref("products").once("value", async(snapshot) =>{
         let products = [];
         let categories = [];
         let suppliers = [];
         let ratings  = [];
         let qt = [];
+        let date = [];
         let noofsupp = {
 
         };
+        const tday = await todaydate();
         snapshot.forEach((snap)=>{
             let values = snap.val();
+            const check = values.startD!==undefined || values.discount!==undefined || values.endD!==undefined?values.discount>0?(new Date(tday).toDateString()===new Date(values.startD).toDateString() || new Date(tday)>=new Date(values.startD)) && (new Date(tday) <= new Date(values.endD) || new Date(tday).toDateString() === new Date(values.endD).toDateString()):false:false;
+            date.push(check);
              qt.push(1);
         if(values.comments!==undefined){
             let avgrating = 0;
@@ -556,7 +577,7 @@ const getData = (qty) => {
             qt=qty;
         }
 
-        resolve([products, categories, suppliers, ratings, qt]);
+        resolve([products, categories, suppliers, ratings, qt, date]);
       });
     });
  }
@@ -565,7 +586,7 @@ const getData = (qty) => {
 
  const getData2 = (t, v, qty) => {
     return new Promise(function (resolve, reject) {
-      data.ref("products").orderByChild(t).startAt(v.toUpperCase()).endAt(v.toLowerCase()+ "\uf8ff").once("value", (snapshot) =>{
+      data.ref("products").orderByChild(t).startAt(v.toUpperCase()).endAt(v.toLowerCase()+ "\uf8ff").once("value", async(snapshot) =>{
         let products = [];
         let categories = [];
         let suppliers = [];
@@ -573,10 +594,13 @@ const getData = (qty) => {
         let noofsupp = {
 
         };
+        let date = [];
+        const tday = await todaydate();
         let qt = [];
         snapshot.forEach((snap)=>{
             let values = snap.val();
-
+            const check = values.startD!==undefined || values.discount!==undefined || values.endD!==undefined?values.discount>0?(new Date(tday).toDateString()===new Date(values.startD).toDateString() || new Date(tday)>=new Date(values.startD)) && (new Date(tday) <= new Date(values.endD) || new Date(tday).toDateString() === new Date(values.endD).toDateString()):false:false;
+            date.push(check);
             qt.push(1);
             if(values[t].toLowerCase().includes(v.toLowerCase())){
             
@@ -613,7 +637,7 @@ const getData = (qty) => {
         }
 
 
-        resolve([products, categories, suppliers, ratings, qt]);
+        resolve([products, categories, suppliers, ratings, qt, date]);
       });
     });
  }
@@ -658,11 +682,11 @@ const getData = (qty) => {
     });
   }
 
-  const checkDate = (date) =>{
-    let next2weeks = new Date();
-    next2weeks.setDate(new Date().getDate()+14);
-    let tomorrow = new Date();
-    tomorrow.setDate(new Date().getDate());
+  const checkDate = async(date) =>{
+    let next2weeks = new Date(await todaydate());
+    next2weeks.setDate(new Date(await todaydate()).getDate()+14);
+    let tomorrow = new Date(await todaydate());
+    tomorrow.setDate(new Date(await todaydate()).getDate());
 
     if(date <= next2weeks && tomorrow <= date){
         return true;
@@ -739,8 +763,8 @@ const getChat = (num, id, func) =>{
   }
   
   const sendChat = ( id, mes) =>{
-    return new Promise((resolve, reject)=>{
-        data.ref("chat").child(id).push({message: mes, who: 'user', date: new Date().toString(), readbya: false, readbyu:true}).then((d)=>{
+    return new Promise(async(resolve, reject)=>{
+        data.ref("chat").child(id).push({message: mes, who: 'user', date: new Date(await todaydate()).toString(), readbya: false, readbyu:true}).then((d)=>{
             resolve(true);
         });
     });
@@ -877,8 +901,8 @@ const addAddress = (id, val) =>{
     });
 }
 const addComment= (id, message, user, rate, email, uid) =>{
-    return new Promise((resolve, reject)=>{
-        data.ref("products").child(id).child('comments').push({date: new Date().toString(), message: message, user: user, rating: rate, email: email, uid:uid}).then(()=>resolve(true));
+    return new Promise(async(resolve, reject)=>{
+        data.ref("products").child(id).child('comments').push({date: new Date(await todaydate()).toString(), message: message, user: user, rating: rate, email: email, uid:uid}).then(()=>resolve(true));
     });
 }
 
@@ -900,35 +924,42 @@ const getCartLength = (idnum) =>{
 }
 
 const getType = (type, seller, mid) =>{
-    return new Promise((resolve, reject)=>{
-        
+    return new Promise(async(resolve, reject)=>{
+        const tday = await todaydate();
+				
         new Promise((resolve, reject)=>{
             data.ref("products").orderByChild("type").equalTo(type).once('value', (snapshot)=>{
                 let x = [];
+                let date = [];
                 snapshot.forEach((snap)=>{
+                    const values = snap.val();
                     if(snap.key!==mid){
-                         x.push([snap.key, snap.val()]);
+                        const check = values.startD!==undefined || values.discount!==undefined || values.endD!==undefined?values.discount>0?(new Date(tday).toDateString()===new Date(values.startD).toDateString() || new Date(tday)>=new Date(values.startD)) && (new Date(tday) <= new Date(values.endD) || new Date(tday).toDateString() === new Date(values.endD).toDateString()):false:false;
+                        date.push(check);
+                         x.push([snap.key, values]);
                     }
                 });
-                resolve(x);
+                resolve([x, date]);
             });
         }).then((x)=>{
-            let arr = x;
+            let arr = x[0];
+            let date2 = x[1];
             new Promise((resolve, reject)=>{
                 data.ref("products").orderByChild("seller").equalTo(seller).once('value', (snapshot)=>{
                     let x = [];
+                   let date = [];
                     snapshot.forEach((snap)=>{
+                        const values = snap.val();
                         if(snap.key!==mid){
-                             x.push([snap.key, snap.val()]);
+                            const check = values.startD!==undefined || values.discount!==undefined || values.endD!==undefined?(new Date(tday).toDateString()===new Date(values.startD).toDateString() || new Date(tday)>=new Date(values.startD)) && (new Date(tday) <= new Date(values.endD) || new Date(tday).toDateString() === new Date(values.endD).toDateString()):false;
+                            date.push(check);
+                             x.push([snap.key, values]);
                         }
                     });
-                    resolve(x);
+                    resolve([x, date]);
                 });
             }).then((p)=>{
-                for (let d of p){
-                    arr.push(d);
-                }
-                resolve(arr);
+                resolve([arr.concat(p[0]), date2.concat(p[1])]);
             });
            
         });
@@ -938,9 +969,9 @@ const getType = (type, seller, mid) =>{
 
 const addAdvanceOrderList = (idn, key, set)=>{
     return new Promise((resolve, reject)=>{
-        data.ref("advorderlist").child(idn).orderByChild('key').equalTo(key).once('value', (snapshot)=>{
+        data.ref("advorderlist").child(idn).orderByChild('key').equalTo(key).once('value', async(snapshot)=>{
             if(snapshot.val()===null){
-                set["date"] = todaydate();
+                set["date"] = await todaydate();
                 set["amount"] = 1;
                 data.ref("advorderlist").child(idn).push(set).then(()=>{
                     resolve(true);
@@ -1031,8 +1062,8 @@ const getAllUnread = (id) =>{
 }
 
 
-const recLogin  = (id) =>{
-    data.ref("accounts").child(id).update({recent: new Date().toString()});
+const recLogin  = async(id) =>{
+    data.ref("accounts").child(id).update({recent: new Date(await todaydate()).toString()});
 }
 const getDatesz = () => {
     return new Promise(function (resolve, reject) {

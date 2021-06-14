@@ -84,7 +84,6 @@ const Chat = (props) =>{
                 <br/>
                 <form onSubmit={handleNewUserMessage}>
                 <div className="input-area">
-                    <button className="button" style={{color: '&#128206', width: '50px', borderRadius: '5px', fontSize: '20px'}}>&#x1F4CE;</button>  &nbsp;
                     <input type="text" className="form-control" id='chatsss' onClick={()=>readAll(props.idnum, num)} onChange={(e)=>{readAll(props.idnum, num); setVal(e.target.value)}} placeholder="Type here ..."/>
                     <button className="submit" style={{color: 'black', backgroundColor: '#eef04d'}}> <i className="material-icons"> send</i></button>
                     

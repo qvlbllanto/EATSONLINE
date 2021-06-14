@@ -1,7 +1,7 @@
 
 import React, {useState} from 'react';
 import { useHistory, Link } from "react-router-dom";
-import {getDateforCart, updateCartData, checkCart, checkPasswordIfCorrect, removeAllCart, addLogs,  getCartData, buyItems,  updateCart,  NumberFormat, getAccountDetails, checkDate, Reservation} from "./functions.js";
+import {todaydate, getDateforCart, updateCartData, checkCart, checkPasswordIfCorrect, removeAllCart, addLogs,  getCartData, buyItems,  updateCart,  NumberFormat, getAccountDetails, checkDate, Reservation} from "./functions.js";
 import {cyrb53} from "./encdec.js";
 import TopSide from "../components/TopSide.js";
 import { set } from 'animejs';
@@ -29,6 +29,7 @@ const Cart = (props)=>{
     const [itemstoadv, setItemstoadv] = useState([]);
     const [codoradv, setCodoradv] = useState(null);
     const [mes, setMes] = useState([false, null]);
+    const [dch, setDch] = useState([]);
     React.useEffect(()=>{
         if(!ch){
             props.setP("Cart");
@@ -38,21 +39,28 @@ const Cart = (props)=>{
             let checkedBoxes = document.getElementsByName("color")
             console.log(checkedBoxes);
         }
-    const timer = setTimeout(() => {
-        getCartData(props.idnum).then((x) =>{
+    const timer = setTimeout(async() => {
+        getCartData(props.idnum).then(async(x) =>{
             setCart(x);
             updateStock(x);
-            let num = 0;
-            let totalcartamt = 0;
-            for (let i of cart) {
-                if(checkboxes.includes(i[0])){
-                    num+=Number(i[1].price)*i[1].amount;
-                }
-                totalcartamt+=Number(i[1].price)*i[1].amount;
-            }
-            setTotalamt(Number(totalcartamt).toFixed(2));
-            setAmount(Number(num).toFixed(2));
+            
+          
         });
+        const tday = await todaydate();
+        let num = 0;
+        let totalcartamt = 0;
+        let dc = [];
+        for (let i of cart) {
+            const check = i[1].startD!==undefined || i[1].discount!==undefined || i[1].endD!==undefined?i[1].discount>0?(new Date(tday).toDateString()===new Date(i[1].startD).toDateString() || new Date(tday)>=new Date(i[1].startD)) && (new Date(tday) <= new Date(i[1].endD) || new Date(tday).toDateString() === new Date(i[1].endD).toDateString()):false:false;
+            dc.push(check);
+            if(checkboxes.includes(i[0])){
+                num+=check?Number(i[1].price-(i[1].price*(i[1].discount/100)))*i[1].amount:Number(i[1].price)*i[1].amount;
+            }
+            totalcartamt+=check?Number(i[1].price-(i[1].price*(i[1].discount/100)))*i[1].amount:Number(i[1].price)*i[1].amount;
+        }
+        setDch(dc);
+        setTotalamt(Number(totalcartamt).toFixed(2));
+        setAmount(Number(num).toFixed(2));
         getDateforCart(cart).then((d)=>{
             setDateCart(d);
         })
@@ -102,15 +110,17 @@ const Cart = (props)=>{
         }
     }
     const countMoneyNotInDB = (c) =>{
-        return new Promise((resolve, reject)=>{
+        return new Promise(async(resolve, reject)=>{
             let x=c;
             let num = 0;
             let totalcartamt = 0;
+            const tday = await todaydate();
             for (let i in x) {
+                const check = x[i][1].startD!==undefined || x[i][1].discount!==undefined || x[i][1].endD!==undefined?x[i][1].discount>0?(new Date(tday).toDateString()===new Date(x[i][1].startD).toDateString() || new Date(tday)>=new Date(x[i][1].startD)) && (new Date(tday) <= new Date(x[i][1].endD) || new Date(tday).toDateString() === new Date(x[i][1].endD).toDateString()):false:false;
                 if(checkboxes.includes(x[i][0])){
-                num+=Number(x[i][1].price)*x[i][1].amount;
+                num+=check?Number(x[i][1].price-(x[i][1].price*(x[i][1].discount/100)))*x[i][1].amount:Number(x[i][1].price)*x[i][1].amount;
                 }
-                totalcartamt+=Number(x[i][1].price)*x[i][1].amount;
+                totalcartamt+=check?Number(x[i][1].price-(x[i][1].price*(x[i][1].discount/100)))*x[i][1].amount:Number(x[i][1].price)*x[i][1].amount;
             }
             setTotalamt(Number(totalcartamt).toFixed(2));
             resolve(Number(num).toFixed(2));
@@ -137,10 +147,6 @@ const Cart = (props)=>{
         x = await Promise.all(x);
         return(arrayRemove(x, null));
     }
-    const checkifHigh = () =>{
-        let x = cart.map((d)=>checkboxes.includes(d[0])?higherthan.includes(d[1].key)?d[1].title:null:null);
-        return(arrayRemove(x, null));
-    }
     const buyNow = () =>{
         return new Promise(async(reso, reje)=>{
                 const v = await checkifHighRepeat2();
@@ -151,14 +157,16 @@ const Cart = (props)=>{
                         x1 = codoradv
                     }
                      if(cart.length!==0){
-                        new Promise((resolve, reject)=>{
+                        new Promise(async(resolve, reject)=>{
                             let x = [];
                             let x2 = {};
                             let ch = false;
                             let valuarr = [];
+                            const tday = await todaydate();
                             for(let v of cart){
                                 if(checkboxes.includes(v[0])){
-                                    
+                                    const check = v[1].startD!==undefined || v[1].discount!==undefined || v[1].endD!==undefined?v[1].discount>0?(new Date(tday).toDateString()===new Date(v[1].startD).toDateString() || new Date(tday)>=new Date(v[1].startD)) && (new Date(tday) <= new Date(v[1].endD) || new Date(tday).toDateString() === new Date(v[1].endD).toDateString()):false:false;
+                                    v[1]["price"] = check?Number(v[1].price-(v[1].price*(v[1].discount/100))).toFixed(2):v[1].price;
                                     if(res){
                                         v[1]["date"] = checkIfDateinA(v[0], cDate[v[0]])>0?cDate[v[0]]:null;
                                         v[1]["status"] = "Pending";
@@ -257,7 +265,6 @@ const Cart = (props)=>{
                     let values = val;
                     values[1]["date"] = checkIfDateinA(values[0], dateOfExc[values[0]])>0?dateOfExc[values[0]]:null;
                     values[1]["status"] = "Pending";
-                   
                     if(values[1]["date"]!==null){
                         newv.push(values);
                     }else{
@@ -339,14 +346,17 @@ const Cart = (props)=>{
                 x1 = codoradv
             }
                 if(cart.length!==0){
-                new Promise((resolve, reject)=>{
+                new Promise(async(resolve, reject)=>{
                     let x = [];
                     let x2 = {};
                     let count = 0;
                     let toBeAdvanceval = new Array();
+                    const tday = await todaydate();
                     let advamount = 0;
                     for(let v of cart){
                         if(checkboxes.includes(v[0])){
+                            const check = v[1].startD!==undefined || v[1].discount!==undefined || v[1].endD!==undefined?v[1].discount>0?(new Date(tday).toDateString()===new Date(v[1].startD).toDateString() || new Date(tday)>=new Date(v[1].startD)) && (new Date(tday) <= new Date(v[1].endD) || new Date(tday).toDateString() === new Date(v[1].endD).toDateString()):false:false;
+                            v[1]["price"] = check?Number(v[1].price-(v[1].price*(v[1].discount/100))).toFixed(2):v[1].price;
                             if(v[1].amount > itemQty[count]){
                                 let newval = {};
                                 let remaining = v[1].amount - itemQty[count];
@@ -731,7 +741,8 @@ const Cart = (props)=>{
                                                          <p className="mb-2">Supplier: {d[1].seller}</p>
                                                          <p className="mb-2">Type: {d[1].type}</p>
                                                          <p className="mb-2">Stock: {itemQty[index]} </p>
-                                                         <p className="mb-3">Price: <span style={{fontSize: '15px'}}>₱</span>{NumberFormat(Number(d[1].price).toFixed(2))}</p>
+                                                         {dch[index]?<p style={{color: 'red', fontStyle:'italic', fontWeight: 'bold'}}>Discount: {d[1].discount}% Off</p>:null}
+                                                         {dch[index]?<div><p>Old Price: ₱{NumberFormat(Number(d[1].price).toFixed(2))}</p><p><strong>New Price: ₱{NumberFormat(Number(d[1].price-(d[1].price*(d[1].discount/100))).toFixed(2))}</strong></p></div>:<p><strong>Price: ₱{NumberFormat(Number(d[1].price).toFixed(2))}</strong></p>}
                                                          <select className="form-control alterationTypeSelect" id={d[0]+d[1].title} style={{width: '60%', height: '35px'}} readOnly={true}>
                                                          <option readOnly={true} selected disabled>Check for available dates</option>
                                                             {datecart.map((d2, ib)=>
@@ -787,7 +798,7 @@ const Cart = (props)=>{
                                                     <tr key={index}>
                                                         <td data-label="Name">{d[1].title} </td>
                                                         <td data-label="Qty" >{d[1].amount}</td>
-                                                        <td data-label="Price"><span id="total_cart_amt"><span style={{fontSize: '15px'}}>₱</span>{NumberFormat(Number(Number(d[1].price)*d[1].amount).toFixed(2))}</span></td>
+                                                        <td data-label="Price">{dch[index]?<span id="total_cart_amt"><span style={{fontSize: '15px'}}>₱</span>{NumberFormat(Number(d[1].price-(d[1].price*(d[1].discount/100))).toFixed(2))}</span>:<span id="total_cart_amt"><span style={{fontSize: '15px'}}>₱</span>{NumberFormat(Number(Number(d[1].price)*d[1].amount).toFixed(2))}</span>}</td>
                                                     </tr>:null);
                                                     })}
                                                     </tbody>
@@ -900,7 +911,7 @@ const Cart = (props)=>{
                                 <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
                                     <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
                                     <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Phone:</strong> 09157483872<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'black'}}>Email: </strong> eats.onlne@gmail.com<br></br>
                                 </p>
                                 <div className="social-links mt-3">
                                     <a href="#hero" className="facebook"><i className="bx bxl-facebook"></i></a>

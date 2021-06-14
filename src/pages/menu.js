@@ -2,7 +2,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { useHistory, Link } from "react-router-dom";
-import {getDatesz, checkifincart, addLogs, getData,getData2, waitloop, NumberFormat, addCart} from "./functions.js"
+import {todaydate, getDatesz, checkifincart, addLogs, getData,getData2, waitloop, NumberFormat, addCart} from "./functions.js"
 import anime, { set } from "animejs";
 import MenuDetails from "./menu-details";
 import TopSide from "../components/TopSide.js"
@@ -27,6 +27,7 @@ const Menu = (props) =>{
 	const [ty, setTy] = useState(null);
 	const [incart, setInCart] = useState(null);
 	const [dates, setDates] = useState([]);
+	const [chforD, setchforD] = useState([]);
     React.useEffect(()=>{
         if(!ch){
 			props.setP("Menu");
@@ -65,7 +66,7 @@ const Menu = (props) =>{
 				setCategory(data[1]);
 				setInCart(await checkifincart(data[0], props.idnum));
 				setProducts(data[0]);
-				
+				setchforD(data[5]);
 				setSuppliers(data[2]);
 				setRate(data[3]);
 				setQty(data[4]);
@@ -87,7 +88,7 @@ const Menu = (props) =>{
 					setVal(data[0]);
 					setRate(data[3]);
 					setQty(data[4]);
-					
+					setchforD(data[5]);
 					setFalse().then(()=>{
 						for(let i=0; i<6;i++){
 							try{
@@ -228,9 +229,9 @@ const Menu = (props) =>{
 	  const goLogin = () =>{
         history.push('/login');
       }
-	 const addProdtoCart = (menuid, title, price, desc, link, seller, type, id, qty) => {
+	 const addProdtoCart = (menuid, title, price, desc, link, seller, type, id, qty, discount, startD, endD) => {
         if(props.logedin){
-           addCart(menuid, title, price, desc, link, props.idnum, seller, type, id, qty);
+           addCart(menuid, title, price, desc, link, props.idnum, seller, type, id, qty, discount, startD, endD);
 				
         }else{
             goLogin();
@@ -250,6 +251,7 @@ const Menu = (props) =>{
 		setFalse().then(()=>{
 			setQty([]);
 			setVal([]);
+			setchforD([]);
 			setProducts([]);
 			setClicked(false);
 			setIndexOfList(6); 
@@ -281,7 +283,7 @@ const Menu = (props) =>{
 	}
     return (
 		<div>
-			<TopSide right={false} first="Our " second="Menu" desc="Your One-stop shop for Regional delicacies" img={["./assets/img/0 NEW SLIDER/Menu.png"]}/>
+			<TopSide right={false} first="Our " second="Menu" desc="Your One-stop Shop for Regional Delicacies!" img={["./assets/img/0 NEW SLIDER/Menu.png"]}/>
 		{/* <section id="home_hero" className="d-flex align-items-center">
 		
 		<div id="myCarouel" className="fullscreen carousel slide " data-ride="carousel">
@@ -404,10 +406,14 @@ const Menu = (props) =>{
 								<div className="product-image-wrapper" style={{borderWidth: '4px',  borderColor: 'black', borderRadius: '10px'}}>
 									<div className="single-products">
 											<div className="productinfo text-center" >
-												<img src={d[1].link} alt={d[1].link} style={{width: '100%', height: '230px'}}/>
+												<div className="ribbon-wrapper">
+												{chforD[startOfList+i]?<div className="ribbon">{d[1].discount} % Off</div>:null}
+													<img src={d[1].link} alt={d[1].link} style={{width: '100%', height: '230px'}}/>
+												</div>
 												<h2>{d[1].title}</h2>
 												<p>By: {d[1].seller}</p>
 												<p>Category: {d[1].type}</p>
+												
 												<p style={{fontSize: '14px'}}>Stock: <span style={parseInt(d[1].numberofitems)<=0?{fontWeight: 'bold'}:null}>{parseInt(d[1].numberofitems)!==0?d[1].numberofitems:'For Advanced Order'}</span></p>
 												<select className="form-control alterationTypeSelect" style={{width: '90%', height: '35px', marginLeft:'5%', marginRight:'5%'}}>
 												<option selected disabled >Check for available Dates</option>
@@ -419,7 +425,10 @@ const Menu = (props) =>{
 											<div className="product-overlay">
 												<div className="overlay-content">
 													<h2>{d[1].description}</h2>
-													<p>₱{NumberFormat(Number(d[1].price).toFixed(2))}</p>
+													<div className="ribbon-wrapper-over">
+													{chforD[startOfList+i]?<div className="ribbon-over">{d[1].discount}% Off</div>:null}
+													</div>
+													{chforD[startOfList+i]?<div><p>Old Price ₱{NumberFormat(Number(d[1].price).toFixed(2))}</p><p><strong>New Price: ₱{NumberFormat(Number(d[1].price-(d[1].price*(d[1].discount/100))).toFixed(2))}</strong></p></div>:<p> ₱{NumberFormat(Number(d[1].price).toFixed(2))}</p>}
 													<a onClick={(e)=>goDetails(d[0],d[1].type, d[1].seller)} className="btn btn-default add-to-cart" style={{borderRadius: '50px'}}><i className="fa fa-shopping-cart"></i>View</a>
 												</div>
 											</div>
@@ -443,7 +452,7 @@ const Menu = (props) =>{
 										</div>:<p style={{fontSize: '15px', fontWeight:'bold'}}>THIS PRODUCT IS ALREADY IN YOUR CART</p>}
 										
 									<div className="text-center" >
-									{!incart[startOfList+i]?<a onClick={(e)=>addProdtoCart(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id, qty[startOfList+i])} className="btn btn-default" style={{borderRadius: '50px', marginBottom: '40px',  fontSize: '15px' ,position: 'relative'}}><i className="fa fa-shopping-cart"></i>Add to Cart</a>:null}
+									{!incart[startOfList+i]?<a onClick={(e)=>addProdtoCart(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id, qty[startOfList+i], d[1].discount!==undefined?d[1].discount:null, d[1].startD!==undefined?d[1].startD:null, d[1].endD!==undefined?d[1].endD:null)} className="btn btn-default" style={{borderRadius: '50px', marginBottom: '40px',  fontSize: '15px' ,position: 'relative'}}><i className="fa fa-shopping-cart"></i>Add to Cart</a>:null}
 									</div>
 
 									<div className="choose" >
@@ -476,10 +485,15 @@ const Menu = (props) =>{
 									<div className="product-image-wrapper" style={{borderWidth: '1px',  borderColor: 'black', borderRadius: '10px'}}>
 										<div className="single-products">
 												<div className="productinfo text-center" >
-												<img src={d[1].link} alt="" style={{width: '100%',   height: '230px'}}/>
+												<div class="ribbon-wrapper">
+												{chforD[startOfList+i]?<div class="ribbon">{d[1].discount} %</div>:null}
+													
+												</div>
+												<img src={d[1].link} alt={d[1].link} style={{width: '100%', height: '230px'}}/>
 												<h2>{d[1].title}</h2>
 												<p>By: {d[1].seller}</p>
 												<p>Category: {d[1].type}</p>
+												
 												<p style={{fontSize: '14px', fontWeight:'bold'}}>Stock: {parseInt(d[1].numberofitems)!==0?d[1].numberofitems:'0 Stock!'}</p>
 												<select className="form-control alterationTypeSelect" style={{width: '90%', height: '35px', marginLeft:'5%', marginRight:'5%'}}>
 												<option selected disabled >Check for available Dates</option>
@@ -492,7 +506,8 @@ const Menu = (props) =>{
 											<div className="product-overlay">
 												<div className="overlay-content">
 													<h2>{d[1].description}</h2>
-													<p>₱{NumberFormat(Number(d[1].price).toFixed(2))}</p>
+													{chforD[startOfList+i]?<p>Discount: {d[1].discount}%</p>:null}
+													{chforD[startOfList+i]?<div><p>Old Price ₱{NumberFormat(Number(d[1].price).toFixed(2))}</p><p><strong>New Price: ₱{NumberFormat(Number(d[1].price-(d[1].price*(d[1].discount/100))).toFixed(2))}</strong></p></div>:<p> ₱{NumberFormat(Number(d[1].price).toFixed(2))}</p>}
 													<a onClick={(e)=>goDetails(d[0],d[1].type, d[1].seller)} className="btn btn-default add-to-cart" style={{borderRadius: '50px'}}><i className="fa fa-shopping-cart"></i>View</a>
 													</div>
 											</div>
@@ -516,7 +531,7 @@ const Menu = (props) =>{
 												</ul>
 										</div>	:<p style={{fontSize: '15px', fontWeight:'bold'}}>THIS PRODUCT IS ALREADY IN YOUR CART</p>}
 									<div className="text-center">
-									{!incart[startOfList+i]?<a onClick={(e)=>addProdtoCart(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id,  qty[startOfList+i])} className="btn btn-default" style={{borderRadius: '50px', marginBottom: '40px',  fontSize: '15px' ,position: 'relative'}}><i className="fa fa-shopping-cart"></i>Add to Cart</a>:null}
+									{!incart[startOfList+i]?<a onClick={(e)=>addProdtoCart(d[0], d[1].title, d[1].price, d[1].description, d[1].link, d[1].seller, d[1].type, d[1].id,  qty[startOfList+i], d[1].discount!==undefined?d[1].discount:null, d[1].startD!==undefined?d[1].startD:null, d[1].endD!==undefined?d[1].endD:null)} className="btn btn-default" style={{borderRadius: '50px', marginBottom: '40px',  fontSize: '15px' ,position: 'relative'}}><i className="fa fa-shopping-cart"></i>Add to Cart</a>:null}
 									</div>
 									<div className="choose" >
 									<h5><a href="#">Ratings: ({startOfList+i<rate.length?rate[startOfList+i][1]: 0})</a></h5>
@@ -568,7 +583,7 @@ const Menu = (props) =>{
                                 <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'white'}}>Location:</strong> 19, Via Milano St., Villa Firenze, Quezon City, Philippines <br></br>
                                     <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'white'}}>Open Hours:</strong> Monday-Saturday: 9:00 AM-5:00 PM<br></br>
                                     <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'white'}}>Phone:</strong> 09157483872<br></br>
-                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'white'}}>Email: </strong> EATSONLINE.2021@gmail.com<br></br>
+                                    <strong style={props.legitkey===true && props.logedin===true && props.idnum!==null?null:{color: 'white'}}>Email: </strong> eats.onlne@gmail.com<br></br>
                                 </p>
                                 <div className="social-links mt-3">
 									<a href="#hero" className="facebook"><i className="bx bxl-facebook"></i></a>
